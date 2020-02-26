@@ -1,0 +1,473 @@
+@charset "UTF-8";
+/* 页面左右间距 */
+/* 文字尺寸 */
+/*文字颜色*/
+/* 边框颜色 */
+/* 图片加载中颜色 */
+/* 行为相关颜色 */
+.mp-header-box {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 9999;
+  width: 750rpx;
+  height: 148rpx;
+  background: #fff;
+}
+.mp-header-box .search-box {
+    padding: 16rpx 30rpx;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    width: 750rpx;
+    height: 88rpx;
+    background-color: #fff;
+    position: relative;
+    left: 0;
+    top: 0;
+    z-index: 9;
+}
+.mp-header-box .search-box .logoWrap {
+      width: 138rpx;
+      height: 56rpx;
+      padding: 8rpx 0;
+      margin-right: 20rpx;
+}
+.mp-header-box .search-box .logoWrap .logo {
+        width: 138rpx;
+        height: 40rpx;
+        background-image: url(//yanxuan-static.nosdn.127.net/hxm/yanxuan-wap/p/20161201/style/img/icon-normal/indexLogo-a90bdaae6b.png?imageView&type=webp);
+        background-size: 138rpx 40rpx;
+}
+.mp-header-box .search-box .ser-input {
+      -webkit-box-flex: 1;
+      -webkit-flex: 1;
+              flex: 1;
+      width: 442rpx;
+      height: 56rpx;
+      line-height: 56rpx;
+      text-align: center;
+      font-size: 28rpx;
+      color: #666;
+      border-radius: 5px;
+      background: #ededed;
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
+              align-items: center;
+      -webkit-box-pack: center;
+      -webkit-justify-content: center;
+              justify-content: center;
+}
+.mp-header-box .search-box .ser-input .search-icon {
+        margin: 20rpx 10rpx 0 0;
+        font-size: 14rpx;
+}
+.mp-header-box .search-box .loginbtn {
+      width: 74rpx;
+      height: 40rpx;
+      margin: 8rpx 0 8rpx 16rpx;
+      border-radius: 6rpx;
+      border: 1px solid #dd1a21;
+      text-align: center;
+      line-height: 38rpx;
+      font-size: 24rpx;
+      color: #dd1a21;
+}
+.mp-header-box .tab-box {
+    width: 750rpx;
+    height: 60rpx;
+    position: relative;
+}
+.mp-header-box .tab-box .scroll-box {
+      width: 650rpx;
+      height: 60rpx;
+}
+.mp-header-box .tab-box .scroll-box .scroll-view {
+        background-color: #567;
+        height: 60rpx;
+        width: 1460rpx;
+        padding: 0 30rpx;
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-flex-wrap: nowrap;
+                flex-wrap: nowrap;
+}
+.mp-header-box .tab-box .scroll-box .scroll-view .scroll-view-item {
+          display: inline-block;
+          line-height: 60rpx;
+          padding: 0 16rpx;
+          font-size: 28rpx;
+          color: #333;
+          margin-left: 20rpx;
+          position: relative;
+}
+.mp-header-box .tab-box .scroll-box .scroll-view .scroll-view-item:first-child {
+            margin-left: 0;
+}
+.mp-header-box .tab-box .scroll-box .scroll-view .scroll-view-item.active {
+            color: #dd1a21;
+}
+.mp-header-box .tab-box .scroll-box .scroll-view .scroll-view-item.active::after {
+              display: block;
+              content: '';
+              width: 100%;
+              height: 4rpx;
+              position: absolute;
+              left: 0;
+              bottom: 0;
+              background: #dd1a21;
+}
+.mp-header-box .tab-box .toggleWrap {
+      width: 160rpx;
+      height: 60rpx;
+      position: absolute;
+      right: 0;
+      top: 0;
+      z-index: 5;
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+}
+.mp-header-box .tab-box .toggleWrap .white {
+        width: 60rpx;
+        height: 60rpx;
+        background-image: -webkit-linear-gradient(left, rgba(255, 255, 255, 0) 0, #fff 100%);
+        background-image: linear-gradient(to right, rgba(255, 255, 255, 0) 0, #fff 100%);
+}
+.mp-header-box .tab-box .toggleWrap .toggle {
+        width: 100rpx;
+        height: 60rpx;
+        text-align: center;
+        background: #fff;
+        position: relative;
+        z-index: 9;
+}
+.mp-header-box .tab-box .toggleWrap .toggle.active {
+          -webkit-transform: rotate(180deg);
+                  transform: rotate(180deg);
+}
+.mp-header-box .tab-box .toggleWrap .toggle .icon {
+          width: 30rpx;
+          height: 30rpx;
+          background-image: url(//yanxuan-static.nosdn.127.net/hxm/yanxuan-wap/p/20161201/style/img/icon-normal/arrow-down-3-9b31adfa37.png?imageView&type=webp);
+          background-size: 30rpx 30rpx;
+          margin: 15rpx 35rpx;
+}
+.mp-header-box .tab-box .toggleWrap .extend {
+        width: 750rpx;
+        height: 372rpx;
+        background-color: #fff;
+        position: absolute;
+        right: 0;
+        top: 0;
+        display: none;
+}
+.mp-header-box .tab-box .toggleWrap .extend.extendActive {
+          display: block;
+}
+.mp-header-box .tab-box .toggleWrap .extend .tabalter {
+          width: 750rpx;
+          height: 60rpx;
+          padding-left: 30rpx;
+          font-size: 28rpx;
+          color: #333;
+          line-height: 60rpx;
+}
+.mp-header-box .tab-box .toggleWrap .extend .alltabs {
+          width: 750rpx;
+          height: 312rpx;
+          padding-top: 24rpx;
+}
+.mp-header-box .tab-box .toggleWrap .extend .alltabs .tab-item {
+            display: inline-block;
+            width: 150rpx;
+            height: 56rpx;
+            border: 1px solid #ccc;
+            margin: 0 0 40rpx 30rpx;
+            color: #333;
+            font-size: 24rpx;
+            background-color: #fafafa;
+            text-align: center;
+            line-height: 54rpx;
+            border-radius: 4rpx;
+}
+.mp-header-box .tab-box .toggleWrap .extend .alltabs .tab-item.active {
+              color: #dd1a21;
+              border-color: #dd1a21;
+}
+.mp-header-box .tab-box .mask {
+      width: 750rpx;
+      height: 1334rpx;
+      background-color: rgba(0, 0, 0, 0.5);
+      position: absolute;
+      top: -88rpx;
+      left: 0;
+      z-index: 1;
+      display: none;
+}
+.mp-header-box .tab-box .mask.maskActive {
+        display: block;
+}
+/*
+page{
+	.cate-section{
+		position:relative;
+		z-index:5;
+		border-radius:16upx 16upx 0 0;
+		margin-top:-20upx;
+	}
+	.carousel-section{
+		padding: 0;
+		.titleNview-placing {
+			padding-top: 0;
+			height: 0;
+		}
+		.carousel{
+			.carousel-item{
+				padding: 0;
+			}
+		}
+		.swiper-dots{
+			left:45upx;
+			bottom:40upx;
+		}
+	}
+}
+*/
+page {
+  background: #f5f5f5;
+}
+.m-t {
+  margin-top: 16rpx;
+}
+/* 中间部分 */
+.mp-main-box {
+  margin-top: 148rpx;
+  /* 头部 轮播图 */
+  /* 特征 */
+  /* 分类 */
+  /* 图片广告 */
+  /* 新人专享礼 */
+}
+.mp-main-box .uni-padding-wrap {
+    width: 750rpx;
+    height: 300rpx;
+}
+.mp-main-box .uni-padding-wrap .page-section-spacing .swiper .swiperPic {
+      width: 750rpx;
+      height: 300rpx;
+}
+.mp-main-box .charact {
+    width: 750rpx;
+    height: 72rpx;
+    padding: 0 30rpx;
+    background: #fff;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+            justify-content: space-between;
+}
+.mp-main-box .charact .charactItem {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
+              align-items: center;
+}
+.mp-main-box .charact .charactItem image {
+        width: 32rpx;
+        height: 32rpx;
+}
+.mp-main-box .charact .charactItem .text {
+        font-size: 24rpx;
+        color: #333;
+        margin-left: 8rpx;
+}
+.mp-main-box .cate-section {
+    width: 750rpx;
+    height: 341rpx;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-justify-content: space-around;
+            justify-content: space-around;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+            align-items: center;
+    -webkit-flex-wrap: wrap;
+            flex-wrap: wrap;
+    background: #fff;
+}
+.mp-main-box .cate-section .cate-item {
+      width: 110rpx;
+      height: 156rpx;
+      margin: 10rpx 20rpx 9rpx;
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      -webkit-flex-direction: column;
+              flex-direction: column;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
+              align-items: center;
+      font-size: 24rpx;
+      color: #333;
+      /* 原图标颜色太深:不想改图了:所以加了透明度 */
+}
+.mp-main-box .cate-section .cate-item image {
+        width: 110rpx;
+        height: 110rpx;
+}
+.mp-main-box .cate-section .cate-item text {
+        display: inline-block;
+        height: 36rpx;
+        width: 110rpx;
+        margin-top: 10rpx;
+        text-align: center;
+}
+.mp-main-box .ad-1 {
+    width: 750rpx;
+    height: 240rpx;
+    background: url(https://yanxuan.nosdn.127.net/8115886c8e4311bd0a9851dae194ebed.gif?imageView&quality=75);
+    background-size: 100% 100%;
+    position: relative;
+}
+.mp-main-box .ad-1 .ad-1-pic {
+      width: 168rpx;
+      height: 168rpx;
+      position: absolute;
+      left: 76rpx;
+      top: 35rpx;
+}
+.mp-main-box .ad-1 .ad-1-pic image {
+        width: 168rpx;
+        height: 168rpx;
+}
+.mp-main-box .ad-1 .ad-1-pic .price {
+        width: 152rpx;
+        height: 32rpx;
+        border-radius: 16rpx;
+        background: #f48f18;
+        color: #fff;
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-align: center;
+        -webkit-align-items: center;
+                align-items: center;
+        -webkit-box-pack: center;
+        -webkit-justify-content: center;
+                justify-content: center;
+        position: absolute;
+        left: 8rpx;
+        bottom: 10rpx;
+}
+.mp-main-box .ad-1 .ad-1-pic .price text {
+          font-size: 20rpx;
+}
+.mp-main-box .ad-1 .ad-1-pic .price ._s {
+          font-size: 16rpx;
+}
+.mp-main-box .ad-2 {
+    width: 750rpx;
+    height: 180rpx;
+    padding: 20rpx 20rpx 0;
+    background: #67a560 url(https://yanxuan.nosdn.127.net/0052ade75d710bff45322e9b2e590d14.gif?imageView&quality=75);
+    background-size: 710rpx 160rpx;
+    background-repeat: no-repeat;
+    background-position: 20rpx 20rpx;
+}
+.mp-main-box .ad-3 {
+    width: 750rpx;
+    height: 236rpx;
+    padding: 8rpx 20rpx;
+    background: #67a560;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-justify-content: space-around;
+            justify-content: space-around;
+}
+.mp-main-box .ad-3 .ad-3-item {
+      width: 230rpx;
+      height: 220rpx;
+      background: url(https://yanxuan.nosdn.127.net/c5a17762a9e287a3ce779204a7916703.png?quality=75&type=webp&imageView&thumbnail=250x0);
+      background-size: 230rpx 220rpx;
+}
+.mp-main-box .ad-3 .ad-3-item .title {
+        color: #333;
+        font-size: 24rpx;
+        text-align: center;
+        font-weight: bold;
+        margin-top: 10rpx;
+}
+.mp-main-box .ad-3 .ad-3-item .desc {
+        color: #208a42;
+        font-size: 20rpx;
+        text-align: center;
+        margin-top: 5rpx;
+}
+.mp-main-box .ad-3 .ad-3-item image {
+        width: 140rpx;
+        height: 140rpx;
+        margin: 5rpx 40rpx 0;
+}
+.mp-main-box .ad-4 {
+    width: 750rpx;
+    height: 100rpx;
+    padding: 0 20rpx 20rpx;
+    background: #67a560 url(https://yanxuan.nosdn.127.net/ba0ae82c90f533c74535cd65c043be34.png?quality=75&type=webp&imageView&thumbnail=750x0);
+    background-size: 710rpx 80rpx;
+    background-repeat: no-repeat;
+    background-position: 20rpx 0;
+}
+/* 底部 */
+.bottomContainer {
+  width: 100%;
+  height: 122px;
+  margin-bottom: 50px;
+  padding: 27px 10px 14px;
+  box-sizing: border-box;
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+  background-color: #414141;
+}
+.bottomContainer .bottom {
+    width: 100%;
+    height: 81px;
+}
+.bottomContainer .bottom .down {
+      padding: 0 76px;
+}
+.bottomContainer .bottom .down navigator {
+        display: inline-block;
+        width: 86px;
+        height: 31px;
+        border: 1px solid #999;
+        border-radius: 4px;
+        color: #ffffff;
+        text-align: center;
+        line-height: 29px;
+}
+.bottomContainer .bottom .down navigator:first-child {
+          margin-right: 25px;
+}
+.bottomContainer .bottom .copyright {
+      margin-top: 13px;
+}
+.bottomContainer .bottom .copyright ._p {
+        color: #999;
+        text-align: center;
+        line-height: 14px;
+        font-size: 12px;
+        padding: 2px;
+}
+
