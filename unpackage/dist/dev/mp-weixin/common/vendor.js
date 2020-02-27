@@ -1,6 +1,6 @@
-(global["webpackJsonp"] = global["webpackJsonp"] || []).push([["common/vendor"],[
-/* 0 */,
-/* 1 */
+(global["webpackJsonp"] = global["webpackJsonp"] || []).push([["common/vendor"],{
+
+/***/ 1:
 /*!************************************************************!*\
   !*** ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js ***!
   \************************************************************/
@@ -1550,7 +1550,1772 @@ var uni$1 = uni;var _default =
 uni$1;exports.default = _default;
 
 /***/ }),
-/* 2 */
+
+/***/ 10:
+/*!********************************************!*\
+  !*** ./node_modules/vuex/dist/vuex.esm.js ***!
+  \********************************************/
+/*! exports provided: Store, install, mapState, mapMutations, mapGetters, mapActions, createNamespacedHelpers, default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Store", function() { return Store; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "install", function() { return install; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mapState", function() { return mapState; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mapMutations", function() { return mapMutations; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mapGetters", function() { return mapGetters; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mapActions", function() { return mapActions; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createNamespacedHelpers", function() { return createNamespacedHelpers; });
+/**
+ * vuex v3.0.1
+ * (c) 2017 Evan You
+ * @license MIT
+ */
+var applyMixin = function (Vue) {
+  var version = Number(Vue.version.split('.')[0]);
+
+  if (version >= 2) {
+    Vue.mixin({ beforeCreate: vuexInit });
+  } else {
+    // override init and inject vuex init procedure
+    // for 1.x backwards compatibility.
+    var _init = Vue.prototype._init;
+    Vue.prototype._init = function (options) {
+      if ( options === void 0 ) options = {};
+
+      options.init = options.init
+        ? [vuexInit].concat(options.init)
+        : vuexInit;
+      _init.call(this, options);
+    };
+  }
+
+  /**
+   * Vuex init hook, injected into each instances init hooks list.
+   */
+
+  function vuexInit () {
+    var options = this.$options;
+    // store injection
+    if (options.store) {
+      this.$store = typeof options.store === 'function'
+        ? options.store()
+        : options.store;
+    } else if (options.parent && options.parent.$store) {
+      this.$store = options.parent.$store;
+    }
+  }
+};
+
+var devtoolHook =
+  typeof window !== 'undefined' &&
+  window.__VUE_DEVTOOLS_GLOBAL_HOOK__;
+
+function devtoolPlugin (store) {
+  if (!devtoolHook) { return }
+
+  store._devtoolHook = devtoolHook;
+
+  devtoolHook.emit('vuex:init', store);
+
+  devtoolHook.on('vuex:travel-to-state', function (targetState) {
+    store.replaceState(targetState);
+  });
+
+  store.subscribe(function (mutation, state) {
+    devtoolHook.emit('vuex:mutation', mutation, state);
+  });
+}
+
+/**
+ * Get the first item that pass the test
+ * by second argument function
+ *
+ * @param {Array} list
+ * @param {Function} f
+ * @return {*}
+ */
+/**
+ * Deep copy the given object considering circular structure.
+ * This function caches all nested objects and its copies.
+ * If it detects circular structure, use cached copy to avoid infinite loop.
+ *
+ * @param {*} obj
+ * @param {Array<Object>} cache
+ * @return {*}
+ */
+
+
+/**
+ * forEach for object
+ */
+function forEachValue (obj, fn) {
+  Object.keys(obj).forEach(function (key) { return fn(obj[key], key); });
+}
+
+function isObject (obj) {
+  return obj !== null && typeof obj === 'object'
+}
+
+function isPromise (val) {
+  return val && typeof val.then === 'function'
+}
+
+function assert (condition, msg) {
+  if (!condition) { throw new Error(("[vuex] " + msg)) }
+}
+
+var Module = function Module (rawModule, runtime) {
+  this.runtime = runtime;
+  this._children = Object.create(null);
+  this._rawModule = rawModule;
+  var rawState = rawModule.state;
+  this.state = (typeof rawState === 'function' ? rawState() : rawState) || {};
+};
+
+var prototypeAccessors$1 = { namespaced: { configurable: true } };
+
+prototypeAccessors$1.namespaced.get = function () {
+  return !!this._rawModule.namespaced
+};
+
+Module.prototype.addChild = function addChild (key, module) {
+  this._children[key] = module;
+};
+
+Module.prototype.removeChild = function removeChild (key) {
+  delete this._children[key];
+};
+
+Module.prototype.getChild = function getChild (key) {
+  return this._children[key]
+};
+
+Module.prototype.update = function update (rawModule) {
+  this._rawModule.namespaced = rawModule.namespaced;
+  if (rawModule.actions) {
+    this._rawModule.actions = rawModule.actions;
+  }
+  if (rawModule.mutations) {
+    this._rawModule.mutations = rawModule.mutations;
+  }
+  if (rawModule.getters) {
+    this._rawModule.getters = rawModule.getters;
+  }
+};
+
+Module.prototype.forEachChild = function forEachChild (fn) {
+  forEachValue(this._children, fn);
+};
+
+Module.prototype.forEachGetter = function forEachGetter (fn) {
+  if (this._rawModule.getters) {
+    forEachValue(this._rawModule.getters, fn);
+  }
+};
+
+Module.prototype.forEachAction = function forEachAction (fn) {
+  if (this._rawModule.actions) {
+    forEachValue(this._rawModule.actions, fn);
+  }
+};
+
+Module.prototype.forEachMutation = function forEachMutation (fn) {
+  if (this._rawModule.mutations) {
+    forEachValue(this._rawModule.mutations, fn);
+  }
+};
+
+Object.defineProperties( Module.prototype, prototypeAccessors$1 );
+
+var ModuleCollection = function ModuleCollection (rawRootModule) {
+  // register root module (Vuex.Store options)
+  this.register([], rawRootModule, false);
+};
+
+ModuleCollection.prototype.get = function get (path) {
+  return path.reduce(function (module, key) {
+    return module.getChild(key)
+  }, this.root)
+};
+
+ModuleCollection.prototype.getNamespace = function getNamespace (path) {
+  var module = this.root;
+  return path.reduce(function (namespace, key) {
+    module = module.getChild(key);
+    return namespace + (module.namespaced ? key + '/' : '')
+  }, '')
+};
+
+ModuleCollection.prototype.update = function update$1 (rawRootModule) {
+  update([], this.root, rawRootModule);
+};
+
+ModuleCollection.prototype.register = function register (path, rawModule, runtime) {
+    var this$1 = this;
+    if ( runtime === void 0 ) runtime = true;
+
+  if (true) {
+    assertRawModule(path, rawModule);
+  }
+
+  var newModule = new Module(rawModule, runtime);
+  if (path.length === 0) {
+    this.root = newModule;
+  } else {
+    var parent = this.get(path.slice(0, -1));
+    parent.addChild(path[path.length - 1], newModule);
+  }
+
+  // register nested modules
+  if (rawModule.modules) {
+    forEachValue(rawModule.modules, function (rawChildModule, key) {
+      this$1.register(path.concat(key), rawChildModule, runtime);
+    });
+  }
+};
+
+ModuleCollection.prototype.unregister = function unregister (path) {
+  var parent = this.get(path.slice(0, -1));
+  var key = path[path.length - 1];
+  if (!parent.getChild(key).runtime) { return }
+
+  parent.removeChild(key);
+};
+
+function update (path, targetModule, newModule) {
+  if (true) {
+    assertRawModule(path, newModule);
+  }
+
+  // update target module
+  targetModule.update(newModule);
+
+  // update nested modules
+  if (newModule.modules) {
+    for (var key in newModule.modules) {
+      if (!targetModule.getChild(key)) {
+        if (true) {
+          console.warn(
+            "[vuex] trying to add a new module '" + key + "' on hot reloading, " +
+            'manual reload is needed'
+          );
+        }
+        return
+      }
+      update(
+        path.concat(key),
+        targetModule.getChild(key),
+        newModule.modules[key]
+      );
+    }
+  }
+}
+
+var functionAssert = {
+  assert: function (value) { return typeof value === 'function'; },
+  expected: 'function'
+};
+
+var objectAssert = {
+  assert: function (value) { return typeof value === 'function' ||
+    (typeof value === 'object' && typeof value.handler === 'function'); },
+  expected: 'function or object with "handler" function'
+};
+
+var assertTypes = {
+  getters: functionAssert,
+  mutations: functionAssert,
+  actions: objectAssert
+};
+
+function assertRawModule (path, rawModule) {
+  Object.keys(assertTypes).forEach(function (key) {
+    if (!rawModule[key]) { return }
+
+    var assertOptions = assertTypes[key];
+
+    forEachValue(rawModule[key], function (value, type) {
+      assert(
+        assertOptions.assert(value),
+        makeAssertionMessage(path, key, type, value, assertOptions.expected)
+      );
+    });
+  });
+}
+
+function makeAssertionMessage (path, key, type, value, expected) {
+  var buf = key + " should be " + expected + " but \"" + key + "." + type + "\"";
+  if (path.length > 0) {
+    buf += " in module \"" + (path.join('.')) + "\"";
+  }
+  buf += " is " + (JSON.stringify(value)) + ".";
+  return buf
+}
+
+var Vue; // bind on install
+
+var Store = function Store (options) {
+  var this$1 = this;
+  if ( options === void 0 ) options = {};
+
+  // Auto install if it is not done yet and `window` has `Vue`.
+  // To allow users to avoid auto-installation in some cases,
+  // this code should be placed here. See #731
+  if (!Vue && typeof window !== 'undefined' && window.Vue) {
+    install(window.Vue);
+  }
+
+  if (true) {
+    assert(Vue, "must call Vue.use(Vuex) before creating a store instance.");
+    assert(typeof Promise !== 'undefined', "vuex requires a Promise polyfill in this browser.");
+    assert(this instanceof Store, "Store must be called with the new operator.");
+  }
+
+  var plugins = options.plugins; if ( plugins === void 0 ) plugins = [];
+  var strict = options.strict; if ( strict === void 0 ) strict = false;
+
+  var state = options.state; if ( state === void 0 ) state = {};
+  if (typeof state === 'function') {
+    state = state() || {};
+  }
+
+  // store internal state
+  this._committing = false;
+  this._actions = Object.create(null);
+  this._actionSubscribers = [];
+  this._mutations = Object.create(null);
+  this._wrappedGetters = Object.create(null);
+  this._modules = new ModuleCollection(options);
+  this._modulesNamespaceMap = Object.create(null);
+  this._subscribers = [];
+  this._watcherVM = new Vue();
+
+  // bind commit and dispatch to self
+  var store = this;
+  var ref = this;
+  var dispatch = ref.dispatch;
+  var commit = ref.commit;
+  this.dispatch = function boundDispatch (type, payload) {
+    return dispatch.call(store, type, payload)
+  };
+  this.commit = function boundCommit (type, payload, options) {
+    return commit.call(store, type, payload, options)
+  };
+
+  // strict mode
+  this.strict = strict;
+
+  // init root module.
+  // this also recursively registers all sub-modules
+  // and collects all module getters inside this._wrappedGetters
+  installModule(this, state, [], this._modules.root);
+
+  // initialize the store vm, which is responsible for the reactivity
+  // (also registers _wrappedGetters as computed properties)
+  resetStoreVM(this, state);
+
+  // apply plugins
+  plugins.forEach(function (plugin) { return plugin(this$1); });
+
+  if (Vue.config.devtools) {
+    devtoolPlugin(this);
+  }
+};
+
+var prototypeAccessors = { state: { configurable: true } };
+
+prototypeAccessors.state.get = function () {
+  return this._vm._data.$$state
+};
+
+prototypeAccessors.state.set = function (v) {
+  if (true) {
+    assert(false, "Use store.replaceState() to explicit replace store state.");
+  }
+};
+
+Store.prototype.commit = function commit (_type, _payload, _options) {
+    var this$1 = this;
+
+  // check object-style commit
+  var ref = unifyObjectStyle(_type, _payload, _options);
+    var type = ref.type;
+    var payload = ref.payload;
+    var options = ref.options;
+
+  var mutation = { type: type, payload: payload };
+  var entry = this._mutations[type];
+  if (!entry) {
+    if (true) {
+      console.error(("[vuex] unknown mutation type: " + type));
+    }
+    return
+  }
+  this._withCommit(function () {
+    entry.forEach(function commitIterator (handler) {
+      handler(payload);
+    });
+  });
+  this._subscribers.forEach(function (sub) { return sub(mutation, this$1.state); });
+
+  if (
+     true &&
+    options && options.silent
+  ) {
+    console.warn(
+      "[vuex] mutation type: " + type + ". Silent option has been removed. " +
+      'Use the filter functionality in the vue-devtools'
+    );
+  }
+};
+
+Store.prototype.dispatch = function dispatch (_type, _payload) {
+    var this$1 = this;
+
+  // check object-style dispatch
+  var ref = unifyObjectStyle(_type, _payload);
+    var type = ref.type;
+    var payload = ref.payload;
+
+  var action = { type: type, payload: payload };
+  var entry = this._actions[type];
+  if (!entry) {
+    if (true) {
+      console.error(("[vuex] unknown action type: " + type));
+    }
+    return
+  }
+
+  this._actionSubscribers.forEach(function (sub) { return sub(action, this$1.state); });
+
+  return entry.length > 1
+    ? Promise.all(entry.map(function (handler) { return handler(payload); }))
+    : entry[0](payload)
+};
+
+Store.prototype.subscribe = function subscribe (fn) {
+  return genericSubscribe(fn, this._subscribers)
+};
+
+Store.prototype.subscribeAction = function subscribeAction (fn) {
+  return genericSubscribe(fn, this._actionSubscribers)
+};
+
+Store.prototype.watch = function watch (getter, cb, options) {
+    var this$1 = this;
+
+  if (true) {
+    assert(typeof getter === 'function', "store.watch only accepts a function.");
+  }
+  return this._watcherVM.$watch(function () { return getter(this$1.state, this$1.getters); }, cb, options)
+};
+
+Store.prototype.replaceState = function replaceState (state) {
+    var this$1 = this;
+
+  this._withCommit(function () {
+    this$1._vm._data.$$state = state;
+  });
+};
+
+Store.prototype.registerModule = function registerModule (path, rawModule, options) {
+    if ( options === void 0 ) options = {};
+
+  if (typeof path === 'string') { path = [path]; }
+
+  if (true) {
+    assert(Array.isArray(path), "module path must be a string or an Array.");
+    assert(path.length > 0, 'cannot register the root module by using registerModule.');
+  }
+
+  this._modules.register(path, rawModule);
+  installModule(this, this.state, path, this._modules.get(path), options.preserveState);
+  // reset store to update getters...
+  resetStoreVM(this, this.state);
+};
+
+Store.prototype.unregisterModule = function unregisterModule (path) {
+    var this$1 = this;
+
+  if (typeof path === 'string') { path = [path]; }
+
+  if (true) {
+    assert(Array.isArray(path), "module path must be a string or an Array.");
+  }
+
+  this._modules.unregister(path);
+  this._withCommit(function () {
+    var parentState = getNestedState(this$1.state, path.slice(0, -1));
+    Vue.delete(parentState, path[path.length - 1]);
+  });
+  resetStore(this);
+};
+
+Store.prototype.hotUpdate = function hotUpdate (newOptions) {
+  this._modules.update(newOptions);
+  resetStore(this, true);
+};
+
+Store.prototype._withCommit = function _withCommit (fn) {
+  var committing = this._committing;
+  this._committing = true;
+  fn();
+  this._committing = committing;
+};
+
+Object.defineProperties( Store.prototype, prototypeAccessors );
+
+function genericSubscribe (fn, subs) {
+  if (subs.indexOf(fn) < 0) {
+    subs.push(fn);
+  }
+  return function () {
+    var i = subs.indexOf(fn);
+    if (i > -1) {
+      subs.splice(i, 1);
+    }
+  }
+}
+
+function resetStore (store, hot) {
+  store._actions = Object.create(null);
+  store._mutations = Object.create(null);
+  store._wrappedGetters = Object.create(null);
+  store._modulesNamespaceMap = Object.create(null);
+  var state = store.state;
+  // init all modules
+  installModule(store, state, [], store._modules.root, true);
+  // reset vm
+  resetStoreVM(store, state, hot);
+}
+
+function resetStoreVM (store, state, hot) {
+  var oldVm = store._vm;
+
+  // bind store public getters
+  store.getters = {};
+  var wrappedGetters = store._wrappedGetters;
+  var computed = {};
+  forEachValue(wrappedGetters, function (fn, key) {
+    // use computed to leverage its lazy-caching mechanism
+    computed[key] = function () { return fn(store); };
+    Object.defineProperty(store.getters, key, {
+      get: function () { return store._vm[key]; },
+      enumerable: true // for local getters
+    });
+  });
+
+  // use a Vue instance to store the state tree
+  // suppress warnings just in case the user has added
+  // some funky global mixins
+  var silent = Vue.config.silent;
+  Vue.config.silent = true;
+  store._vm = new Vue({
+    data: {
+      $$state: state
+    },
+    computed: computed
+  });
+  Vue.config.silent = silent;
+
+  // enable strict mode for new vm
+  if (store.strict) {
+    enableStrictMode(store);
+  }
+
+  if (oldVm) {
+    if (hot) {
+      // dispatch changes in all subscribed watchers
+      // to force getter re-evaluation for hot reloading.
+      store._withCommit(function () {
+        oldVm._data.$$state = null;
+      });
+    }
+    Vue.nextTick(function () { return oldVm.$destroy(); });
+  }
+}
+
+function installModule (store, rootState, path, module, hot) {
+  var isRoot = !path.length;
+  var namespace = store._modules.getNamespace(path);
+
+  // register in namespace map
+  if (module.namespaced) {
+    store._modulesNamespaceMap[namespace] = module;
+  }
+
+  // set state
+  if (!isRoot && !hot) {
+    var parentState = getNestedState(rootState, path.slice(0, -1));
+    var moduleName = path[path.length - 1];
+    store._withCommit(function () {
+      Vue.set(parentState, moduleName, module.state);
+    });
+  }
+
+  var local = module.context = makeLocalContext(store, namespace, path);
+
+  module.forEachMutation(function (mutation, key) {
+    var namespacedType = namespace + key;
+    registerMutation(store, namespacedType, mutation, local);
+  });
+
+  module.forEachAction(function (action, key) {
+    var type = action.root ? key : namespace + key;
+    var handler = action.handler || action;
+    registerAction(store, type, handler, local);
+  });
+
+  module.forEachGetter(function (getter, key) {
+    var namespacedType = namespace + key;
+    registerGetter(store, namespacedType, getter, local);
+  });
+
+  module.forEachChild(function (child, key) {
+    installModule(store, rootState, path.concat(key), child, hot);
+  });
+}
+
+/**
+ * make localized dispatch, commit, getters and state
+ * if there is no namespace, just use root ones
+ */
+function makeLocalContext (store, namespace, path) {
+  var noNamespace = namespace === '';
+
+  var local = {
+    dispatch: noNamespace ? store.dispatch : function (_type, _payload, _options) {
+      var args = unifyObjectStyle(_type, _payload, _options);
+      var payload = args.payload;
+      var options = args.options;
+      var type = args.type;
+
+      if (!options || !options.root) {
+        type = namespace + type;
+        if ( true && !store._actions[type]) {
+          console.error(("[vuex] unknown local action type: " + (args.type) + ", global type: " + type));
+          return
+        }
+      }
+
+      return store.dispatch(type, payload)
+    },
+
+    commit: noNamespace ? store.commit : function (_type, _payload, _options) {
+      var args = unifyObjectStyle(_type, _payload, _options);
+      var payload = args.payload;
+      var options = args.options;
+      var type = args.type;
+
+      if (!options || !options.root) {
+        type = namespace + type;
+        if ( true && !store._mutations[type]) {
+          console.error(("[vuex] unknown local mutation type: " + (args.type) + ", global type: " + type));
+          return
+        }
+      }
+
+      store.commit(type, payload, options);
+    }
+  };
+
+  // getters and state object must be gotten lazily
+  // because they will be changed by vm update
+  Object.defineProperties(local, {
+    getters: {
+      get: noNamespace
+        ? function () { return store.getters; }
+        : function () { return makeLocalGetters(store, namespace); }
+    },
+    state: {
+      get: function () { return getNestedState(store.state, path); }
+    }
+  });
+
+  return local
+}
+
+function makeLocalGetters (store, namespace) {
+  var gettersProxy = {};
+
+  var splitPos = namespace.length;
+  Object.keys(store.getters).forEach(function (type) {
+    // skip if the target getter is not match this namespace
+    if (type.slice(0, splitPos) !== namespace) { return }
+
+    // extract local getter type
+    var localType = type.slice(splitPos);
+
+    // Add a port to the getters proxy.
+    // Define as getter property because
+    // we do not want to evaluate the getters in this time.
+    Object.defineProperty(gettersProxy, localType, {
+      get: function () { return store.getters[type]; },
+      enumerable: true
+    });
+  });
+
+  return gettersProxy
+}
+
+function registerMutation (store, type, handler, local) {
+  var entry = store._mutations[type] || (store._mutations[type] = []);
+  entry.push(function wrappedMutationHandler (payload) {
+    handler.call(store, local.state, payload);
+  });
+}
+
+function registerAction (store, type, handler, local) {
+  var entry = store._actions[type] || (store._actions[type] = []);
+  entry.push(function wrappedActionHandler (payload, cb) {
+    var res = handler.call(store, {
+      dispatch: local.dispatch,
+      commit: local.commit,
+      getters: local.getters,
+      state: local.state,
+      rootGetters: store.getters,
+      rootState: store.state
+    }, payload, cb);
+    if (!isPromise(res)) {
+      res = Promise.resolve(res);
+    }
+    if (store._devtoolHook) {
+      return res.catch(function (err) {
+        store._devtoolHook.emit('vuex:error', err);
+        throw err
+      })
+    } else {
+      return res
+    }
+  });
+}
+
+function registerGetter (store, type, rawGetter, local) {
+  if (store._wrappedGetters[type]) {
+    if (true) {
+      console.error(("[vuex] duplicate getter key: " + type));
+    }
+    return
+  }
+  store._wrappedGetters[type] = function wrappedGetter (store) {
+    return rawGetter(
+      local.state, // local state
+      local.getters, // local getters
+      store.state, // root state
+      store.getters // root getters
+    )
+  };
+}
+
+function enableStrictMode (store) {
+  store._vm.$watch(function () { return this._data.$$state }, function () {
+    if (true) {
+      assert(store._committing, "Do not mutate vuex store state outside mutation handlers.");
+    }
+  }, { deep: true, sync: true });
+}
+
+function getNestedState (state, path) {
+  return path.length
+    ? path.reduce(function (state, key) { return state[key]; }, state)
+    : state
+}
+
+function unifyObjectStyle (type, payload, options) {
+  if (isObject(type) && type.type) {
+    options = payload;
+    payload = type;
+    type = type.type;
+  }
+
+  if (true) {
+    assert(typeof type === 'string', ("Expects string as the type, but found " + (typeof type) + "."));
+  }
+
+  return { type: type, payload: payload, options: options }
+}
+
+function install (_Vue) {
+  if (Vue && _Vue === Vue) {
+    if (true) {
+      console.error(
+        '[vuex] already installed. Vue.use(Vuex) should be called only once.'
+      );
+    }
+    return
+  }
+  Vue = _Vue;
+  applyMixin(Vue);
+}
+
+var mapState = normalizeNamespace(function (namespace, states) {
+  var res = {};
+  normalizeMap(states).forEach(function (ref) {
+    var key = ref.key;
+    var val = ref.val;
+
+    res[key] = function mappedState () {
+      var state = this.$store.state;
+      var getters = this.$store.getters;
+      if (namespace) {
+        var module = getModuleByNamespace(this.$store, 'mapState', namespace);
+        if (!module) {
+          return
+        }
+        state = module.context.state;
+        getters = module.context.getters;
+      }
+      return typeof val === 'function'
+        ? val.call(this, state, getters)
+        : state[val]
+    };
+    // mark vuex getter for devtools
+    res[key].vuex = true;
+  });
+  return res
+});
+
+var mapMutations = normalizeNamespace(function (namespace, mutations) {
+  var res = {};
+  normalizeMap(mutations).forEach(function (ref) {
+    var key = ref.key;
+    var val = ref.val;
+
+    res[key] = function mappedMutation () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
+
+      var commit = this.$store.commit;
+      if (namespace) {
+        var module = getModuleByNamespace(this.$store, 'mapMutations', namespace);
+        if (!module) {
+          return
+        }
+        commit = module.context.commit;
+      }
+      return typeof val === 'function'
+        ? val.apply(this, [commit].concat(args))
+        : commit.apply(this.$store, [val].concat(args))
+    };
+  });
+  return res
+});
+
+var mapGetters = normalizeNamespace(function (namespace, getters) {
+  var res = {};
+  normalizeMap(getters).forEach(function (ref) {
+    var key = ref.key;
+    var val = ref.val;
+
+    val = namespace + val;
+    res[key] = function mappedGetter () {
+      if (namespace && !getModuleByNamespace(this.$store, 'mapGetters', namespace)) {
+        return
+      }
+      if ( true && !(val in this.$store.getters)) {
+        console.error(("[vuex] unknown getter: " + val));
+        return
+      }
+      return this.$store.getters[val]
+    };
+    // mark vuex getter for devtools
+    res[key].vuex = true;
+  });
+  return res
+});
+
+var mapActions = normalizeNamespace(function (namespace, actions) {
+  var res = {};
+  normalizeMap(actions).forEach(function (ref) {
+    var key = ref.key;
+    var val = ref.val;
+
+    res[key] = function mappedAction () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
+
+      var dispatch = this.$store.dispatch;
+      if (namespace) {
+        var module = getModuleByNamespace(this.$store, 'mapActions', namespace);
+        if (!module) {
+          return
+        }
+        dispatch = module.context.dispatch;
+      }
+      return typeof val === 'function'
+        ? val.apply(this, [dispatch].concat(args))
+        : dispatch.apply(this.$store, [val].concat(args))
+    };
+  });
+  return res
+});
+
+var createNamespacedHelpers = function (namespace) { return ({
+  mapState: mapState.bind(null, namespace),
+  mapGetters: mapGetters.bind(null, namespace),
+  mapMutations: mapMutations.bind(null, namespace),
+  mapActions: mapActions.bind(null, namespace)
+}); };
+
+function normalizeMap (map) {
+  return Array.isArray(map)
+    ? map.map(function (key) { return ({ key: key, val: key }); })
+    : Object.keys(map).map(function (key) { return ({ key: key, val: map[key] }); })
+}
+
+function normalizeNamespace (fn) {
+  return function (namespace, map) {
+    if (typeof namespace !== 'string') {
+      map = namespace;
+      namespace = '';
+    } else if (namespace.charAt(namespace.length - 1) !== '/') {
+      namespace += '/';
+    }
+    return fn(namespace, map)
+  }
+}
+
+function getModuleByNamespace (store, helper, namespace) {
+  var module = store._modulesNamespaceMap[namespace];
+  if ( true && !module) {
+    console.error(("[vuex] module namespace not found in " + helper + "(): " + namespace));
+  }
+  return module
+}
+
+var index_esm = {
+  Store: Store,
+  install: install,
+  version: '3.0.1',
+  mapState: mapState,
+  mapMutations: mapMutations,
+  mapGetters: mapGetters,
+  mapActions: mapActions,
+  createNamespacedHelpers: createNamespacedHelpers
+};
+
+
+/* harmony default export */ __webpack_exports__["default"] = (index_esm);
+
+
+/***/ }),
+
+/***/ 155:
+/*!********************************************************************************************!*\
+  !*** C:/Users/Apple/Desktop/study/13-网易严选/project_app_wyyx/common/datas/cateNavDatas.json ***!
+  \********************************************************************************************/
+/*! exports provided: categoryL1List, default */
+/***/ (function(module) {
+
+module.exports = {"categoryL1List":[{"showIndex":0,"type":0,"categoryType":0,"superCategoryId":0,"name":"推荐专区","id":11,"subCateList":[]},{"showIndex":0,"type":0,"categoryType":0,"superCategoryId":0,"name":"宅家防护","id":12,"subCateList":[]},{"showIndex":0,"type":0,"categoryType":0,"superCategoryId":0,"name":"爆品专区","id":13,"subCateList":[]},{"showIndex":15,"wapBannerUrl":"","bannerUrl":"https://yanxuan.nosdn.127.net/dec6ff5ae8bae410809598950ba1f5b4.jpg","type":1,"frontName":"","categoryType":0,"wapExpandPicTargetUrl":"","superCategoryId":0,"name":"新品专区","id":109217021,"subCateList":[{"showIndex":18,"wapBannerUrl":"https://yanxuan-item.nosdn.127.net/b23608821bfc854805df49363e38b301.png","bannerUrl":"https://yanxuan-item.nosdn.127.net/b23608821bfc854805df49363e38b301.png","type":3,"frontName":"居家生活新品推荐","categoryType":0,"wapExpandPicTargetUrl":"","superCategoryId":0,"name":"居家生活新品","id":109241000,"subCateList":[]},{"showIndex":17,"wapBannerUrl":"https://yanxuan-item.nosdn.127.net/a803f572289dc4ada7ad8ff817422fdc.png","bannerUrl":"https://yanxuan-item.nosdn.127.net/a803f572289dc4ada7ad8ff817422fdc.png","type":3,"frontName":"服饰鞋包新品推荐","categoryType":0,"wapExpandPicTargetUrl":"","superCategoryId":0,"name":"服饰鞋包新品","id":109241001,"subCateList":[]},{"showIndex":16,"wapBannerUrl":"https://yanxuan-item.nosdn.127.net/cc66ac0e306d77a241f6fd9ac34b2a00.png","bannerUrl":"https://yanxuan-item.nosdn.127.net/cc66ac0e306d77a241f6fd9ac34b2a00.png","type":3,"frontName":"美食酒水新品推荐","categoryType":0,"wapExpandPicTargetUrl":"","superCategoryId":0,"name":"美食酒水新品","id":109241002,"subCateList":[]},{"showIndex":15,"wapBannerUrl":"https://yanxuan-item.nosdn.127.net/aea14016264a2ccd83a6295bf93fb714.png","bannerUrl":"https://yanxuan-item.nosdn.127.net/aea14016264a2ccd83a6295bf93fb714.png","type":3,"frontName":"个护清洁新品推荐","categoryType":0,"wapExpandPicTargetUrl":"","superCategoryId":0,"name":"个护清洁新品","id":109241003,"subCateList":[]},{"showIndex":14,"wapBannerUrl":"https://yanxuan-item.nosdn.127.net/10dd076c96e0248ae1b54d4b277439cf.png","bannerUrl":"https://yanxuan-item.nosdn.127.net/10dd076c96e0248ae1b54d4b277439cf.png","type":3,"frontName":"运动旅行新品推荐","categoryType":0,"wapExpandPicTargetUrl":"","superCategoryId":0,"name":"运动旅行新品","id":109241004,"subCateList":[]},{"showIndex":13,"wapBannerUrl":"https://yanxuan-item.nosdn.127.net/1fb768e549be93be3da68930bc7c7f4b.png","bannerUrl":"https://yanxuan-item.nosdn.127.net/1fb768e549be93be3da68930bc7c7f4b.png","type":3,"frontName":"母婴亲子新品推荐","categoryType":0,"wapExpandPicTargetUrl":"","superCategoryId":0,"name":"母婴亲子新品","id":109241005,"subCateList":[]},{"showIndex":12,"wapBannerUrl":"https://yanxuan-item.nosdn.127.net/dc413d2d5e81dc11997b8a0ca0abab2f.png","bannerUrl":"https://yanxuan-item.nosdn.127.net/dc413d2d5e81dc11997b8a0ca0abab2f.png","type":3,"frontName":"数码家电新品推荐","categoryType":0,"wapExpandPicTargetUrl":"","superCategoryId":0,"name":"数码家电新品","id":109241006,"subCateList":[]},{"showIndex":11,"wapBannerUrl":"https://yanxuan-item.nosdn.127.net/7b29bba18a0cbf5de8cbb76607b13077.png","bannerUrl":"https://yanxuan-item.nosdn.127.net/7b29bba18a0cbf5de8cbb76607b13077.png","type":3,"frontName":"全球特色新品推荐","categoryType":0,"wapExpandPicTargetUrl":"","superCategoryId":0,"name":"全球特色新品","id":109241007,"subCateList":[]}]},{"showIndex":1,"level":"L1","wapBannerUrl":"https://yanxuan.nosdn.127.net/e8bf0cf08cf7eda21606ab191762e35c.png","bannerUrl":"https://yanxuan.nosdn.127.net/761877bc4e2cf50d7c424a8a7e6378bf.jpg","frontDesc":"回家，放松身心","type":0,"frontName":"","categoryType":0,"imgUrl":"","superCategoryId":0,"name":"居家生活","iconUrl":"https://yanxuan.nosdn.127.net/a45c2c262a476fea0b9fc684fed91ef5.png","id":1005000,"subCateList":[]},{"showIndex":2,"level":"L1","wapBannerUrl":"https://yanxuan.nosdn.127.net/e9fe3cabed74c62c447396c8a4a8db0b.png","bannerUrl":"https://yanxuan.nosdn.127.net/2d7c7841acae25d7bd66d95d22cb20f9.png","frontDesc":"贴身的，要亲肤","type":0,"frontName":"","categoryType":0,"imgUrl":"","superCategoryId":0,"name":"服饰鞋包","iconUrl":"https://yanxuan.nosdn.127.net/9f64e690b593694a25cb0be4807d4de5.png","id":1010000,"subCateList":[]},{"showIndex":3,"level":"L1","wapBannerUrl":"https://yanxuan.nosdn.127.net/fb670ff3511182833e5b035275e4ac09.png","bannerUrl":"https://yanxuan.nosdn.127.net/e71c18948044771a7ebd4c9cc551ce8a.png","frontDesc":"好吃，高颜值美食","type":0,"frontName":"","categoryType":0,"imgUrl":"","superCategoryId":0,"name":"美食酒水","iconUrl":"https://yanxuan.nosdn.127.net/c9280327a3fd2374c000f6bf52dff6eb.png","id":1005002,"subCateList":[]},{"showIndex":4,"level":"L1","wapBannerUrl":"https://yanxuan.nosdn.127.net/284e588ee387f8491afd93d3cec77901.png","bannerUrl":"https://yanxuan.nosdn.127.net/73e8dfdda753de91e028da67a0963c1a.png","frontDesc":"亲肤之物，严选天然","type":0,"frontName":"","categoryType":0,"imgUrl":"","superCategoryId":0,"name":"个护清洁","iconUrl":"https://yanxuan.nosdn.127.net/a6dcd39065e12767ec099cf37b65f000.png","id":1013001,"subCateList":[]},{"showIndex":5,"level":"L1","wapBannerUrl":"https://yanxuan.nosdn.127.net/f946bc18da43e2f1f5417aec2060e492.png","bannerUrl":"https://yanxuan.nosdn.127.net/e65d94b55a1c785cedeb398f62115922.png","frontDesc":"爱，从心开始","type":0,"frontName":"","categoryType":0,"imgUrl":"","superCategoryId":0,"name":"母婴亲子","iconUrl":"https://yanxuan.nosdn.127.net/0a427bfa1804cdf3fb5249b4c31e6319.png","id":1011000,"subCateList":[]},{"showIndex":6,"level":"L1","wapBannerUrl":"https://yanxuan.nosdn.127.net/740f6ec44f396001a19ce3bb34b06d8e.png","bannerUrl":"https://yanxuan.nosdn.127.net/20a3cc5d6c582f65119503b93b005976.png","frontDesc":"走出去，自然的恩赐","type":0,"frontName":"","categoryType":0,"imgUrl":"","superCategoryId":0,"name":"运动旅行","iconUrl":"https://yanxuan.nosdn.127.net/d1bb0452344b61f78da41dcb74c57d28.png","id":109243029,"subCateList":[]},{"showIndex":7,"level":"L1","wapBannerUrl":"https://yanxuan.nosdn.127.net/4ac8bfac92724054a3ab2aafe5676832.jpg","bannerUrl":"https://yanxuan.nosdn.127.net/fcd5a4b7f9dc02673945513aecc3d14a.jpg","frontDesc":"智能电器，点亮生活。","type":0,"frontName":"","categoryType":0,"imgUrl":"","superCategoryId":0,"name":"数码家电","iconUrl":"https://yanxuan.nosdn.127.net/4a54379128e65792fd836ee461e2ce27.png","id":1043000,"subCateList":[]},{"showIndex":9,"level":"L1","wapBannerUrl":"https://yanxuan.nosdn.127.net/1706e24a5e605870ba3b37ff5f49aa18.png","bannerUrl":"https://yanxuan.nosdn.127.net/54e55e9d8a74c2cef5d624f99860ccdb.png","frontDesc":"爱好，点缀生活","type":0,"frontName":"","categoryType":0,"imgUrl":"","superCategoryId":0,"name":"全球特色","iconUrl":"https://yanxuan.nosdn.127.net/7093cfecb9dde1dd3eaf459623df4071.png","id":1019000,"subCateList":[]}]};
+
+/***/ }),
+
+/***/ 156:
+/*!*****************************************************************************************!*\
+  !*** C:/Users/Apple/Desktop/study/13-网易严选/project_app_wyyx/common/datas/cateLists.json ***!
+  \*****************************************************************************************/
+/*! exports provided: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, default */
+/***/ (function(module) {
+
+module.exports = [{"categoryList":[{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/c117ea2f1c4d978eb1f310d6d9ec3226.png","bannerUrl":"https://yanxuan.nosdn.127.net/c117ea2f1c4d978eb1f310d6d9ec3226.png","type":0,"frontName":"自家员工眼里，什么值得买","categoryType":0,"superCategoryId":11,"extra":{"materialContentFrom":1,"materialName":"推荐专区-员工精选好货","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"无分组","resourcesId":1,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54629129","taskId":"54645701"},"name":"精选好物15元起","id":9999954645701,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/cda4a56526a230055bea8221a6b7ab11.png","bannerUrl":"https://yanxuan.nosdn.127.net/cda4a56526a230055bea8221a6b7ab11.png","type":0,"frontName":"这些商品都是999+的好评","categoryType":0,"superCategoryId":11,"extra":{"materialContentFrom":1,"materialName":"推荐专区-999 好评","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"无分组","resourcesId":2,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54629151","taskId":"54645702"},"name":"999+好评","id":9999954645702,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/71a5f1a0299e278f8193c193d8b7d1e4.png","bannerUrl":"https://yanxuan.nosdn.127.net/71a5f1a0299e278f8193c193d8b7d1e4.png","type":0,"frontName":"网易严选明星商品，百万用户的共同选择","categoryType":0,"superCategoryId":11,"extra":{"materialContentFrom":1,"materialName":"推荐专区-明星商品","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"无分组","resourcesId":3,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54630361","taskId":"54645703"},"name":"明星商品低至69元","id":9999954645703,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/da5ac697d47e43bd6ad9ce8b1e5e0060.png","bannerUrl":"https://yanxuan.nosdn.127.net/da5ac697d47e43bd6ad9ce8b1e5e0060.png","type":0,"frontName":"必买爆品新鲜补单","categoryType":0,"superCategoryId":11,"extra":{"materialContentFrom":1,"materialName":"推荐专区-断货补单榜","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"无分组","resourcesId":4,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54631826","taskId":"54645704"},"name":"断货补单王39元起","id":9999954645704,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/25daae363ef6662629d06e70846b983f.png","bannerUrl":"https://yanxuan.nosdn.127.net/25daae363ef6662629d06e70846b983f.png","type":0,"frontName":"9.9、19.9、49.9、99.9好物推荐","categoryType":0,"superCategoryId":11,"extra":{"materialContentFrom":1,"materialName":"推荐专区-9.9元超值好物","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"无分组","resourcesId":5,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54629133","taskId":"54645705"},"name":"9.9元超值好物","id":9999954645705,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/a449c1305adff30ce82922f2e3546cf2.png","bannerUrl":"https://yanxuan.nosdn.127.net/a449c1305adff30ce82922f2e3546cf2.png","type":0,"frontName":"不出门也能拥有好心情","categoryType":0,"superCategoryId":11,"extra":{"materialContentFrom":1,"materialName":"宅家囤美食","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"无分组","resourcesId":6,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54639399","taskId":"54647387"},"name":"宅家囤美食","id":9999954647387,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/1aa18004d8b43e7bc55d54dd03ee5f29.png","bannerUrl":"https://yanxuan.nosdn.127.net/1aa18004d8b43e7bc55d54dd03ee5f29.png","type":0,"frontName":"寒潮来袭，保暖好物推荐","categoryType":0,"superCategoryId":11,"extra":{"materialContentFrom":1,"materialName":"推荐专区-降温必备好物","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"无分组","resourcesId":7,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54635008","taskId":"54645707"},"name":"降温降价39元起","id":9999954645707,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/0cb19987ddd873c693272c60352ba6a7.png","bannerUrl":"https://yanxuan.nosdn.127.net/0cb19987ddd873c693272c60352ba6a7.png","type":0,"frontName":"这些生活小确幸，50元就可以抱回家","categoryType":0,"superCategoryId":11,"extra":{"materialContentFrom":1,"materialName":"推荐专区-50元幸福好物","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"无分组","resourcesId":8,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54629136","taskId":"54645708"},"name":"50元幸福好物","id":9999954645708,"subCateList":[]}],"name":"","id":11,"imgUrl":"https://yanxuan.nosdn.127.net/868844d3288f130c1aa808312dbbd1d8.png?quality=75&type=webp&imageView&thumbnail=0x196"},{"categoryList":[{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/c4bf35c93af25b7c9c8c89ad1b1d19b6.png","bannerUrl":"https://yanxuan.nosdn.127.net/c4bf35c93af25b7c9c8c89ad1b1d19b6.png","type":0,"frontName":"","categoryType":0,"superCategoryId":12,"extra":{"materialContentFrom":1,"materialName":"杀菌消毒","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"无分组","resourcesId":1,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54639494","taskId":"54646514"},"name":"杀菌消毒","id":9999954646514,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/f8e1511c63bdcd3d08f8aac47a6f5ad2.png","bannerUrl":"https://yanxuan.nosdn.127.net/f8e1511c63bdcd3d08f8aac47a6f5ad2.png","type":0,"frontName":"","categoryType":0,"superCategoryId":12,"extra":{"materialContentFrom":1,"materialName":"提高免疫","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"无分组","resourcesId":2,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54639507","taskId":"54646539"},"name":"提高免疫","id":9999954646539,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/c2998cee2f7c5f8eab2f4a546f10e14c.png","bannerUrl":"https://yanxuan.nosdn.127.net/c2998cee2f7c5f8eab2f4a546f10e14c.png","type":0,"frontName":"快速进入工作状态，宅家也能高效办公","categoryType":0,"superCategoryId":12,"extra":{"materialContentFrom":1,"materialName":"推荐专区-宅家办公","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"无分组","resourcesId":3,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54635011","taskId":"54646540"},"name":"远程办公","id":9999954646540,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/d65e9c8ed4c93cc4a9144b3fc80ff553.png","bannerUrl":"https://yanxuan.nosdn.127.net/d65e9c8ed4c93cc4a9144b3fc80ff553.png","type":0,"frontName":"","categoryType":0,"superCategoryId":12,"extra":{"materialContentFrom":1,"materialName":"室内运动好物","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"无分组","resourcesId":4,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54629150","taskId":"54646541"},"name":"室内运动","id":9999954646541,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/8b20393c8220b369e59ffe0e45f9696e.png","bannerUrl":"https://yanxuan.nosdn.127.net/8b20393c8220b369e59ffe0e45f9696e.png","type":0,"frontName":"","categoryType":0,"superCategoryId":12,"extra":{"materialContentFrom":1,"materialName":"秋冬好物-日用换新","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":5,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54631793","taskId":"54646518"},"name":"日用换新","id":9999954646518,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/b90129aae85c64794d1a68d2177af50f.png","bannerUrl":"https://yanxuan.nosdn.127.net/b90129aae85c64794d1a68d2177af50f.png","type":0,"frontName":"","categoryType":0,"superCategoryId":12,"extra":{"materialContentFrom":1,"materialName":"生鲜果蔬","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"无分组","resourcesId":6,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54639495","taskId":"54646520"},"name":"生鲜果蔬","id":9999954646520,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/160274883e15e024802d25832f0e7ed1.png","bannerUrl":"https://yanxuan.nosdn.127.net/160274883e15e024802d25832f0e7ed1.png","type":0,"frontName":"","categoryType":0,"superCategoryId":12,"extra":{"materialContentFrom":1,"materialName":"秋冬好物-干季护肤","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"无分组","resourcesId":7,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54631799","taskId":"54646522"},"name":"干季护肤","id":9999954646522,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/b049ba42c4a7413eef72f3be8b6f85da.png","bannerUrl":"https://yanxuan.nosdn.127.net/b049ba42c4a7413eef72f3be8b6f85da.png","type":0,"frontName":"","categoryType":0,"superCategoryId":12,"extra":{"materialContentFrom":1,"materialName":"暖冬好物-解馋必备小食","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"无分组","resourcesId":8,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54632697","taskId":"54646521"},"name":"解馋小食","id":9999954646521,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/04516a37a1f2aaaf6b388bbeaa4ec02a.png","bannerUrl":"https://yanxuan.nosdn.127.net/04516a37a1f2aaaf6b388bbeaa4ec02a.png","type":0,"frontName":"","categoryType":0,"superCategoryId":12,"extra":{"materialContentFrom":1,"materialName":"秋冬好物-秋日养生","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"无分组","resourcesId":9,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54631798","taskId":"54646523"},"name":"宅家养生","id":9999954646523,"subCateList":[]}],"name":"","id":12,"imgUrl":"https://yanxuan.nosdn.127.net/37d7317bfb19641d744c6a45fb5d350a.jpg?quality=75&type=webp&imageView&thumbnail=0x196"},{"categoryList":[{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/4a7eaff4e3cb3b7e90a7e88ffc897f04.png","bannerUrl":"https://yanxuan.nosdn.127.net/4a7eaff4e3cb3b7e90a7e88ffc897f04.png","type":0,"frontName":"居家生活爆品推荐","categoryType":0,"superCategoryId":13,"extra":{"materialContentFrom":1,"materialName":"爆品专区-居家生活","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":1,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54629163","taskId":"54644374"},"name":"居家生活","id":9999954644374,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/5aa5f7d5f2d137c1bf635eba8477aca1.png","bannerUrl":"https://yanxuan.nosdn.127.net/5aa5f7d5f2d137c1bf635eba8477aca1.png","type":0,"frontName":"服饰鞋包爆品推荐","categoryType":0,"superCategoryId":13,"extra":{"materialContentFrom":1,"materialName":"爆品专区-服饰鞋包","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":2,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54629166","taskId":"54644375"},"name":"服饰鞋包","id":9999954644375,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/31e4234a9c64af28f5cee04b1425d758.png","bannerUrl":"https://yanxuan.nosdn.127.net/31e4234a9c64af28f5cee04b1425d758.png","type":0,"frontName":"美食酒水爆品推荐","categoryType":0,"superCategoryId":13,"extra":{"materialContentFrom":1,"materialName":"爆品专区-美食酒水","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":3,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54629167","taskId":"54644376"},"name":"美食酒水","id":9999954644376,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/31361f7e78182fe2a38c10148012a601.png","bannerUrl":"https://yanxuan.nosdn.127.net/31361f7e78182fe2a38c10148012a601.png","type":0,"frontName":"个护清洁爆品推荐","categoryType":0,"superCategoryId":13,"extra":{"materialContentFrom":1,"materialName":"爆品专区-个护清洁","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":4,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54629168","taskId":"54644377"},"name":"个护清洁","id":9999954644377,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/5cbd1ced1c0c8148251601e68685bcd4.png","bannerUrl":"https://yanxuan.nosdn.127.net/5cbd1ced1c0c8148251601e68685bcd4.png","type":0,"frontName":"运动旅行爆品推荐","categoryType":0,"superCategoryId":13,"extra":{"materialContentFrom":1,"materialName":"爆品专区-运动旅行","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":5,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54630536","taskId":"54644378"},"name":"运动旅行","id":9999954644378,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/6a9ee4e42c8675717a2aae6ebf7dcff5.png","bannerUrl":"https://yanxuan.nosdn.127.net/6a9ee4e42c8675717a2aae6ebf7dcff5.png","type":0,"frontName":"母婴亲子爆品推荐","categoryType":0,"superCategoryId":13,"extra":{"materialContentFrom":1,"materialName":"爆品专区-母婴亲子","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":6,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54630538","taskId":"54644379"},"name":"母婴亲子","id":9999954644379,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/dce70bfc0cc50d65def7deb2b4d4a27e.png","bannerUrl":"https://yanxuan.nosdn.127.net/dce70bfc0cc50d65def7deb2b4d4a27e.png","type":0,"frontName":"数码家电爆品推荐","categoryType":0,"superCategoryId":13,"extra":{"materialContentFrom":1,"materialName":"爆品专区-数码家电","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":7,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54630539","taskId":"54644380"},"name":"数码家电","id":9999954644380,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/d5690ebca5f6305b5ed5ee5a3ec7cd5d.png","bannerUrl":"https://yanxuan.nosdn.127.net/d5690ebca5f6305b5ed5ee5a3ec7cd5d.png","type":0,"frontName":"海外精选爆品推荐","categoryType":0,"superCategoryId":13,"extra":{"materialContentFrom":1,"materialName":"爆品专区-海外精选","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":8,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54630540","taskId":"54644381"},"name":"海外精选","id":9999954644381,"subCateList":[]},{"showIndex":0,"wapBannerUrl":"https://yanxuan.nosdn.127.net/331332104225a04d91c1672224a9ab23.png","bannerUrl":"https://yanxuan.nosdn.127.net/331332104225a04d91c1672224a9ab23.png","type":0,"frontName":"周边特色爆品推荐","categoryType":0,"superCategoryId":13,"extra":{"materialContentFrom":1,"materialName":"爆品专区-周边特色","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":9,"materialType":"自定义二级分类","crmUserGroupId":"0","materialId":"54630541","taskId":"54644382"},"name":"周边特色","id":9999954644382,"subCateList":[]}],"name":"","id":13,"imgUrl":"https://yanxuan.nosdn.127.net/edc311882c97da117f860264548212e1.png?quality=75&type=webp&imageView&thumbnail=0x196"},{"categoryList":[{"showIndex":18,"wapBannerUrl":"https://yanxuan-item.nosdn.127.net/96330c8ddf2d128e950dca368b0ba0b0.png","bannerUrl":"https://yanxuan-item.nosdn.127.net/96330c8ddf2d128e950dca368b0ba0b0.png","type":3,"frontName":"居家生活新品推荐","categoryType":0,"wapExpandPicTargetUrl":"","superCategoryId":0,"name":"居家生活新品","id":109241000,"subCateList":[]},{"showIndex":17,"wapBannerUrl":"https://yanxuan-item.nosdn.127.net/661e7ddc1918d291ea941a1ffc1b497a.png","bannerUrl":"https://yanxuan-item.nosdn.127.net/661e7ddc1918d291ea941a1ffc1b497a.png","type":3,"frontName":"服饰鞋包新品推荐","categoryType":0,"wapExpandPicTargetUrl":"","superCategoryId":0,"name":"服饰鞋包新品","id":109241001,"subCateList":[]},{"showIndex":16,"wapBannerUrl":"https://yanxuan-item.nosdn.127.net/cc66ac0e306d77a241f6fd9ac34b2a00.png","bannerUrl":"https://yanxuan-item.nosdn.127.net/cc66ac0e306d77a241f6fd9ac34b2a00.png","type":3,"frontName":"美食酒水新品推荐","categoryType":0,"wapExpandPicTargetUrl":"","superCategoryId":0,"name":"美食酒水新品","id":109241002,"subCateList":[]},{"showIndex":15,"wapBannerUrl":"https://yanxuan-item.nosdn.127.net/aea14016264a2ccd83a6295bf93fb714.png","bannerUrl":"https://yanxuan-item.nosdn.127.net/aea14016264a2ccd83a6295bf93fb714.png","type":3,"frontName":"个护清洁新品推荐","categoryType":0,"wapExpandPicTargetUrl":"","superCategoryId":0,"name":"个护清洁新品","id":109241003,"subCateList":[]},{"showIndex":14,"wapBannerUrl":"https://yanxuan-item.nosdn.127.net/10dd076c96e0248ae1b54d4b277439cf.png","bannerUrl":"https://yanxuan-item.nosdn.127.net/10dd076c96e0248ae1b54d4b277439cf.png","type":3,"frontName":"运动旅行新品推荐","categoryType":0,"wapExpandPicTargetUrl":"","superCategoryId":0,"name":"运动旅行新品","id":109241004,"subCateList":[]},{"showIndex":13,"wapBannerUrl":"https://yanxuan-item.nosdn.127.net/1fb768e549be93be3da68930bc7c7f4b.png","bannerUrl":"https://yanxuan-item.nosdn.127.net/1fb768e549be93be3da68930bc7c7f4b.png","type":3,"frontName":"母婴亲子新品推荐","categoryType":0,"wapExpandPicTargetUrl":"","superCategoryId":0,"name":"母婴亲子新品","id":109241005,"subCateList":[]},{"showIndex":12,"wapBannerUrl":"https://yanxuan-item.nosdn.127.net/dc413d2d5e81dc11997b8a0ca0abab2f.png","bannerUrl":"https://yanxuan-item.nosdn.127.net/dc413d2d5e81dc11997b8a0ca0abab2f.png","type":3,"frontName":"数码家电新品推荐","categoryType":0,"wapExpandPicTargetUrl":"","superCategoryId":0,"name":"数码家电新品","id":109241006,"subCateList":[]},{"showIndex":11,"wapBannerUrl":"https://yanxuan-item.nosdn.127.net/7b29bba18a0cbf5de8cbb76607b13077.png","bannerUrl":"https://yanxuan-item.nosdn.127.net/7b29bba18a0cbf5de8cbb76607b13077.png","type":3,"frontName":"全球特色新品推荐","categoryType":0,"wapExpandPicTargetUrl":"","superCategoryId":0,"name":"全球特色新品","id":109241007,"subCateList":[]}],"id":109217021,"imgUrl":"http://yanxuan.nosdn.127.net/dec6ff5ae8bae410809598950ba1f5b4.jpg?quality=75&type=webp&imageView&thumbnail=0x196"},{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/e078499f093213840f0f5c94bc938f01.jpg?quality=75&type=webp&imageView&thumbnail=0x196","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"居家生活","id":1005000,"type":0,"subCateList":[{"categoryType":0,"showIndex":1,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1d89de114797fb9237314920695c564d.png","name":"秋冬好物","id":109243003,"frontDesc":"温暖秋冬","type":0,"subCateList":[],"frontName":"秋冬好物"},{"categoryType":0,"showIndex":2,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0fe3073506c10f604c4ed7e0ba65d1f4.png","name":"主题床品","id":109243004,"frontDesc":"设计点亮，品质当道","type":0,"subCateList":[],"frontName":"设计点亮，品质当道"},{"categoryType":0,"showIndex":3,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/02d3e51b8db87c331dc73bef9e217133.png","name":"北欧原木","id":109252033,"frontDesc":"经典北欧风，打造原木家","type":0,"subCateList":[],"frontName":"经典北欧风，打造原木家"},{"categoryType":0,"showIndex":4,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan-item.nosdn.127.net/4ccd6ee87a83918474e7e962b06d96fd.png","name":"餐厨爆款清单","id":109261015,"frontDesc":"烹饪享乐趣","type":0,"subCateList":[],"frontName":"烹饪享乐趣"},{"categoryType":0,"showIndex":6,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ed6400e5be573e1524cdef0b5c9e462d.png","bannerUrl":"","name":"床品件套","id":1008009,"frontDesc":"甄选品质，睡眠美学","type":0,"subCateList":[],"frontName":"甄选品质，睡眠美学"},{"categoryType":0,"showIndex":7,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/96d109867f08a14af62d2390b7787439.png","name":"被枕盖毯","id":109260008,"frontDesc":"陷进柔软，多样选择","type":0,"subCateList":[],"frontName":"陷进柔软，多样选择"},{"categoryType":0,"showIndex":8,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b91e14afc5a138df8dbc3236146d24e6.png","bannerUrl":"","name":"床垫床褥","id":1008008,"frontDesc":"安心托护，美梦时刻","type":0,"subCateList":[],"frontName":"安心托护，美梦时刻"},{"categoryType":0,"showIndex":9,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ef4a874893fb5e76504fb044c2f7cd49.png","name":"抱枕靠垫","id":109260009,"frontDesc":"装点美家，生活美学","type":0,"subCateList":[],"frontName":"装点美家，生活美学"},{"showIndex":10,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0e5da66d87fc9db4279322d59f9b3d5b.png","bannerUrl":"","frontDesc":"装点家的格调","type":0,"frontName":"装点家的格调","categoryType":0,"superCategoryId":1005000,"name":"家饰","iconUrl":"","id":1011004,"subCateList":[]},{"categoryType":0,"showIndex":11,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/d8f74a5d23c731084779b095e80fb3e3.png","bannerUrl":"","name":"居家布艺","id":1008002,"frontDesc":"趣意点缀，家中有格","type":0,"subCateList":[],"frontName":"趣意点缀，家中有格"},{"categoryType":0,"showIndex":12,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/aeecf63c24567c5a7a51b747a7dcf10a.png","name":"客餐厅家具","id":109243006,"frontDesc":"舒适经典，幸福宅家","type":0,"subCateList":[],"frontName":"舒适经典，幸福宅家"},{"categoryType":0,"showIndex":13,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/29a60124243be40301a571e09f8c935c.png","name":"卧室家具","id":109243007,"frontDesc":"天然选材，安心酣睡","type":0,"subCateList":[],"frontName":"天然选材，安心酣睡"},{"categoryType":0,"showIndex":14,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c35578aa38ec1c9e55aa74d9e77287a9.png","name":"办公书房家具","id":109243008,"frontDesc":"人体工学设计，健康办公","type":0,"subCateList":[],"frontName":"人体工学设计，健康办公"},{"categoryType":0,"showIndex":15,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/becde30fadf4ec335cd7ad8078798acf.png","name":"小件家具","id":109243009,"frontDesc":"实用至上，讲究质感","type":0,"subCateList":[],"frontName":"实用至上，讲究质感"},{"categoryType":0,"showIndex":16,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9bc4cae742e2b2709974ad074f897493.png","bannerUrl":"","name":"灯具","id":1008016,"frontDesc":"一盏灯，温暖一个家","type":0,"subCateList":[],"frontName":"一盏灯，温暖一个家"},{"categoryType":0,"showIndex":17,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f2e3e9df2cdb7e790e68356ac763cd58.png","name":"地毯窗帘","id":109261054,"frontDesc":"优质装点，柔软家居","type":0,"subCateList":[],"frontName":"优质装点，柔软家居"},{"categoryType":0,"showIndex":18,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ccf0ff26ca7bf8bbbc8683a740e28ae9.png","bannerUrl":"","name":"收纳","id":1008017,"frontDesc":"收纳神器大集结","type":0,"subCateList":[],"frontName":"收纳神器大集结"},{"categoryType":0,"showIndex":20,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/36d167a99e28b00dd08aa5e45fd33946.png","name":"晾晒除味","id":1092010,"frontDesc":"居家晾晒必备好物","type":0,"subCateList":[],"frontName":"居家晾晒必备好物"},{"categoryType":0,"showIndex":21,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f6eaa94e8920dd4290b9da7c545c8841.png","bannerUrl":"","name":"毛巾浴巾","id":1008001,"frontDesc":"亲肤柔棉，安心品质","type":0,"subCateList":[],"frontName":"亲肤柔棉，安心品质"},{"categoryType":0,"showIndex":22,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3e0c0c0f1d842ae66f4fbfd50a571ac1.png","name":"居家拖鞋","id":109243010,"frontDesc":"慵懒休闲时光，轻松惬意生活","type":0,"subCateList":[],"frontName":"慵懒休闲时光，轻松惬意生活"},{"categoryType":0,"showIndex":23,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3e60f0abe39d4cce0237edffad25c459.png","name":"家庭医疗","id":1092011,"frontDesc":"专业家庭医用好物","type":0,"subCateList":[],"frontName":"专业家庭医用好物"},{"categoryType":0,"showIndex":24,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/17cc6774b480037536a0f360bf207676.png","bannerUrl":"","name":"锅具","id":1005007,"frontDesc":"一口好锅，料理生活一日三餐","type":0,"subCateList":[],"frontName":"一口好锅，炖煮生活一日三餐"},{"categoryType":0,"showIndex":25,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1055eb85d2c5431c8f6623aed74bbbde.png","bannerUrl":"","name":"餐厨配件","id":1008012,"frontDesc":"下厨省力好帮手","type":0,"subCateList":[],"frontName":"下厨省力好帮手"},{"categoryType":0,"showIndex":26,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f17d41a51a2bb3a1b73f927959cd9ae2.png","bannerUrl":"","name":"刀剪砧板","id":1013005,"frontDesc":"传统工艺 源自中国刀城","type":0,"subCateList":[],"frontName":"传统工艺 源自中国刀城"},{"categoryType":0,"showIndex":27,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/338c77be5f292272e43869bcc52c8229.png","bannerUrl":"","name":"餐具","id":1005008,"frontDesc":"皇家道尔顿、日本KEYUCA制造商出品","type":0,"subCateList":[],"frontName":"餐桌上的舞蹈"},{"categoryType":0,"showIndex":28,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b24d4e3c402ecb4a95d7d6e8d77a93ba.png","bannerUrl":"","name":"水具杯壶","id":1007000,"frontDesc":"精工生产制作，匠人手艺","type":0,"subCateList":[],"frontName":"精工生产制作，匠人手艺"},{"categoryType":0,"showIndex":29,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/6395f0efc4c720dbc1bee012af23e56e.png","bannerUrl":"","name":"茶咖酒具","id":1005009,"frontDesc":"严选精巧器具，轻松冲调","type":0,"subCateList":[],"frontName":"严选精巧器具，轻松冲调"},{"categoryType":0,"showIndex":30,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/7d3612daccae482c1c9631992d4ffa44.png","name":"数码办公","id":109249013,"frontDesc":"职场数码办公用品","type":0,"subCateList":[],"frontName":"职场数码办公用品"},{"categoryType":0,"showIndex":31,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/41b1aa9754ea3d7cd29b2c753bdf3dd1.png","name":"办公家具","id":109248001,"frontDesc":"为健康办公生活加油","type":0,"subCateList":[],"frontName":"为健康办公生活加油"},{"categoryType":0,"showIndex":32,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2963d464664ffc426ed8dffd2f44ba16.png","name":"靠枕坐垫","id":109248002,"frontDesc":"让工位比被窝更舒适","type":0,"subCateList":[],"frontName":"让工位比被窝更舒适"},{"categoryType":0,"showIndex":33,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8bceb409edbc6415c91095a82d4d3edf.png","name":"宠物食品","id":1017000,"frontDesc":"用心选料，让爱宠健康成长","type":0,"subCateList":[],"frontName":"用心选料，让爱宠健康成长"},{"categoryType":0,"showIndex":34,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0dc939d1cb0e437b56e392fbf859f768.png","name":"宠物用品","id":109248004,"frontDesc":"贴心设计，照顾爱宠舒适生活","type":0,"subCateList":[],"frontName":"贴心设计，照顾爱宠舒适生活"}]},{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/9fafb4adb40303dc2914c3aa04da03df.jpg?quality=75&type=webp&imageView&thumbnail=0x196","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"服饰鞋包","id":1010000,"type":0,"subCateList":[{"categoryType":0,"showIndex":1,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e279c3e247614d47404d9d5d88b397c9.png","name":"热销爆款","id":109257004,"frontDesc":"人气好物放心购","type":0,"subCateList":[],"frontName":"人气好物放心购"},{"categoryType":0,"showIndex":2,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/d0a099cb4bfdb9afccf9470719b3611c.png","name":"好物上新","id":109243011,"frontDesc":"新品好物 一手掌握","type":0,"subCateList":[],"frontName":"新品好物 一手掌握"},{"categoryType":0,"showIndex":3,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1fc7bbf077f022659cb4eff564d382fa.png","name":"夏季新品","id":109243013,"frontDesc":"夏季热力爆品 抢先预览","type":0,"subCateList":[],"frontName":"夏季热力爆品 抢先预览"},{"categoryType":0,"showIndex":4,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/fa89d78c2c70477987ec09c56661dc31.png","name":"居家囤货","id":109243014,"frontDesc":"慵懒居家 一秒提升幸福感","type":0,"subCateList":[],"frontName":"慵懒居家 一秒提升幸福感"},{"categoryType":0,"showIndex":5,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f2ab8dca74661d5b7d36f80b14e50a5a.png","name":"抄底特惠","id":109259014,"frontDesc":"抄底特惠 低至5折","type":0,"subCateList":[],"frontName":"抄底特惠"},{"categoryType":0,"showIndex":6,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/10b0537e284e4eb89a9461e583d017db.png","name":"男式衬衫","id":1093008,"frontDesc":"经典百搭 精致设计","type":0,"subCateList":[],"frontName":"经典百搭 精致设计"},{"categoryType":0,"showIndex":7,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2c5a1f681831987ff3d4fb8e63f6d0d6.jpg","name":"男式针织衫/卫衣","id":109214004,"frontDesc":"简约调性 儒雅休闲自如切换","type":0,"subCateList":[],"frontName":"简约调性 儒雅休闲自如切换"},{"categoryType":0,"showIndex":8,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/35b564c2867fc5faed9403cec440bafe.png","name":"男式外套","id":1093012,"frontDesc":"自在潇洒穿着感","type":0,"subCateList":[],"frontName":"自在潇洒穿着感"},{"categoryType":0,"showIndex":9,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/690dee73a00b6922664f727b40a58a3b.png","name":"男式牛仔","id":1068003,"frontDesc":"颠覆牛仔认知 革新你的穿着体验","type":0,"subCateList":[],"frontName":"颠覆牛仔认知 革新你的穿着体验"},{"categoryType":0,"showIndex":10,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/270011056e5216e03d2d054683c2b337.png","name":"女式内衣","id":109272000,"frontDesc":"柔软呵护","type":0,"subCateList":[],"frontName":"柔软呵护"},{"categoryType":0,"showIndex":11,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/aba02a880a47a4a62cd85842ea6eadce.jpg","name":"男式裤装","id":1093009,"frontDesc":"高质感面料 休闲商务两适宜","type":0,"subCateList":[],"frontName":"高质感面料 休闲商务两适宜"},{"categoryType":0,"showIndex":12,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f917b00b07445c46a1df90ccaff2a8de.png","name":"男式T恤/POLO","id":109214000,"frontDesc":"内搭T恤 贴身自在","type":0,"subCateList":[],"frontName":"内搭T恤 贴身自在"},{"categoryType":0,"showIndex":13,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a729319b8b4d127b09402f65c96d421f.jpg","name":"女式针织衫/卫衣","id":109214003,"frontDesc":"体验温柔的质感","type":0,"subCateList":[],"frontName":"体验温柔的质感"},{"categoryType":0,"showIndex":14,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/7a6f1ba8da59a454e7c4a2b7b61ff26a.jpg","name":"女式衬衫","id":109214001,"frontDesc":"职场精致LOOK","type":0,"subCateList":[],"frontName":"职场精致LOOK"},{"categoryType":0,"showIndex":15,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3084ec837a9f38b053b81061cfcdae78.png","name":"女式外套","id":1093010,"frontDesc":"选对风格 只做自己","type":0,"subCateList":[],"frontName":"选对风格 只做自己"},{"categoryType":0,"showIndex":16,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/55ddb8143c911ee1881a6205572c718e.png","name":"女式裤装","id":1093007,"frontDesc":"轻松舒适 送给双腿的温柔力量","type":0,"subCateList":[],"frontName":"轻松舒适 送给双腿的温柔力量"},{"categoryType":0,"showIndex":17,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2f4686765e77abf8213f2b0e127045be.png","name":"女式牛仔","id":109214002,"frontDesc":"基础裤型的舒适之选","type":0,"subCateList":[],"frontName":"基础裤型的舒适之选"},{"categoryType":0,"showIndex":18,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/77ade36fe051e9800409dbfd3f7fa644.jpg","name":"女式T恤/POLO","id":1093006,"frontDesc":"精选材质 穿出质感","type":0,"subCateList":[],"frontName":"精选材质 穿出质感"},{"categoryType":0,"showIndex":19,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2b65c76b9aec77fe724b23199c79e718.png","name":"女式裙装","id":1037007,"frontDesc":"量身裁体的优雅","type":0,"subCateList":[],"frontName":"量身裁体的优雅"},{"categoryType":0,"showIndex":20,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e7fee5bb435eb5d5f094eb9f65df6c86.jpg","name":"男式家居服","id":1093004,"frontDesc":"舒适源自高品质","type":0,"subCateList":[],"frontName":"舒适源自高品质"},{"categoryType":0,"showIndex":21,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/603d7a8d9e2449aaec58ca191d0bea61.jpg","name":"女式家居服","id":1093005,"frontDesc":"享受宅家时光","type":0,"subCateList":[],"frontName":"享受宅家时光"},{"categoryType":0,"showIndex":22,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8207750f810aea25e43c423e6de7f943.png","bannerUrl":"","name":"男式内裤","id":1010002,"frontDesc":"透气舒爽 自由空间","type":0,"subCateList":[],"frontName":"透气舒爽 自由空间"},{"categoryType":0,"showIndex":23,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b330070087bb87cb7586bd4097aa5a65.png","bannerUrl":"","name":"女式内裤","id":1013006,"frontDesc":"温和安全 亲密呵护","type":0,"subCateList":[],"frontName":"温和安全 亲密呵护"},{"categoryType":0,"showIndex":24,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/59122ca632ba972f02d8621458da74c4.png","name":"女式文胸/套装","id":1093011,"frontDesc":"贴身关怀 少束缚","type":0,"subCateList":[],"frontName":"贴身关怀 少束缚"},{"categoryType":0,"showIndex":25,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/df3c77be2e897ad51fb5cfd2040b7b55.png","name":"男式内衣","id":1093013,"frontDesc":"绅士的第二肌肤","type":0,"subCateList":[],"frontName":"绅士的第二肌肤"},{"categoryType":0,"showIndex":26,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f850599cb9c99a523b0a88160da80eca.png","bannerUrl":"","name":"男袜","id":1008004,"frontDesc":"始于足下的品质生活","type":0,"subCateList":[],"frontName":"始于足下的品质生活"},{"categoryType":0,"showIndex":27,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e888bde27a75c01f67b20c8b3eb3cee3.png","name":"丝袜","id":1034000,"frontDesc":"犹如你腿部的第二层肌肤","type":0,"subCateList":[],"frontName":"犹如你腿部的第二层肌肤"},{"categoryType":0,"showIndex":28,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/27ba0c6e4898bffd723ea4272e6380db.png","bannerUrl":"","name":"女袜/连裤袜","id":109273001,"frontDesc":"始于足下的品质生活","type":0,"subCateList":[],"frontName":"始于足下的品质生活"},{"categoryType":0,"showIndex":29,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/5452d909f0caddc1b9a8311968e78a17.png","bannerUrl":"","name":"男鞋","id":1008003,"frontDesc":"匠心打造 轻潮舒适","type":0,"subCateList":[],"frontName":"匠心打造 轻潮舒适"},{"categoryType":0,"showIndex":30,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1a51bbdd24badf39d66b884ea71e665c.png","bannerUrl":"","name":"女鞋","id":1013000,"frontDesc":"优雅 如此舒适","type":0,"subCateList":[],"frontName":"优雅 如此舒适"},{"categoryType":0,"showIndex":31,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2885bf2a48a744cbf6c1aa4a9d0f907b.png","bannerUrl":"","name":"拖鞋","id":1008010,"frontDesc":"慵懒休闲时光 轻松惬意生活","type":0,"subCateList":[],"frontName":"慵懒休闲时光 轻松惬意生活"},{"showIndex":32,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/eedd6de98be2da9e63608b994035bf14.png","bannerUrl":"","frontDesc":"呵护双脚 驱散行走的压力","type":0,"frontName":"呵护双脚 驱散行走的压力","categoryType":0,"superCategoryId":1010000,"name":"鞋配","iconUrl":"","id":1044000,"subCateList":[]},{"categoryType":0,"showIndex":33,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/dbc1125c627b106de9b3d078b97292fb.png","name":"女士包袋","id":1056002,"frontDesc":"包里装着你的整个世界","type":0,"subCateList":[],"frontName":"包里装着你的整个世界"},{"categoryType":0,"showIndex":34,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e8b034f63aac15198f971503a6370947.png","name":"男士包袋","id":1056001,"frontDesc":"懂你的责任也更懂你","type":0,"subCateList":[],"frontName":"懂你的责任也更懂你"},{"categoryType":0,"showIndex":35,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a94a5d317d289f01a93ee093c3975121.png","name":"钱包及小皮件","id":1056003,"frontDesc":"握在手中的精致","type":0,"subCateList":[],"frontName":"握在手中的精致"},{"categoryType":0,"showIndex":36,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/638f6de1cfa9defef5468a952f4efcad.png","name":"行李箱","id":1037000,"frontDesc":"带着梦想即刻出发","type":0,"subCateList":[],"frontName":"带着梦想即刻出发"},{"showIndex":37,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/210c5f72a701ec888efa0c1d885d1de1.png","bannerUrl":"","frontDesc":"璀璨闪耀 品质甄选","type":0,"frontName":"璀璨闪耀 品质甄选","categoryType":0,"superCategoryId":1010000,"name":"奢华珠宝","iconUrl":"","id":1020008,"subCateList":[]},{"categoryType":0,"showIndex":38,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1eb26c281fa9b7b9e386cfd5ce1d67a7.png","name":"时尚饰品","id":109253000,"frontDesc":"精致灵动的小确幸","type":0,"subCateList":[],"frontName":"精致灵动的小确幸"},{"categoryType":0,"showIndex":39,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a83b12528629ec1f6d08e6344739fce7.png","bannerUrl":"","name":"围巾手套","id":1008007,"frontDesc":"冬日出街必备","type":0,"subCateList":[],"frontName":"冬日出街必备"},{"categoryType":0,"showIndex":40,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1d653f706fb834937a3d1c29e5725618.png","name":"眼镜墨镜","id":1036001,"frontDesc":"你和潮流之间就差一个我","type":0,"subCateList":[],"frontName":"你和潮流之间就差一个我"},{"categoryType":0,"showIndex":41,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/52d449042bc437f6179935624f0c1056.png","bannerUrl":"","name":"腰带腕表","id":1010004,"frontDesc":"匠心雕琢细节 细节彰显品位","type":0,"subCateList":[],"frontName":"匠心雕琢细节 细节彰显品位"},{"categoryType":0,"showIndex":42,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/dbee5f088438f7a1538454372788845d.png","name":"帽子发饰","id":109253001,"frontDesc":"时髦 从“头”开始","type":0,"subCateList":[],"frontName":"时髦 从“头”开始"},{"categoryType":0,"showIndex":43,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/01f06c74b0591a8da403199cf27dd875.png","name":"Yessing上装","id":109202000,"frontDesc":"运动生活两相宜","type":0,"subCateList":[],"frontName":"运动生活两相宜"},{"categoryType":0,"showIndex":44,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/6a68adf468654a26d916fcaf5a4ab5bd.png","name":"Yessing下装","id":109214006,"frontDesc":"时尚下装 元气满满","type":0,"subCateList":[],"frontName":"时尚下装 元气满满"},{"categoryType":0,"showIndex":45,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9fe3213589cf74af2ec8ec3ce5322ada.png","name":"女式上装","id":109255016,"frontDesc":"一步获取元气女神","type":0,"subCateList":[],"frontName":"一步获取元气女神"},{"categoryType":0,"showIndex":46,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/d0c83b8c8429de534a5945e2a6135a8a.png","name":"男式上装","id":109255014,"frontDesc":"运动休闲型男魅力","type":0,"subCateList":[],"frontName":"运动休闲型男魅力"},{"categoryType":0,"showIndex":47,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/353876f9db324dc0976ccef7bc834451.png","name":"女式下装","id":109255017,"frontDesc":"好穿易搭轻松减龄","type":0,"subCateList":[],"frontName":"好穿易搭轻松减龄"},{"categoryType":0,"showIndex":48,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/25a81eb6ab646d8a294f3a51d7dc231f.png","name":"男式下装","id":109255015,"frontDesc":"时尚生活有型有款","type":0,"subCateList":[],"frontName":"时尚生活有型有款"},{"categoryType":0,"showIndex":49,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8ebf546b13d24f2dc3c08521b592313f.png","name":"免烫系列","id":109263000,"frontDesc":"舒适免烫 时刻平整","type":0,"subCateList":[],"frontName":"舒适免烫 时刻平整"},{"categoryType":0,"showIndex":50,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a9db6faaa689c4dfcc37ef80d0552b1a.png","name":"棉麻系列","id":109263002,"frontDesc":"透气棉麻 清楚不羁","type":0,"subCateList":[],"frontName":"透气棉麻 清楚不羁"},{"categoryType":0,"showIndex":51,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/cc358f426cbe81d9e806c6b7c2fb64aa.png","name":"真丝系列","id":109263003,"frontDesc":"生活质感更考究","type":0,"subCateList":[],"frontName":"生活质感更考究"},{"categoryType":0,"showIndex":52,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/674af56699e3ccf525f4d65b7bab5446.png","name":"莫代尔系列","id":109263004,"frontDesc":"舒适不同凡响","type":0,"subCateList":[],"frontName":"舒适不同凡响"},{"categoryType":0,"showIndex":53,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9f7531cbaa489ec85a91a3a7dae92e21.png","name":"几何森林","id":109263005,"frontDesc":"绮梦穿梭 视觉世界","type":0,"subCateList":[],"frontName":"绮梦穿梭 视觉世界"},{"categoryType":0,"showIndex":54,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f08b4c04de93a6896f4e02df44ab457b.png","name":"海洋环保","id":109269000,"frontDesc":"海洋垃圾再生面料 时尚又环保","type":0,"subCateList":[],"frontName":"海洋环保"}]},{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/a657e5214585b1825b7970c4b956e3c2.jpg?quality=75&type=webp&imageView&thumbnail=0x196","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"美食酒水","id":1005002,"type":0,"subCateList":[{"showIndex":1,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/85bf41ca68dc4fe79892344af5887e56.png","bannerUrl":"","frontDesc":"春节宅家囤美食，放假期间正常发货","type":0,"frontName":"春节宅家囤美食，放假期间正常发货","categoryType":0,"superCategoryId":1005002,"name":"宅家囤美食","iconUrl":"","id":109271000,"subCateList":[]},{"categoryType":0,"showIndex":2,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/eefce6cae6d9f89b309612f70a80c3e0.png","name":"居家保健","id":109273000,"frontDesc":"宅家吃好物，强身养生抵抗力棒","type":0,"subCateList":[],"frontName":"宅家吃好物，强身养生抵抗力棒"},{"categoryType":0,"showIndex":3,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/6282955a3db5db7c0ee06e9d560c165f.png","name":"上新美味","id":109253007,"frontDesc":"为你寻遍世间美味，让你品尝第一口好物","type":0,"subCateList":[],"frontName":"为你寻遍世间美味，让你品尝第一口好物"},{"categoryType":0,"showIndex":4,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/59fa0a9ddd1264dbc6f4cb8979357007.png","name":"大家都在买","id":109253008,"frontDesc":"网友购物车里的美食的TOP榜","type":0,"subCateList":[],"frontName":"网友购物车里的美食的TOP榜"},{"categoryType":0,"showIndex":5,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2e753a8f0977fd09a74ccea4f0c6192c.png","bannerUrl":"","name":"饼干糕点","id":1008015,"frontDesc":"无人工添加香精、防腐剂","type":0,"subCateList":[],"frontName":"四季糕点，用心烘焙"},{"categoryType":0,"showIndex":6,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/6941ede8541ceeb432e8da16e200152b.png","bannerUrl":"","name":"小食糖巧","id":1005011,"frontDesc":"原香鲜材，以小食之味，带来味蕾惊喜","type":0,"subCateList":[],"frontName":"原香鲜材，以小食之味，带来味蕾惊喜"},{"categoryType":0,"showIndex":7,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/18dc905db6c49fbf55b2709078875cdb.png","name":"肉类零食","id":1035003,"frontDesc":"真嗜肉者，都爱这一味，或麻辣鲜香、或五味俱全，都是佳肴美馔真滋味","type":0,"subCateList":[],"frontName":"真嗜肉者，都爱这一味，佳肴美馔真滋味"},{"categoryType":0,"showIndex":8,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/46b5256193d052612ecb9fb22d7f4b88.png","bannerUrl":"","name":"坚果炒货","id":1005010,"frontDesc":"精选原产地，美味加营养","type":0,"subCateList":[],"frontName":"精选原产地，美味加营养"},{"showIndex":9,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/dfc7d79ca21ee0f55428c8be218da5d3.png","bannerUrl":"","frontDesc":"品尝与收获到的是自然的味道","type":0,"frontName":"品尝与收获到的是自然的味道","categoryType":0,"superCategoryId":1005002,"name":"蜜饯果干","iconUrl":"","id":1027001,"subCateList":[]},{"categoryType":0,"showIndex":10,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8d4523c21259f514d378ad7431cd4a75.png","bannerUrl":"","name":"冲调饮品","id":1005013,"frontDesc":"以用料天然之美，尽享闲雅之意","type":0,"subCateList":[],"frontName":"以用料天然之美，尽享闲雅之意"},{"categoryType":0,"showIndex":11,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/edb41097ac4cc34ffd08d02f125c98e8.jpg","name":"传统茗茶","id":1027000,"frontDesc":"一品茶香，品茗即是观心，饮茶涤净尘虑","type":0,"subCateList":[],"frontName":"一品茶香，品茗即是观心，饮茶涤净尘虑"},{"showIndex":12,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/01a25fc0ec89278943d488eba3b959e1.jpg","bannerUrl":"","frontDesc":"人生圆满，不过赠好友一盒茶礼，品味畅谈","type":0,"frontName":"人生圆满，不过赠好友一盒茶礼，品味畅谈","categoryType":0,"superCategoryId":1005002,"name":"茗茶礼盒","iconUrl":"","id":109260000,"subCateList":[]},{"categoryType":0,"showIndex":13,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/bd65e6d2bd8985e55d38c06f173a6fb5.jpg","name":"茶包花茶","id":109206006,"frontDesc":"办公室必备茶包花茶","type":0,"subCateList":[],"frontName":"办公室必备茶包花茶"},{"categoryType":0,"showIndex":14,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0a66214a911887c854cb75e4112c07ed.png","name":"滋补食材","id":1054001,"frontDesc":"营养滋补，只为健康","type":0,"subCateList":[],"frontName":"营养滋补，只为健康"},{"categoryType":0,"showIndex":15,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/65fa4fbdbff206271c27179844e9297a.png","name":"保健品","id":109206016,"frontDesc":"保健佳品","type":0,"subCateList":[],"frontName":"保健佳品"},{"categoryType":0,"showIndex":16,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/25428a7b8047d4e35ab58367bf44d030.png","name":"乳品饮料","id":109206008,"frontDesc":"四季饮料，欢乐共享","type":0,"subCateList":[],"frontName":"四季饮料，欢乐共享"},{"categoryType":0,"showIndex":17,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e2ec593d7d5feae8a2f227892d08b081.png","name":"酒类","id":1053001,"frontDesc":"美酒佳酿，用心典藏","type":0,"subCateList":[],"frontName":"美酒佳酿，用心典藏"},{"categoryType":0,"showIndex":18,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e486923c1ffa14ad47672c6d495be8ed.png","name":"名酒馆","id":109264007,"frontDesc":"寻遍全球，甄选世界好酒","type":0,"subCateList":[],"frontName":"名酒馆"},{"categoryType":0,"showIndex":19,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/7ecc7eab5519a1bf49fd2b6f4ad433ec.png","name":"米面粮油","id":109206007,"frontDesc":"米面粮油，家庭必备","type":0,"subCateList":[],"frontName":"米面粮油，家庭必备"},{"categoryType":0,"showIndex":20,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/7154cb8de296a6d6acb16022d2725189.png","name":"方便食品","id":109201001,"frontDesc":"健康方便食品","type":0,"subCateList":[],"frontName":"健康方便食品"},{"categoryType":0,"showIndex":21,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4daf3eb8c49f473596bb15a71edc510f.png","bannerUrl":"","name":"南北干货","id":1005012,"frontDesc":"天时地利人和，寻找这个时节这个地点的味道","type":0,"subCateList":[],"frontName":"天时地利人和，寻找这个时节这个地点的味道"},{"categoryType":0,"showIndex":22,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/339889b1f38aba8b4a63c472e782d1ee.png","name":"调味酱菜","id":1036003,"frontDesc":"烹饪必备，美食调味","type":0,"subCateList":[],"frontName":"烹饪必备，美食调味"},{"categoryType":0,"showIndex":23,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e370d525c0bc5c35173fd72f2b598403.jpg","name":"水果蔬菜","id":109264008,"frontDesc":"应季果蔬，应有尽有","type":0,"subCateList":[],"frontName":"水果蔬菜"},{"categoryType":0,"showIndex":24,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/d3e0c79acff00d7b481e003816d5c105.png","name":"肉蛋海鲜","id":109206009,"frontDesc":"新鲜肉质，新鲜体验","type":0,"subCateList":[],"frontName":"肉蛋海鲜"},{"categoryType":0,"showIndex":25,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/075e800278eea9266f2d839f4c6cb5a2.png","name":"冷冻冷藏","id":109264009,"frontDesc":"冷冻美食，冷藏好味道","type":0,"subCateList":[],"frontName":"冷冻冷藏"},{"showIndex":26,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0a35aef69fd20761d113f4dc54f4ef2c.png","bannerUrl":"","frontDesc":"安全配送，新鲜直达","type":0,"frontName":"安全配送，新鲜直达","categoryType":0,"superCategoryId":1005002,"name":"网易黑猪","iconUrl":"","id":1008014,"subCateList":[]},{"categoryType":0,"showIndex":27,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ed9fda295d73fa8bbd0b9ea428329c1b.png","name":"全球美食","id":109206010,"frontDesc":"全球制造，环球美食","type":0,"subCateList":[],"frontName":"全球制造，环球美食"}]},{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/0cf6e47037b7cc7688ec9845b543525f.jpg?quality=75&type=webp&imageView&thumbnail=0x196","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"个护清洁","id":1013001,"type":0,"subCateList":[{"categoryType":0,"showIndex":1,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0af70c043ee2418c63eb74135084b215.png","name":"爆款榜单","id":109256007,"frontDesc":"精选口碑尖货","type":0,"subCateList":[],"frontName":"精选口碑尖货"},{"categoryType":0,"showIndex":2,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ad777c7b8e1e53040bfe7e46a93f5950.png","name":"面部护理","id":1020001,"frontDesc":"温和无刺激的呵护","type":0,"subCateList":[],"frontName":"温和无刺激的呵护"},{"categoryType":0,"showIndex":3,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ffce24773c1b680572353d1d864da1e7.jpg","name":"新品尝鲜","id":109256008,"frontDesc":"新品速递，等你来试","type":0,"subCateList":[],"frontName":"新品速递，等你来试"},{"categoryType":0,"showIndex":4,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/52bca59c658299046c4df435c3abee1c.png","name":"基础护肤","id":109256010,"frontDesc":"高效补水，深层修护","type":0,"subCateList":[],"frontName":"高效补水，深层修护"},{"categoryType":0,"showIndex":5,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e3211f79704b02298656ec8c99b6a70d.png","name":"卸妆洁面","id":109256009,"frontDesc":"温和配方，养卸一体","type":0,"subCateList":[],"frontName":"温和配方，养卸一体"},{"categoryType":0,"showIndex":6,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/52068e062728c10f4d4da30fed9d3280.png","name":"护肤工具","id":109256011,"frontDesc":"智能美颜，匠心工艺","type":0,"subCateList":[],"frontName":"智能美颜，匠心工艺"},{"categoryType":0,"showIndex":7,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1ac9a9eee6be87a02faaea2e3abfec25.png","bannerUrl":"","name":"洗发护发","id":1013003,"frontDesc":"护发超有效小秘诀","type":0,"subCateList":[],"frontName":"呵护秀发，柔顺不同发质"},{"categoryType":0,"showIndex":8,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/cf842f27c11f1587ca55d20035c1caba.png","name":"身体护理","id":1037002,"frontDesc":"呵护肌肤，天然温和","type":0,"subCateList":[],"frontName":"呵护肌肤，天然温和"},{"categoryType":0,"showIndex":9,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/cef1d1b9f26a01037d705443e585d313.png","name":"口腔护理","id":1037003,"frontDesc":"健康口腔，品质生活","type":0,"subCateList":[],"frontName":"健康口腔，品质生活"},{"categoryType":0,"showIndex":10,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/13d7d7e9fa5f59227f8d5c4be153a957.png","name":"女性护理","id":109208003,"frontDesc":"品质之选，温柔呵护","type":0,"subCateList":[],"frontName":"品质之选，温柔呵护"},{"categoryType":0,"showIndex":11,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/5f91b77da79bb06f72973ecbb63c6a64.png","bannerUrl":"","name":"彩妆修容","id":1013002,"frontDesc":"为你的面容添色","type":0,"subCateList":[],"frontName":"为你的面容添色"},{"categoryType":0,"showIndex":12,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/fd2d0e6a87331d18ec67e77cd0f09c5b.png","name":"美妆工具","id":109243017,"frontDesc":"选对工具，精致妆容","type":0,"subCateList":[],"frontName":"选对工具，精致妆容"},{"categoryType":0,"showIndex":13,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e4c674c49a1a7da65fda7d50e2a32328.png","bannerUrl":"","name":"香水香氛","id":1013004,"frontDesc":"提炼纯净，清雅不腻","type":0,"subCateList":[],"frontName":"提炼纯净，清雅不腻"},{"categoryType":0,"showIndex":14,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/31856d567e5c2de30f2d06c03994148c.png","name":"个护电器","id":109248003,"frontDesc":"科技护理，创享精致生活","type":0,"subCateList":[],"frontName":"科技护理，创享精致生活"},{"categoryType":0,"showIndex":15,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8efe5dc20ae937faa0f8918678728f3d.png","name":"口腔护理电器","id":109254053,"frontDesc":"专业高效护理口腔","type":0,"subCateList":[],"frontName":"专业高效护理口腔"},{"categoryType":0,"showIndex":16,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/be5d2abe1db1b8efe84bb48250d2899c.png","name":"面部护理电器","id":109254054,"frontDesc":"让你变美的仪器们","type":0,"subCateList":[],"frontName":"让你变美的仪器们"},{"categoryType":0,"showIndex":17,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/539ea18e491d8e0c98152eed1d300f54.png","name":"头发护理电器","id":109254055,"frontDesc":"头发亮泽光彩，随心造型","type":0,"subCateList":[],"frontName":"头发亮泽光彩，随心造型"},{"categoryType":0,"showIndex":18,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/fb99d01e5fc25568f97b6cf93012b1d2.png","name":"身体护理电器","id":109254056,"frontDesc":"爱护身体，方寸间蕴出肌肤之美","type":0,"subCateList":[],"frontName":"爱护身体，方寸间蕴出肌肤之美"},{"categoryType":0,"showIndex":19,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/921337182aa5a4540ab0632c1fb6ad89.png","name":"纸品湿巾","id":1037001,"frontDesc":"和风设计，温和清洁","type":0,"subCateList":[],"frontName":"和风设计，温和清洁"},{"categoryType":0,"showIndex":20,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/869ab6b70b45716c9ffd35ed55669855.png","name":"纸品","id":109256012,"frontDesc":"和风设计，原生木浆","type":0,"subCateList":[],"frontName":"和风设计，原生木浆"},{"categoryType":0,"showIndex":21,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1275d57ba465ea26488f3be701295099.png","name":"湿巾","id":109256013,"frontDesc":"温和致净，亲密呵护","type":0,"subCateList":[],"frontName":"温和致净，亲密呵护"},{"categoryType":0,"showIndex":22,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e40f60a3fe682b3317f3672e374dca0b.png","name":"衣物护理","id":109243015,"frontDesc":"洁净衣物，守护全家","type":0,"subCateList":[],"frontName":"洁净衣物，守护全家"},{"categoryType":0,"showIndex":23,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/54f2e4f7a9cb17b61804d4d9a8982889.png","bannerUrl":"","name":"家庭清洁","id":1009000,"frontDesc":"天然材料，温和去除污垢","type":0,"subCateList":[],"frontName":"洁净才能带来清爽心情"},{"categoryType":0,"showIndex":24,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/45d436cc3d818ee3686b9ceb2a6a71e0.png","name":"餐厨清洁","id":109243016,"frontDesc":"高效清洁，省时省心","type":0,"subCateList":[],"frontName":"高效清洁，省时省心"},{"categoryType":0,"showIndex":25,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/44114978a0117bac622cdc3ffdc7b638.png","name":"毛巾浴巾","id":109261055,"frontDesc":"亲肤柔棉，安心品质","type":0,"subCateList":[],"frontName":"亲肤柔棉，安心品质"},{"categoryType":0,"showIndex":26,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/76d4335b8a97c7e2635f66e1b71e4ee1.png","name":"浴室用品","id":1020002,"frontDesc":"环保材料，耐用不发霉","type":0,"subCateList":[],"frontName":"小工具成就美好浴室"},{"categoryType":0,"showIndex":27,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c96383b484c677dacd0c696040a769b4.png","name":"避孕套","id":109255010,"frontDesc":"给爱爱一层安全感","type":0,"subCateList":[],"frontName":"给爱爱一层安全感"},{"categoryType":0,"showIndex":28,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8ea84f70b41e0441b8df48bd2f88b26e.png","name":"女用情趣","id":109255011,"frontDesc":"解锁身体的快乐秘密","type":0,"subCateList":[],"frontName":"解锁身体的快乐秘密"},{"categoryType":0,"showIndex":29,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/5f2f9f911ff905040f6d5c747a5c9bf5.png","name":"男用情趣","id":109255012,"frontDesc":"男儿硬器，尽兴释放自己","type":0,"subCateList":[],"frontName":"男儿硬器，尽兴释放自己"},{"categoryType":0,"showIndex":30,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/72e99034707dc6ffa890b3e82113c8e6.png","name":"润滑液","id":109255013,"frontDesc":"让亲密接触更湿滑畅意","type":0,"subCateList":[],"frontName":"让亲密接触更湿滑畅意"},{"categoryType":0,"showIndex":31,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1adf88cfc906928959e5741e9455790f.png","name":"计生情趣","id":1037004,"frontDesc":"解锁身体里的快乐秘密","type":0,"subCateList":[],"frontName":"解锁身体里的快乐秘密"}]},{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/3dbb62e200611707a0f818833b823d9a.jpg?quality=75&type=webp&imageView&thumbnail=0x196","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"母婴亲子","id":1011000,"type":0,"subCateList":[{"categoryType":0,"showIndex":1,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/97f65393f6a4a7b3d91cbe0cd19c617d.png","name":"防疫榜单","id":109259002,"frontDesc":"清洁洗护 科学防疫","type":0,"subCateList":[],"frontName":"清洁洗护 科学防疫"},{"categoryType":0,"showIndex":2,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ad29850918fab29003201e7778bf84ea.png","name":"宅家好物","id":109255006,"frontDesc":"文具玩具 成长好礼","type":0,"subCateList":[],"frontName":"文具玩具 成长好礼"},{"categoryType":0,"showIndex":3,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9dacf066ccf643c91b64cf93dfb9dfb5.png","name":"初春换新","id":1037005,"frontDesc":"服配居家 等你来挑","type":0,"subCateList":[],"frontName":"服配居家 等你来挑"},{"categoryType":0,"showIndex":4,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e16890ca1f2e296261025a896d5c16e0.png","name":"尾货秒杀","id":1034001,"frontDesc":"限量抢购 抄底折扣","type":0,"subCateList":[],"frontName":"限量抢购 抄底折扣"},{"categoryType":0,"showIndex":5,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4da3ff593625177ec09a23228b338290.png","name":"秋日出游","id":109255007,"frontDesc":"秋高气爽 放心出行","type":0,"subCateList":[],"frontName":"秋高气爽 放心出行"},{"categoryType":0,"showIndex":6,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/5be2729ef9a10df2e201b3084b551ae8.png","name":"五折封顶","id":109255008,"frontDesc":"夏日抄底特惠专区","type":0,"subCateList":[],"frontName":"夏日抄底特惠专区"},{"categoryType":0,"showIndex":7,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f3d5a10fbd65c58e0bb54d6e569597f2.png","name":"新手妈妈指南","id":109255009,"frontDesc":"新妈妈装备 一站购全","type":0,"subCateList":[],"frontName":"新妈妈装备 一站购全"},{"categoryType":0,"showIndex":8,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0e94a5a01e13752b6c5d75e13e3b1283.png","name":"卫衣/毛衫","id":1091003,"frontDesc":"舒适穿搭 精彩童年","type":0,"subCateList":[],"frontName":"舒适穿搭 精彩童年"},{"categoryType":0,"showIndex":9,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/24244fafbbde8f6e6215647a03ebbc7c.png","name":"T恤/polo/衬衫","id":1020003,"frontDesc":"必备上衣 百搭精选","type":0,"subCateList":[],"frontName":"必备上衣 百搭精选"},{"categoryType":0,"showIndex":10,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/60a70b35a24ad07449c763a6f2d16434.png","name":"外套/套装","id":109243018,"frontDesc":"甄选衣橱 陪伴左右","type":0,"subCateList":[],"frontName":"甄选衣橱 陪伴左右"},{"categoryType":0,"showIndex":11,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8ae80697a24aefe4069f1066ebe142fc.png","name":"裤子/裙装","id":109243019,"frontDesc":"实用下装 方便活动","type":0,"subCateList":[],"frontName":"实用下装 方便活动"},{"categoryType":0,"showIndex":12,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/cfbe20d66ea16903d786d5a19976d5d0.png","name":"裙装","id":109243020,"frontDesc":"气质裙装 优雅大方","type":0,"subCateList":[],"frontName":"气质裙装 优雅大方"},{"categoryType":0,"showIndex":13,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/6df0eecd6458ca390b1cfefeb910f33b.png","name":"连体衣/礼盒","id":109243021,"frontDesc":"A类无荧光 给宝宝更好的","type":0,"subCateList":[],"frontName":"A类无荧光 给宝宝更好的"},{"categoryType":0,"showIndex":14,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/772eb195bae088cb2c3bef9987ae75b9.png","name":"内衣/配搭","id":1089001,"frontDesc":"孩子衣橱里的配搭好物","type":0,"subCateList":[],"frontName":"孩子衣橱里的配搭好物"},{"categoryType":0,"showIndex":15,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/514726ef6c2ec1d0bd377a903666e9da.png","name":"儿童鞋","id":1037006,"frontDesc":"活力鞋品 孩子必备","type":0,"subCateList":[],"frontName":"活力鞋品 孩子必备"},{"categoryType":0,"showIndex":16,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/cee62d001b384e8f16ba290d37c04e10.png","name":"学步鞋","id":109243022,"frontDesc":"宝宝学步 专业科学","type":0,"subCateList":[],"frontName":"宝宝学步 专业科学"},{"categoryType":0,"showIndex":17,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a1a521de2a5708b3c3f4a93471346f58.png","name":"尿裤纸品","id":109255004,"frontDesc":"呵护宝宝的每寸肌肤","type":0,"subCateList":[],"frontName":"呵护宝宝的每寸肌肤"},{"categoryType":0,"showIndex":18,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b0ae93ae9133420fb688c193462eeabc.png","name":"洗护","id":1020004,"frontDesc":"天然专业 呵护宝宝肌","type":0,"subCateList":[],"frontName":"天然专业 呵护宝宝肌"},{"categoryType":0,"showIndex":19,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/eb8c8e70f88d8cb4866a811a34badb51.png","name":"喂养","id":1020007,"frontDesc":"宝宝吃得香 妈妈才放心","type":0,"subCateList":[],"frontName":"宝宝吃得香 妈妈才放心"},{"categoryType":0,"showIndex":20,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4843c411dec12e6873dc8d6ff0b4b3b1.png","name":"儿童家具收纳","id":109206012,"frontDesc":"有你才有家 成长快乐窝","type":0,"subCateList":[],"frontName":"有你才有家 成长快乐窝"},{"categoryType":0,"showIndex":21,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/cea5a4dcff63ff83c1f34ca576ccb8d9.png","name":"婴童被枕芯类","id":1020005,"frontDesc":"甄选贴肤材质 宝宝舒眠甜梦","type":0,"subCateList":[],"frontName":"甄选贴肤材质 宝宝舒眠甜梦"},{"categoryType":0,"showIndex":22,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c230d5a5edf629bd921ee37dabb5cb03.png","name":"婴童床品套件","id":109245001,"frontDesc":"甄选天然面料 亲肤透气","type":0,"subCateList":[],"frontName":"甄选天然面料 亲肤透气"},{"categoryType":0,"showIndex":23,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/126545cd9cd34dc4e63b815e83ec4a06.png","name":"抱被睡袋","id":109245002,"frontDesc":"贴心设计 好眠助成长","type":0,"subCateList":[],"frontName":"贴心设计 好眠助成长"},{"categoryType":0,"showIndex":24,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9556bfa01dde5eb46cf56a0bbc3c6461.png","name":"推车/安全座椅","id":109243027,"frontDesc":"安全严苛标准 溜娃神器","type":0,"subCateList":[],"frontName":"安全严苛标准 溜娃神器"},{"categoryType":0,"showIndex":25,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/064b9f83a29735b3c6517f6c6be35d47.png","name":"童包/雨具","id":109206013,"frontDesc":"出行必备包包雨具","type":0,"subCateList":[],"frontName":"出行必备包包雨具"},{"categoryType":0,"showIndex":26,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e5ae3db7c2819731768ac50b2ff04d64.png","name":"玩具","id":1020006,"frontDesc":"益智趣味 在玩乐中学习","type":0,"subCateList":[],"frontName":"益智趣味 在玩乐中学习"},{"categoryType":0,"showIndex":27,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/76a23e423710c88ac1070aed906580b2.png","name":"文具","id":1089000,"frontDesc":"本册纸笔 翻译利器","type":0,"subCateList":[],"frontName":"本册纸笔 翻译利器"},{"categoryType":0,"showIndex":28,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/628b0985bf900d543c3aad06d1f40c46.png","name":"图书","id":109243023,"frontDesc":"开拓视野 亲子共读","type":0,"subCateList":[],"frontName":"开拓视野 亲子共读"},{"showIndex":29,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2d96684c2b2dc89df9a001235abd0a6d.png","bannerUrl":"","frontDesc":"妈咪贴身衣物 承诺无荧光剂","type":0,"frontName":"妈咪贴身衣物 承诺无荧光剂","categoryType":0,"superCategoryId":1011000,"name":"孕妈服饰","iconUrl":"","id":1011001,"subCateList":[]},{"categoryType":0,"showIndex":30,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8ab1afb09ce988aef93263280e2c2097.png","name":"妈咪用品","id":109206015,"frontDesc":"新手妈妈 必备用品","type":0,"subCateList":[],"frontName":"新手妈妈 必备用品"},{"categoryType":0,"showIndex":31,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9b7bb9df09836b1cb7e46f9fefb1b2c0.png","name":"孕妈装","id":109206014,"frontDesc":"时尚大方 安全无荧光剂","type":0,"subCateList":[],"frontName":"时尚大方 安全无荧光剂"},{"categoryType":0,"showIndex":32,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b51b268801f04b6f9210967a0136e0bb.png","name":"安全座椅","id":109243026,"frontDesc":"比安全更周全 专业安全","type":0,"subCateList":[],"frontName":"比安全更周全 专业安全"},{"categoryType":0,"showIndex":33,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/7a347426bb41f4e5221001855dcbc65c.png","name":"毛巾口水巾","id":109206011,"frontDesc":"婴童高标准毛巾","type":0,"subCateList":[],"frontName":"婴童高标准毛巾"},{"categoryType":0,"showIndex":34,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c6557651e50d82d7d9f8184f8a0e955b.png","name":"儿童雨具/泳具","id":109255005,"frontDesc":"趣味玩水 放肆一夏","type":0,"subCateList":[],"frontName":"趣味玩水 放肆一夏"},{"categoryType":0,"showIndex":35,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1f93797e2f77cb0e0ac3c153183d2697.png","name":"防走丢包","id":109243024,"frontDesc":"防护牵引 安全出行","type":0,"subCateList":[],"frontName":"防护牵引 安全出行"},{"categoryType":0,"showIndex":36,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/34f22f5e50082da73d91e07794a9afea.png","name":"其它箱包","id":109243025,"frontDesc":"休闲实用 出游必备","type":0,"subCateList":[],"frontName":"休闲实用 出游必备"}]},{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/7325584e6fcaf7a6af0fa469b605ac0e.jpg?quality=75&type=webp&imageView&thumbnail=0x196","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"运动旅行","id":109243029,"type":0,"subCateList":[{"categoryType":0,"showIndex":1,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ba81ce10c1e0fab23d010736d65ba0a7.jpg","name":"Yessing","id":109256006,"frontDesc":"穿出你的个性态度","type":0,"subCateList":[],"frontName":"穿出你的个性态度"},{"categoryType":0,"showIndex":1,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/87e3129e372b7ebf73767f10be8a15a2.png","name":"男式运动","id":1020010,"frontDesc":"细节讲究 合身剪裁不束缚","type":0,"subCateList":[],"frontName":"细节讲究 合身剪裁不束缚"},{"categoryType":0,"showIndex":3,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/18d5a7a3ed8b3731d4e37394a37a6dd3.png","name":"健身系列","id":109254039,"frontDesc":"静体静心 养生健体","type":0,"subCateList":[],"frontName":"静体静心 养生健体"},{"categoryType":0,"showIndex":4,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2e8953d954d410a2ae2c9321651b85f1.png","name":"出行好物","id":109254040,"frontDesc":"出行好物 贴心相伴","type":0,"subCateList":[],"frontName":"出行好物 贴心相伴"},{"categoryType":0,"showIndex":5,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c2871979efcc7ed2d40bc569c7fe70a2.png","name":"男式运动外套/卫衣","id":109254042,"frontDesc":"运动工作自由切换","type":0,"subCateList":[],"frontName":"运动工作自由切换"},{"categoryType":0,"showIndex":6,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/23cbe4d7d1e3e23d4cc097a67f57b6f9.png","name":"男式运动裤装","id":109254043,"frontDesc":"运动中 让双腿更自如","type":0,"subCateList":[],"frontName":"运动中 让双腿更自如"},{"categoryType":0,"showIndex":7,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/26f8b210ff0dba32cee3e2f374c47e9b.png","name":"男式户外服装","id":109254044,"frontDesc":"防风防水 户外防晒","type":0,"subCateList":[],"frontName":"防风防水 户外防晒"},{"categoryType":0,"showIndex":8,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0ccd33322fda8fc8ad7ccc61b1207afa.png","name":"男式运动T恤","id":109254041,"frontDesc":"经典款式 运动通勤皆可","type":0,"subCateList":[],"frontName":"经典款式 运动通勤皆可"},{"categoryType":0,"showIndex":11,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/dae55f67c05dd3a544c68aaf91e2d2bd.png","name":"女式运动外套/卫衣","id":109254047,"frontDesc":"运动工作自由切换","type":0,"subCateList":[],"frontName":"运动工作自由切换"},{"categoryType":0,"showIndex":12,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3715a4db6b8449843105cd819c1b4fb3.png","name":"女式运动裤装","id":109254048,"frontDesc":"运动中 让双腿更自如","type":0,"subCateList":[],"frontName":"运动中 让双腿更自如"},{"categoryType":0,"showIndex":13,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a49e9afcf7d91826cbaa86c04c94e94d.png","name":"女式户外服装","id":109254049,"frontDesc":"防风防水 户外防晒","type":0,"subCateList":[],"frontName":"防风防水 户外防晒"},{"categoryType":0,"showIndex":14,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/639008fcca7a3a4ecc9ce5cf9e28506e.png","name":"女式运动T恤","id":109254045,"frontDesc":"经典款式 运动通勤皆可","type":0,"subCateList":[],"frontName":"经典款式 运动通勤皆可"},{"categoryType":0,"showIndex":14,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/20c2a3b3b7b1795954c58d8088e6d05e.png","name":"女式运动","id":1035002,"frontDesc":"高质感面料","type":0,"subCateList":[],"frontName":"高质感面料"},{"categoryType":0,"showIndex":15,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f2ccaf4abc6ecf8dca27b50602a61f6a.png","name":"女式运动内衣/泳装","id":109254046,"frontDesc":"运动承托 保护胸部","type":0,"subCateList":[],"frontName":"运动承托 保护胸部"},{"categoryType":0,"showIndex":15,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a1a82637fc8e1ab9eafdd7ae3eec4d4f.png","name":"男式运动下装","id":1015001,"frontDesc":"立体裁剪，专为国人打造","type":0,"subCateList":[],"frontName":"自在而潇洒的穿着感"},{"categoryType":0,"showIndex":16,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4088b6af21f8174909d62084848ef198.png","name":"女式运动下装","id":109214005,"frontDesc":"女士修身运动","type":0,"subCateList":[],"frontName":"女士修身运动"},{"categoryType":0,"showIndex":17,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4415c184ae39afbd59b5e34eed42ed4f.png","name":"男式户外","id":1078000,"frontDesc":"专业休闲运动风","type":0,"subCateList":[],"frontName":"运动休闲多场景任意切换"},{"categoryType":0,"showIndex":18,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9f820db8517536cd0fe2632955198722.png","bannerUrl":"","name":"女式户外","id":1010001,"frontDesc":"户外运动休闲运动","type":0,"subCateList":[],"frontName":"户外运动休闲运动"},{"categoryType":0,"showIndex":19,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/bc18133d4c92124c95c801f5c2582cd2.png","name":"男式运动鞋","id":109249011,"frontDesc":"热血潮流 畅快奔跑","type":0,"subCateList":[],"frontName":"热血潮流 畅快奔跑"},{"categoryType":0,"showIndex":20,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e2bf3f81c3d0916d2f7a14b6d44dcd56.png","name":"女式运动鞋","id":109249012,"frontDesc":"青春运动 轻便舒适","type":0,"subCateList":[],"frontName":"青春运动 轻便舒适"},{"categoryType":0,"showIndex":21,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/63e23cd56352d2cb3c835560e643bf9a.png","name":"旅行用品","id":1020000,"frontDesc":"便携设计 轻便旅途","type":0,"subCateList":[],"frontName":"出行小物 贴心相伴"},{"categoryType":0,"showIndex":22,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3c37a0b380fdcca237d64552db99cce0.png","name":"行李箱","id":109243030,"frontDesc":"带着梦想即刻出发","type":0,"subCateList":[],"frontName":"带着梦想即刻出发"},{"categoryType":0,"showIndex":23,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/cc5ff5a9d325a70b0693795644803d5d.png","name":"颈枕眼罩","id":109261036,"frontDesc":"多功能使用 舒适旅途","type":0,"subCateList":[],"frontName":"多功能使用 舒适旅途"},{"categoryType":0,"showIndex":24,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a97b4100cf9e753d1c51d8f38bdc3a38.png","name":"雨具","id":109261037,"frontDesc":"晴雨两用 随身出行","type":0,"subCateList":[],"frontName":"晴雨两用 随身出行"},{"categoryType":0,"showIndex":25,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b5950f5984ede4241d12ca14620c321a.png","name":"旅行收纳","id":109254051,"frontDesc":"整理你的旅行箱","type":0,"subCateList":[],"frontName":"整理你的旅行箱"},{"categoryType":0,"showIndex":26,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/01ceeee87efb0f66ee19d5b4a2c156e4.png","name":"出行用品","id":109254050,"frontDesc":"让旅途更轻松","type":0,"subCateList":[],"frontName":"让旅途更轻松"},{"categoryType":0,"showIndex":27,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c5550b962058846f3e7e45b137d1ca5f.png","name":"露营野餐","id":109243031,"frontDesc":"趣味露营 享受户外","type":0,"subCateList":[],"frontName":"趣味露营 享受户外"},{"categoryType":0,"showIndex":28,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f821a3c1d8894e89a72d396a19890810.png","name":"徒步登山","id":109261038,"frontDesc":"户外行走 探索无限","type":0,"subCateList":[],"frontName":"户外行走 探索无限"},{"categoryType":0,"showIndex":29,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b91545cb45289cc89e0bcc1a006621b9.png","name":"健身器械","id":109254052,"frontDesc":"打造自己的健身房","type":0,"subCateList":[],"frontName":"打造自己的健身房"},{"categoryType":0,"showIndex":30,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/84464237e022135f1e5e5e1c1c4f9f84.png","name":"按摩护具","id":109243033,"frontDesc":"运动防护 无惧伤害","type":0,"subCateList":[],"frontName":"运动防护 无惧伤害"},{"categoryType":0,"showIndex":31,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0ffac069b042edf1bf24090face6a4bb.png","name":"瑜伽美体","id":109261040,"frontDesc":"静体静心 养生健体","type":0,"subCateList":[],"frontName":"静体静心 养生健体"},{"categoryType":0,"showIndex":32,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2c2f4c3457c2c3c94567cd97157f43c2.png","name":"运动配件","id":109243032,"frontDesc":"运动伴侣 助力训练","type":0,"subCateList":[],"frontName":"运动伴侣 助力训练"},{"categoryType":0,"showIndex":32,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f2bec10d8188a4980f0d5bab26ffa201.png","name":"游泳装备","id":109261041,"frontDesc":"自由泳者","type":0,"subCateList":[],"frontName":"自由泳者"},{"categoryType":0,"showIndex":32,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/12aef6f81b524bd1e9d5aa051266ca65.png","name":"球类运动","id":109261042,"frontDesc":"运动随心","type":0,"subCateList":[],"frontName":"运动随心"}]},{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/6ea5a277746a4e9849040bf2c619d6e9.jpg?quality=75&type=webp&imageView&thumbnail=0x196","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"数码家电","id":1043000,"type":0,"subCateList":[{"categoryType":0,"showIndex":1,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/00bc575e28c69cd85e59ec39adcb5de6.png","name":"当季热销","id":109255020,"frontDesc":"消毒抑菌/除湿烘干/清洁除螨","type":0,"subCateList":[],"frontName":"消毒抑菌/除湿烘干/清洁除螨"},{"categoryType":0,"showIndex":2,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/d2ac4fa7cf365849707e378f15e7d6e3.png","name":"新品首发","id":109255021,"frontDesc":"率先掌握上新资讯","type":0,"subCateList":[],"frontName":"率先掌握上新资讯"},{"categoryType":0,"showIndex":3,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1ca73b12b6338a54421add710d406364.png","name":"甄选爆款","id":109255019,"frontDesc":"严选用户高好评爆款","type":0,"subCateList":[],"frontName":"严选用户高好评爆款"},{"categoryType":0,"showIndex":4,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/61d16210f6dfff72668ff425b79c7190.png","name":"身体护理","id":109249010,"frontDesc":"爱护身体，方寸间蕴出肌肤之美","type":0,"subCateList":[],"frontName":"爱护身体，方寸间蕴出肌肤之美"},{"categoryType":0,"showIndex":5,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e6c44e8dd451090b324fe127e3e8616d.png","name":"口腔护理","id":109249005,"frontDesc":"清新口气，健康牙齿","type":0,"subCateList":[],"frontName":"清新口气，健康牙齿"},{"categoryType":0,"showIndex":6,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2de6707340d511031a3fcb3d98ae770d.png","name":"面部护理","id":109249006,"frontDesc":"美容护肤，让你闪耀脱颖而出","type":0,"subCateList":[],"frontName":"美容护肤，让你闪耀脱颖而出"},{"categoryType":0,"showIndex":7,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/117270efbbb5f5520dbc609dda5d5b44.png","name":"头发护理","id":109249007,"frontDesc":"头发亮泽光彩，随心造型","type":0,"subCateList":[],"frontName":"头发亮泽光彩，随心造型"},{"categoryType":0,"showIndex":8,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8bdd8292aae3861f52b5739174764d99.png","name":"两季电器","id":109249000,"frontDesc":"冬天温暖舒适，夏天清凉舒爽","type":0,"subCateList":[],"frontName":"冬天温暖舒适，夏天清凉舒爽"},{"categoryType":0,"showIndex":9,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c650bffea04dd2749d04d9f63edae464.png","name":"清洁电器","id":109249002,"frontDesc":"清洁好助手，每天都像住新家","type":0,"subCateList":[],"frontName":"清洁好助手，每天都像住新家"},{"categoryType":0,"showIndex":10,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b0e72093d1d047bbd0de7b3160b1506c.png","name":"衣物护理","id":109249001,"frontDesc":"焕然一新，陶醉在衣物的平顺里","type":0,"subCateList":[],"frontName":"焕然一新，陶醉在衣物的平顺里"},{"categoryType":0,"showIndex":11,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0427066bea93d5639f1ba79672ab846b.png","name":"空气调节","id":109249003,"frontDesc":"除湿/加湿/净化，空气焕然一新","type":0,"subCateList":[],"frontName":"除湿/加湿/净化，空气焕然一新"},{"categoryType":0,"showIndex":12,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/591fe5284130069a3e408517443a78dd.png","name":"厨房电器","id":1023000,"frontDesc":"囿于厨房与爱，准备丰富大餐","type":0,"subCateList":[],"frontName":"囿于厨房与爱，准备丰富大餐"},{"categoryType":0,"showIndex":13,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0a563ba0f5e2c9e75031f5f160aee9ae.png","name":"按摩器","id":109249009,"frontDesc":"你的专属按摩大师","type":0,"subCateList":[],"frontName":"你的专属按摩大师"},{"categoryType":0,"showIndex":14,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e05ec7535fb083138a4afb683c63b45b.png","name":"按摩椅","id":109249004,"frontDesc":"仿真人手按摩，享受全方位放松","type":0,"subCateList":[],"frontName":"仿真人手按摩，享受全方位放松"},{"categoryType":0,"showIndex":15,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/32481c037b206627d500daf078087ad7.png","name":"智能家居","id":109249008,"frontDesc":"智能升级家居，提升生活幸福感","type":0,"subCateList":[],"frontName":"智能升级家居，提升生活幸福感"},{"categoryType":0,"showIndex":16,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/590c1c397c52cee5cc0d13c5ccd3dc34.png","name":"智能出行","id":109255018,"frontDesc":"出行黑科技，陪你探索有趣的世界","type":0,"subCateList":[],"frontName":"出行黑科技，陪你探索有趣的世界"},{"categoryType":0,"showIndex":17,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/47e953a95e4378907b131205ce3cbc45.png","name":"3C数码","id":1022000,"frontDesc":"专为职场精英和学生设计","type":0,"subCateList":[],"frontName":"专为职场精英和学生设计"},{"categoryType":0,"showIndex":18,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/620d2c977da93f5130eb5aed639850a0.png","name":"手机配件","id":109243035,"frontDesc":"高颜值配件，武装随身装备","type":0,"subCateList":[],"frontName":"高颜值配件，武装随身装备"},{"categoryType":0,"showIndex":19,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/09c8b36ba252b486eec081479606baa7.png","name":"车载用品","id":109243036,"frontDesc":"车载神器陪你跨过山和大海","type":0,"subCateList":[],"frontName":"车载神器陪你跨过山和大海"},{"showIndex":20,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9d635abb986bd40f217dba2ac67df7f2.png","bannerUrl":"https://yanxuan.nosdn.127.net/ea626506991f03f638dc32b72212e8a3.png","frontDesc":"找回书写的力量","type":0,"frontName":"找回书写的力量","categoryType":0,"superCategoryId":1043000,"name":"办公文具","iconUrl":"https://yanxuan.nosdn.127.net/8ccf1a360077d2a8e37d33cd6427801c.png","id":109243046,"subCateList":[]},{"showIndex":21,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a2170cc17ed18303f4f18949fea341b9.png","bannerUrl":"","frontDesc":"视听盛宴","type":0,"frontName":"视听盛宴","categoryType":0,"superCategoryId":1043000,"name":"影音娱乐","iconUrl":"","id":1008006,"subCateList":[]},{"categoryType":0,"showIndex":22,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/77847b8066205331eb22c9c363e3740e.png","bannerUrl":"","name":"乐器","id":1028001,"frontDesc":"造乐，开启一段别具一格的音乐历程","type":0,"subCateList":[],"frontName":"造乐，开启一段别具一格的音乐历程"}]},{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/a29e68a6f85dc934412b478edc907ee8.jpg?quality=75&type=webp&imageView&thumbnail=0x196","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"全球特色","id":1019000,"type":0,"subCateList":[{"showIndex":1,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/70ae2b665302d78224b2e209d32f6454.jpg","bannerUrl":"https://yanxuan.nosdn.127.net/3437871ce35a1bb291d461f15a7e2beb.jpg","frontDesc":"健康身体 全球守护","type":0,"frontName":"健康身体 全球守护","categoryType":0,"superCategoryId":1019000,"name":"全球防护","iconUrl":"https://yanxuan.nosdn.127.net/85f8d354cf9c41cf1855685ae2cb9a22.jpg","id":109268001,"subCateList":[]},{"categoryType":0,"showIndex":2,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9b809562dfee86bab55e49638fc0bd92.png","name":"当季星品","id":109254027,"frontDesc":"秋冬暖心 全球好物","type":0,"subCateList":[],"frontName":"秋冬暖心 全球好物"},{"categoryType":0,"showIndex":3,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/d49727b5068e5d07ef12121131ba57f1.png","name":"好评推荐","id":109245000,"frontDesc":"口碑爆款 无限回购","type":0,"subCateList":[],"frontName":"口碑爆款 无限回购"},{"categoryType":0,"showIndex":4,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e98025a8dc0578fce04a78f19b29b5f7.png","name":"礼品点卡","id":1025000,"frontDesc":"严选礼品卡/话费充值/游戏点卡","type":0,"subCateList":[],"frontName":"严选礼品卡/话费充值/游戏点卡"},{"showIndex":5,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3294b591e402e50a859499bf343190cc.png","bannerUrl":"https://yanxuan.nosdn.127.net/e25f623df42af8929ffbc6a8abd2134c.png","frontDesc":"地方特色，匠心独运","type":0,"frontName":"地方特色，匠心独运","categoryType":0,"superCategoryId":1019000,"name":"特色手工艺","iconUrl":"https://yanxuan.nosdn.127.net/c06bf9ac1b93ddaa98091661993b72a9.png","id":109270000,"subCateList":[]},{"categoryType":0,"showIndex":6,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ef0e7cea476170bf5ea27e5fbfaaf063.png","name":"床品家纺","id":109256014,"frontDesc":"产地原料 家居推荐","type":0,"subCateList":[],"frontName":"产地原料 家居推荐"},{"categoryType":0,"showIndex":7,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/efc1a0fa662f5e199c578d24b8b39281.png","name":"餐厨用品","id":109256015,"frontDesc":"匠心名品 艺术烹饪","type":0,"subCateList":[],"frontName":"匠心名品 艺术烹饪"},{"categoryType":0,"showIndex":8,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/6cc34e3f44e2da140a2aca023d2dc61b.png","name":"日用百货","id":109256016,"frontDesc":"品质生活 悦享升级","type":0,"subCateList":[],"frontName":"品质生活 悦享升级"},{"categoryType":0,"showIndex":9,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a131ac5e43cba3d03481221d9e258531.png","name":"美妆个护","id":109256017,"frontDesc":"口碑精选 焕醒美肌","type":0,"subCateList":[],"frontName":"口碑精选 焕醒美肌"},{"categoryType":0,"showIndex":10,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/492c8129ea3933ba389b8cc5a2be78b9.png","name":"口腔护理","id":109256018,"frontDesc":"健康口腔 璀璨笑容","type":0,"subCateList":[],"frontName":"健康口腔 璀璨笑容"},{"categoryType":0,"showIndex":11,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/079e00fe5f2100c8e2e80d8f28677656.png","name":"家清卫浴","id":109256019,"frontDesc":"专业高效清洁","type":0,"subCateList":[],"frontName":"专业高效清洁"},{"categoryType":0,"showIndex":12,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4a00b88682ab9646c1a598914dfb6800.png","name":"休闲美食","id":109256021,"frontDesc":"足不出户 食遍全球","type":0,"subCateList":[],"frontName":"足不出户 食遍全球"},{"categoryType":0,"showIndex":13,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3f482ed16162d2e14090802ca3aa8997.png","name":"营养保健","id":109256020,"frontDesc":"营养健康 保健佳品","type":0,"subCateList":[],"frontName":"营养健康 保健佳品"},{"categoryType":0,"showIndex":14,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/46d8b6bda0dfd1bb0a6d8ea15b5e51fc.png","name":"高级珠宝","id":109256022,"frontDesc":"璀璨闪耀 品质甄选","type":0,"subCateList":[],"frontName":"璀璨闪耀 品质甄选"},{"categoryType":0,"showIndex":15,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1e24297816459c8a3b2d2fb568180695.png","name":"时尚配搭","id":109256023,"frontDesc":"潮流设计 彰显品味","type":0,"subCateList":[],"frontName":"潮流设计 彰显品味"},{"categoryType":0,"showIndex":16,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c39ff69de9baf07222994196d007c335.png","name":"日韩馆","id":1065001,"frontDesc":"日韩制造生活好物","type":0,"subCateList":[],"frontName":"日韩制造生活好物"},{"categoryType":0,"showIndex":17,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/abc716169323f1b7ec9b11f243a1c742.png","name":"东南亚馆","id":1065005,"frontDesc":"东南亚特色好物","type":0,"subCateList":[],"frontName":"东南亚特色好物"},{"categoryType":0,"showIndex":18,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b8e0d041ccff6967364311588f3ef2e1.png","name":"欧美馆","id":1065004,"frontDesc":"欧美制造好物","type":0,"subCateList":[],"frontName":"欧美制造好物"},{"categoryType":0,"showIndex":19,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/06ce9b7401d93bca1869d68adb6e7a61.png","name":"澳新馆","id":1065002,"frontDesc":"澳大利亚、新西兰制造天然好物","type":0,"subCateList":[],"frontName":"澳大利亚、新西兰制造天然好物"},{"showIndex":20,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/750465c2faa5391c217601550563babc.png","bannerUrl":"https://yanxuan.nosdn.127.net/b79c71f0a896c8b650e95500644ef1e9.png","frontDesc":"8地特色，助力扶贫","type":0,"frontName":"8地特色，助力扶贫","categoryType":0,"superCategoryId":1019000,"name":"乡间好物","iconUrl":"https://yanxuan.nosdn.127.net/6f1d81d5cb39310cab92ef97891460e0.png","id":109270001,"subCateList":[]},{"categoryType":0,"showIndex":21,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/11f3825726d6ba6cf683ab529a351902.png","name":"春风馆","id":1065007,"frontDesc":"网易原创情趣品牌，专为亚洲年轻人设计","type":0,"subCateList":[],"frontName":"网易原创情趣品牌，专为亚洲年轻人设计"},{"categoryType":0,"showIndex":22,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3835a4198a9955b6047a44998b92dc6c.png","name":"味央馆","id":1065008,"frontDesc":"网易味央精品黑猪肉","type":0,"subCateList":[],"frontName":"网易味央精品黑猪肉"},{"categoryType":0,"showIndex":23,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0fc461daa1fe3a479a2d745141ebe45b.png","name":"Yessing馆","id":109202001,"frontDesc":"Yessing品牌馆，衣生元气","type":0,"subCateList":[],"frontName":"Yessing品牌馆，衣生元气"},{"categoryType":0,"showIndex":24,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0203a26ab1b38a3a0841eb97d93fa4b5.png","name":"国风馆","id":1038001,"frontDesc":"发现东方美学","type":0,"subCateList":[],"frontName":"发现东方美学"},{"categoryType":0,"showIndex":25,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/915a6f1e93a0f422021325c48863b331.png","name":"东方草木馆","id":1047000,"frontDesc":"大师甄选天下好茶","type":0,"subCateList":[],"frontName":"大师甄选天下好茶"},{"categoryType":0,"showIndex":26,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ef13f4b0eb17ed2c5da7fe816900f7ec.png","name":"礼盒","id":109243037,"frontDesc":"馈赠佳品","type":0,"subCateList":[],"frontName":"馈赠佳品"},{"categoryType":0,"showIndex":27,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/75d351532c2e5cf03cc1c6b37caa6216.png","name":"话费点卡","id":1050000,"frontDesc":"给信仰充值","type":0,"subCateList":[],"frontName":"给信仰充值"},{"categoryType":0,"showIndex":28,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9e8462ef0d9d8a132fe9d5429c0706a7.png","name":"黑胶/CD","id":109257024,"frontDesc":"乐享人生","type":0,"subCateList":[],"frontName":"乐享人生"},{"categoryType":0,"showIndex":29,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/26ee378c85e9bfc7f8c31dffac0117d2.png","name":"童书/育儿","id":109244000,"frontDesc":"为孩子严选好书","type":0,"subCateList":[],"frontName":"为孩子严选好书"},{"categoryType":0,"showIndex":30,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/d11985fe7852e9fe4fcfc281e2ee9e96.png","name":"文学/小说","id":109244001,"frontDesc":"君子不器","type":0,"subCateList":[],"frontName":"君子不器"},{"categoryType":0,"showIndex":31,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/40b88a59cc3d9769f054e2ce8f381e14.png","name":"生活/娱乐","id":109251000,"frontDesc":"把日子过成诗","type":0,"subCateList":[],"frontName":"把日子过成诗"},{"categoryType":0,"showIndex":32,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/30c9826ef1eb4a088270dcc59b2960b0.png","name":"人文/社科","id":109248000,"frontDesc":"遇见思想的火花","type":0,"subCateList":[],"frontName":"遇见思想的火花"},{"categoryType":0,"showIndex":33,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4ec4e12201baabc563a4a39ee856147b.png","name":"技能/成长","id":109252000,"frontDesc":"日益精进","type":0,"subCateList":[],"frontName":"日益精进"},{"categoryType":0,"showIndex":34,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/97ee8a9031cf562a746958347cc90787.png","name":"云音乐周边","id":1065009,"frontDesc":"网易云音乐周边发售","type":0,"subCateList":[],"frontName":"网易云音乐周边发售"},{"categoryType":0,"showIndex":35,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e70587ace9f936e45198514ff8074e8d.png","name":"暴雪周边","id":1066000,"frontDesc":"暴雪周边商品发售","type":0,"subCateList":[],"frontName":"暴雪周边商品发售"},{"categoryType":0,"showIndex":36,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/98f700a137c2f8e63e5e8b8261e2030e.png","name":"我的世界","id":1041001,"frontDesc":"我的世界游戏周边","type":0,"subCateList":[],"frontName":"我的世界游戏周边"},{"categoryType":0,"showIndex":37,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b011aba7843fe35523cd084f02de4d2f.png","name":"梦幻西游","id":1033000,"frontDesc":"梦幻西游精品周边","type":0,"subCateList":[],"frontName":"梦幻西游精品周边"},{"categoryType":0,"showIndex":38,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4615c4af82fb22d5e31cb41249982ea8.png","name":"大话西游","id":1036004,"frontDesc":"大话西游正版周边","type":0,"subCateList":[],"frontName":"大话西游正版周边"},{"categoryType":0,"showIndex":39,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/64196ac59c60923bb4023c8881376ef2.png","name":"阴阳师","id":1039000,"frontDesc":"快到寮里来","type":0,"subCateList":[],"frontName":"欧气，快到寮里来"},{"categoryType":0,"showIndex":40,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/dc5ea3f67a9312a19d685d85aae68474.png","name":"游戏印象","id":1018000,"frontDesc":"网易多款经典游戏周边","type":0,"subCateList":[],"frontName":"网易多款经典游戏周边"},{"categoryType":0,"showIndex":41,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a09ba4fc348225a055a7a3c82e05e49b.png","name":"文创周边","id":1032001,"frontDesc":"大英博物馆等文创周边","type":0,"subCateList":[],"frontName":"大英博物馆等文创周边"},{"categoryType":0,"showIndex":42,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b47bd562bedb8631c27e639da1e92b43.png","name":"影视周边","id":1069000,"frontDesc":"漫威、DC等影视周边","type":0,"subCateList":[],"frontName":"漫威、DC等影视周边"},{"categoryType":0,"showIndex":43,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1785d77ba60a7b7f4d7641c702c3cf5f.png","name":"动漫电玩","id":1069001,"frontDesc":"初音、任天堂等动漫游戏周边","type":0,"subCateList":[],"frontName":"初音、任天堂等动漫游戏周边"},{"categoryType":0,"showIndex":44,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ca7287d399e71f7e10a722fcfcb725b6.png","name":"严选推荐馆","id":1065010,"frontDesc":"严选推荐精品好物","type":0,"subCateList":[],"frontName":"严选推荐精品好物"},{"categoryType":0,"showIndex":45,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e074795f61a83292d0f20eb7d124e2ac.png","bannerUrl":"","name":"文具","id":1012003,"frontDesc":"极简设计，环保材质","type":0,"subCateList":[],"frontName":"找回书写的力量"},{"categoryType":0,"showIndex":46,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a15c33fdefe11388b6f4ed5280919fdd.png","bannerUrl":"","name":"运动户外","id":1008005,"frontDesc":"踏青出游，便携不误好心情","type":0,"subCateList":[],"frontName":"MUJI、Nike等制造商出品"},{"categoryType":0,"showIndex":47,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a1e185658914642b71a7d51170108195.png","name":"韩国馆","id":1065003,"frontDesc":"韩国制造精巧好物","type":0,"subCateList":[],"frontName":"韩国制造精巧好物"}]}];
+
+/***/ }),
+
+/***/ 16:
+/*!**********************************************************************************************************!*\
+  !*** ./node_modules/@dcloudio/vue-cli-plugin-uni/packages/vue-loader/lib/runtime/componentNormalizer.js ***!
+  \**********************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return normalizeComponent; });
+/* globals __VUE_SSR_CONTEXT__ */
+
+// IMPORTANT: Do NOT use ES2015 features in this file (except for modules).
+// This module is a runtime utility for cleaner component module output and will
+// be included in the final webpack user bundle.
+
+function normalizeComponent (
+  scriptExports,
+  render,
+  staticRenderFns,
+  functionalTemplate,
+  injectStyles,
+  scopeId,
+  moduleIdentifier, /* server only */
+  shadowMode, /* vue-cli only */
+  components, // fixed by xxxxxx auto components
+  renderjs // fixed by xxxxxx renderjs
+) {
+  // Vue.extend constructor export interop
+  var options = typeof scriptExports === 'function'
+    ? scriptExports.options
+    : scriptExports
+
+  // fixed by xxxxxx auto components
+  if (components) {
+    options.components = Object.assign(components, options.components || {})
+  }
+  // fixed by xxxxxx renderjs
+  if (renderjs) {
+    (renderjs.beforeCreate || (renderjs.beforeCreate = [])).unshift(function() {
+      this[renderjs.__module] = this
+    });
+    (options.mixins || (options.mixins = [])).push(renderjs)
+  }
+
+  // render functions
+  if (render) {
+    options.render = render
+    options.staticRenderFns = staticRenderFns
+    options._compiled = true
+  }
+
+  // functional template
+  if (functionalTemplate) {
+    options.functional = true
+  }
+
+  // scopedId
+  if (scopeId) {
+    options._scopeId = 'data-v-' + scopeId
+  }
+
+  var hook
+  if (moduleIdentifier) { // server build
+    hook = function (context) {
+      // 2.3 injection
+      context =
+        context || // cached call
+        (this.$vnode && this.$vnode.ssrContext) || // stateful
+        (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext) // functional
+      // 2.2 with runInNewContext: true
+      if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
+        context = __VUE_SSR_CONTEXT__
+      }
+      // inject component styles
+      if (injectStyles) {
+        injectStyles.call(this, context)
+      }
+      // register component module identifier for async chunk inferrence
+      if (context && context._registeredComponents) {
+        context._registeredComponents.add(moduleIdentifier)
+      }
+    }
+    // used by ssr in case component is cached and beforeCreate
+    // never gets called
+    options._ssrRegister = hook
+  } else if (injectStyles) {
+    hook = shadowMode
+      ? function () { injectStyles.call(this, this.$root.$options.shadowRoot) }
+      : injectStyles
+  }
+
+  if (hook) {
+    if (options.functional) {
+      // for template-only hot-reload because in that case the render fn doesn't
+      // go through the normalizer
+      options._injectStyles = hook
+      // register for functioal component in vue file
+      var originalRender = options.render
+      options.render = function renderWithStyleInjection (h, context) {
+        hook.call(context)
+        return originalRender(h, context)
+      }
+    } else {
+      // inject component registration as beforeCreate hook
+      var existing = options.beforeCreate
+      options.beforeCreate = existing
+        ? [].concat(existing, hook)
+        : [hook]
+    }
+  }
+
+  return {
+    exports: scriptExports,
+    options: options
+  }
+}
+
+
+/***/ }),
+
+/***/ 17:
+/*!*********************************************************************!*\
+  !*** C:/Users/Apple/Desktop/study/13-网易严选/project_app_wyyx/Json.js ***!
+  \*********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0; /* 用户 */
+var userInfo = {
+  status: 1,
+  data: {
+    id: 1,
+    mobile: 18888888888,
+    nickname: 'Leo yo',
+    portrait: 'http://img.61ef.cn/news/201409/28/2014092805595807.jpg' },
+
+  msg: '提示'
+
+  /* 首页轮播图 */ };
+var carouselList = [{
+  src: "/static/temp/banner3.jpg",
+  background: "rgb(203, 87, 60)" },
+
+{
+  src: "/static/temp/banner2.jpg",
+  background: "rgb(205, 215, 218)" },
+
+{
+  src: "/static/temp/banner4.jpg",
+  background: "rgb(183, 73, 69)" }];
+
+
+/* 商品列表 */
+var goodsList = [{
+  image: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553187020783&di=bac9dd78b36fd984502d404d231011c0&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201609%2F26%2F20160926173213_s5adi.jpeg",
+  image2: "http://pic.rmb.bdstatic.com/819a044daa66718c2c40a48c1ba971e6.jpeg",
+  image3: "http://img001.hc360.cn/y5/M00/1B/45/wKhQUVYFE0uEZ7zVAAAAAMj3H1w418.jpg",
+  title: "古黛妃 短袖t恤女夏装2019新款韩版宽松",
+  price: 179,
+  sales: 61 },
+
+{
+  image: "https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=4031878334,2682695508&fm=11&gp=0.jpg",
+  image2: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554013048&di=a3dc9fd1406dd7bad7fbb97b5489ec04&imgtype=jpg&er=1&src=http%3A%2F%2Fimg009.hc360.cn%2Fhb%2FnKo44ac2656F831c684507E3Da0E3a26841.jpg",
+  image3: "http://img.zcool.cn/community/017a4e58b4eab6a801219c77084373.jpg",
+  title: "潘歌针织连衣裙",
+  price: 78,
+  sales: 16 },
+
+{
+  image: "https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg",
+  image2: "http://m.360buyimg.com/n12/jfs/t247/42/1078640382/162559/3628a0b/53f5ad09N0dd79894.jpg%21q70.jpg",
+  image3: "http://ikids.61kids.com.cn/upload/2018-12-29/1546070626796114.jpg",
+  title: "巧谷2019春夏季新品新款女装",
+  price: 108.8,
+  sales: 5 },
+{
+  image: "https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=756705744,3505936868&fm=11&gp=0.jpg",
+  image2: "http://images.jaadee.com/images/201702/goods_img/30150_d85aed83521.jpg",
+  image3: "http://img13.360buyimg.com/popWaterMark/jfs/t865/120/206320620/138889/dcc94caa/550acedcN613e2a9d.jpg",
+  title: "私萱连衣裙",
+  price: 265,
+  sales: 88 },
+{
+  image: "https://img13.360buyimg.com/n8/jfs/t1/30343/20/1029/481370/5c449438Ecb46a15b/2b2adccb6dc742fd.jpg",
+  image2: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553418265666&di=d4a7f7eb0ae3c859edeb921641ee1c3a&imgtype=0&src=http%3A%2F%2Fimg003.hc360.cn%2Fy3%2FM02%2FF8%2F9F%2FwKhQh1TuSkGELIlQAAAAAPuLl4M987.jpg",
+  image3: "http://img.ef43.com.cn/product/2016/8/05100204b0c.jpg",
+  title: "娇诗茹 ulzzang原宿风学生潮韩版春夏短",
+  price: 422,
+  sales: 137 },
+{
+  image: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553187020783&di=bac9dd78b36fd984502d404d231011c0&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201609%2F26%2F20160926173213_s5adi.jpeg",
+  image2: "http://image5.suning.cn/uimg/b2c/newcatentries/0070158827-000000000622091973_2_800x800.jpg",
+  image3: "http://img.61ef.cn/news/201903/20/2019032009251784.jpg",
+  title: "古黛妃 短袖t恤女夏装2019新款韩版宽松",
+  price: 179,
+  sales: 95 }];
+
+
+
+/* 购物车 */
+var cartList = [{
+  id: 1,
+  image: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553005139&di=3368549edf9eee769a9bcb3fbbed2504&imgtype=jpg&er=1&src=http%3A%2F%2Fimg002.hc360.cn%2Fy3%2FM01%2F5F%2FDB%2FwKhQh1T7iceEGRdWAAAAADQvqk8733.jpg',
+  attr_val: '春装款 L',
+  stock: 15,
+  title: 'OVBE 长袖风衣',
+  price: 278.00,
+  number: 1 },
+
+{
+  id: 3,
+  image: 'https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=2319343996,1107396922&fm=26&gp=0.jpg',
+  attr_val: '激光导航 扫拖一体',
+  stock: 3,
+  title: '科沃斯 Ecovacs 扫地机器人',
+  price: 1348.00,
+  number: 5 },
+
+{
+  id: 4,
+  image: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=2668268226,1765897385&fm=26&gp=0.jpg',
+  attr_val: 'XL',
+  stock: 55,
+  title: '朵绒菲小西装',
+  price: 175.88,
+  number: 1 },
+
+{
+  id: 5,
+  image: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1552410549432&di=06dd3758053fb6d6362516f30a42d055&imgtype=0&src=http%3A%2F%2Fimgcache.mysodao.com%2Fimg3%2FM0A%2F67%2F42%2FCgAPD1vNSsHNm-TnAAEy61txQb4543_400x400x2.JPG',
+  attr_val: '520 #粉红色',
+  stock: 15,
+  title: '迪奥（Dior）烈艳唇膏',
+  price: 1089.00,
+  number: 1 },
+
+{
+  id: 6,
+  image: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1031875829,2994442603&fm=26&gp=0.jpg',
+  attr_val: '樱花味润手霜 30ml',
+  stock: 15,
+  title: "欧舒丹（L'OCCITANE）乳木果",
+  price: 128,
+  number: 1 },
+
+{
+  id: 7,
+  image: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553007107&di=390915aa8a022cf0b03c03340881b0e7&imgtype=jpg&er=1&src=http%3A%2F%2Fimg13.360buyimg.com%2Fn0%2Fjfs%2Ft646%2F285%2F736444951%2F480473%2Faa701c97%2F548176feN10c9ed7b.jpg',
+  attr_val: '特级 12个',
+  stock: 7,
+  title: '新疆阿克苏苹果 特级',
+  price: 58.8,
+  number: 10 },
+
+{
+  id: 8,
+  image: 'https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=2319343996,1107396922&fm=26&gp=0.jpg',
+  attr_val: '激光导航 扫拖一体',
+  stock: 15,
+  title: '科沃斯 Ecovacs 扫地机器人',
+  price: 1348.00,
+  number: 1 },
+
+{
+  id: 9,
+  image: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=2668268226,1765897385&fm=26&gp=0.jpg',
+  attr_val: 'XL',
+  stock: 55,
+  title: '朵绒菲小西装',
+  price: 175.88,
+  number: 1 },
+
+{
+  id: 10,
+  image: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1552410549432&di=06dd3758053fb6d6362516f30a42d055&imgtype=0&src=http%3A%2F%2Fimgcache.mysodao.com%2Fimg3%2FM0A%2F67%2F42%2FCgAPD1vNSsHNm-TnAAEy61txQb4543_400x400x2.JPG',
+  attr_val: '520 #粉红色',
+  stock: 15,
+  title: '迪奥（Dior）烈艳唇膏',
+  price: 1089.00,
+  number: 1 },
+
+{
+  id: 11,
+  image: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1031875829,2994442603&fm=26&gp=0.jpg',
+  attr_val: '樱花味润手霜 30ml',
+  stock: 15,
+  title: "欧舒丹（L'OCCITANE）乳木果",
+  price: 128,
+  number: 1 },
+
+{
+  id: 12,
+  image: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553007107&di=390915aa8a022cf0b03c03340881b0e7&imgtype=jpg&er=1&src=http%3A%2F%2Fimg13.360buyimg.com%2Fn0%2Fjfs%2Ft646%2F285%2F736444951%2F480473%2Faa701c97%2F548176feN10c9ed7b.jpg',
+  attr_val: '特级 12个',
+  stock: 7,
+  title: '新疆阿克苏苹果 特级',
+  price: 58.8,
+  number: 10 },
+
+{
+  id: 13,
+  image: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1552405266625&di=a703f2b2cdb0fe7f3f05f62dd91307ab&imgtype=0&src=http%3A%2F%2Fwww.78.cn%2Fzixun%2Fnews%2Fupload%2F20190214%2F1550114706486250.jpg',
+  attr_val: '春装款/m',
+  stock: 15,
+  title: '女装2019春秋新款',
+  price: 420.00,
+  number: 1 }];
+
+
+//详情展示页面
+var detailData = {
+  title: '纯种金毛幼犬活体有血统证书',
+  title2: '拆家小能手 你值得拥有',
+  favorite: true,
+  imgList: [{
+    src: 'http://img0.imgtn.bdimg.com/it/u=2396068252,4277062836&fm=26&gp=0.jpg' },
+
+  {
+    src: 'http://img.pconline.com.cn/images/upload/upc/tx/itbbs/1309/06/c4/25310541_1378426131583.jpg' },
+
+  {
+    src: 'http://img.pconline.com.cn/images/upload/upc/tx/photoblog/1610/26/c4/28926240_1477451226577_mthumb.jpg' },
+
+  {
+    src: 'http://picture.ik123.com/uploads/allimg/190219/12-1Z219105139.jpg' }],
+
+
+  episodeList: [
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24],
+
+  guessList: [{
+    src: 'http://img.52z.com/upload/news/image/20180530/20180530081619_31029.jpg',
+    title: '猫眼指甲油',
+    title2: '独树一帜的免照灯猫眼指甲' },
+
+  {
+    src: 'http://m.china-7.net/uploads/14778449362891.jpg',
+    title: '创意屋',
+    title2: '创意屋形上下双层高低床' },
+
+  {
+    src: 'http://www.k73.com/up/allimg/130415/22-130415093527.jpg',
+    title: 'MissCandy 指甲油',
+    title2: '十分适合喜欢素净的妹纸，尽显淡雅的气质' },
+
+  {
+    src: 'http://img0.imgtn.bdimg.com/it/u=2108933440,2194129200&fm=214&gp=0.jpg	',
+    title: 'RMK 2017星空海蓝唇釉',
+    title2: '唇釉质地，上唇后很滋润。少女也会心动的蓝色，透明液体形状。' }],
+
+
+  evaList: [{
+    src: 'http://gss0.baidu.com/-fo3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/77c6a7efce1b9d1663174705fbdeb48f8d546486.jpg',
+    nickname: 'Ranth Allngal',
+    time: '09-20 12:54',
+    zan: '54',
+    content: '评论不要太苛刻，不管什么产品都会有瑕疵，客服也说了可以退货并且商家承担运费，我觉得至少态度就可以给五星。' },
+
+  {
+    src: 'http://img0.imgtn.bdimg.com/it/u=2396068252,4277062836&fm=26&gp=0.jpg',
+    nickname: 'Ranth Allngal',
+    time: '09-20 12:54',
+    zan: '54',
+    content: '楼上说的好有道理。' }] };
+
+
+
+var shareList = [{
+  type: 1,
+  icon: '/static/temp/share_wechat.png',
+  text: '微信好友' },
+
+{
+  type: 2,
+  icon: '/static/temp/share_moment.png',
+  text: '朋友圈' },
+
+{
+  type: 3,
+  icon: '/static/temp/share_qq.png',
+  text: 'QQ好友' },
+
+{
+  type: 4,
+  icon: '/static/temp/share_qqzone.png',
+  text: 'QQ空间' }];
+
+
+var lazyLoadList = [{
+  src: 'http://img0.imgtn.bdimg.com/it/u=2396068252,4277062836&fm=26&gp=0.jpg' },
+
+{
+  src: 'http://img.pconline.com.cn/images/upload/upc/tx/itbbs/1309/06/c4/25310541_1378426131583.jpg' },
+
+{
+  src: 'http://img.pconline.com.cn/images/upload/upc/tx/photoblog/1610/26/c4/28926240_1477451226577_mthumb.jpg' },
+
+{
+  src: 'http://picture.ik123.com/uploads/allimg/190219/12-1Z219105139.jpg' },
+
+{
+  src: 'http://img5.imgtn.bdimg.com/it/u=2904900134,438461613&fm=26&gp=0.jpg' },
+
+{
+  src: 'http://img1.imgtn.bdimg.com/it/u=1690475408,2565370337&fm=26&gp=0.jpg' },
+
+{
+  src: 'http://img.99114.com/group1/M00/7F/99/wKgGS1kVrPGAe5LmAAU2KrJmb3Q923_600_600.jpg' },
+
+{
+  src: 'http://img4.imgtn.bdimg.com/it/u=261047209,372231813&fm=26&gp=0.jpg' },
+
+{
+  src: 'http://i2.17173cdn.com/i7mz64/YWxqaGBf/tu17173com/20150107/eMyVMObjlbcvDEv.jpg' },
+
+{
+  src: 'http://img008.hc360.cn/m4/M02/E7/87/wKhQ6FSrfU6EfUoyAAAAAITAfyc280.jpg' },
+
+{
+  src: 'http://pic1.win4000.com/wallpaper/d/5991569950166.jpg' },
+
+{
+  src: 'http://gss0.baidu.com/9fo3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/6f061d950a7b0208f9fe945e60d9f2d3572cc85e.jpg' },
+
+{
+  src: 'http://pic41.nipic.com/20140429/18169759_125841756000_2.jpg' },
+
+{
+  src: 'http://www.k73.com/up/allimg/130415/22-130415093527.jpg' },
+
+{
+  src: 'http://img.52z.com/upload/news/image/20180530/20180530081619_31029.jpg' },
+
+{
+  src: 'http://b-ssl.duitang.com/uploads/item/201410/02/20141002111638_tXAzU.jpeg' },
+
+{
+  src: 'http://img2.ph.126.net/C4JW6f57QWSB21-8jh2UGQ==/1762596304262286698.jpg' },
+
+{
+  src: 'http://att.bbs.duowan.com/forum/201405/17/190257nzcvkkdg6w2e8226.jpg' },
+
+{
+  src: 'http://attach.bbs.miui.com/forum/201504/10/223644v3intigyvva0vgym.jpg' },
+
+{
+  src: 'http://pic1.win4000.com/mobile/3/57888a298d61d.jpg' }];
+
+
+
+var orderList = [{
+  time: '2019-04-06 11:37',
+  state: 1,
+  goodsList: [{
+    image: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553187020783&di=bac9dd78b36fd984502d404d231011c0&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201609%2F26%2F20160926173213_s5adi.jpeg' },
+
+  {
+    image: 'https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=4031878334,2682695508&fm=11&gp=0.jpg' },
+
+  {
+    image: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg' },
+
+  {
+    image: 'https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=4031878334,2682695508&fm=11&gp=0.jpg' },
+
+  {
+    image: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg' },
+
+  {
+    image: 'https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=4031878334,2682695508&fm=11&gp=0.jpg' },
+
+  {
+    image: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg' }] },
+
+
+
+{
+  time: '2019-04-06 11:37',
+  state: 9,
+  goodsList: [{
+    title: '古黛妃 短袖t恤女 春夏装2019新款韩版宽松',
+    price: 179.5,
+    image: 'https://img13.360buyimg.com/n8/jfs/t1/30343/20/1029/481370/5c449438Ecb46a15b/2b2adccb6dc742fd.jpg',
+    number: 1,
+    attr: '珊瑚粉 M' }] },
+
+
+{
+  time: '2019-04-06 11:37',
+  state: 1,
+  goodsList: [{
+    image: 'https://img.alicdn.com/imgextra/https://img.alicdn.com/imgextra/i2/2120460599/O1CN01LBPS4C1GINkwsOTXS_!!2120460599.jpg_430x430q90.jpg' },
+
+  {
+    image: 'https://img.alicdn.com/imgextra/i2/1069876356/TB2ocTQG4WYBuNjy1zkXXXGGpXa_!!1069876356.jpg_430x430q90.jpg' },
+
+  {
+    image: 'https://img.alicdn.com/imgextra/https://img.alicdn.com/imgextra/i4/2120460599/O1CN01YsmgwZ1GINkv38rkn_!!2120460599.jpg_430x430q90.jpg' }] },
+
+
+
+{
+  time: '2019-04-06 11:37',
+  state: 1,
+  goodsList: [{
+    title: '回力女鞋高帮帆布鞋女学生韩版鞋子女2019潮鞋女鞋新款春季板鞋女',
+    price: 69,
+    image: 'https://img.alicdn.com/imgextra/i3/2128794607/TB2gzzoc41YBuNjy1zcXXbNcXXa_!!2128794607.jpg_430x430q90.jpg',
+    number: 1,
+    attr: '白色-高帮 39' }] },
+
+
+{
+  time: '2019-04-06 11:37',
+  state: 1,
+  goodsList: [{
+    image: 'https://img.alicdn.com/imgextra/https://img.alicdn.com/imgextra/i4/3358098495/O1CN01dhYyid2Ccl5MWLDok_!!3358098495.jpg_430x430q90.jpg' },
+
+  {
+    image: 'https://img.alicdn.com/imgextra/https://img.alicdn.com/imgextra/i3/3358098495/O1CN01AWsnFA2Ccl5OzvqsL_!!3358098495.jpg_430x430q90.jpg' }] },
+
+
+
+{
+  time: '2019-04-06 11:37',
+  state: 1,
+  goodsList: [{
+    image: 'https://img.alicdn.com/imgextra/i4/3470687433/O1CN0124mMQOSERr18L1h_!!3470687433.jpg_430x430q90.jpg' },
+
+  {
+    image: 'https://img.alicdn.com/imgextra/i3/2888462616/O1CN01ERra5J1VCAbZaKI5n_!!0-item_pic.jpg_430x430q90.jpg' },
+
+  {
+    image: 'https://gd3.alicdn.com/imgextra/i3/819381730/O1CN01YV4mXj1OeNhQIhQlh_!!819381730.jpg_400x400.jpg' }] }];
+
+
+
+
+
+var cateList = [{
+  id: 1,
+  name: '手机数码' },
+
+{
+  id: 2,
+  name: '礼品鲜花' },
+
+{
+  id: 3,
+  name: '男装女装' },
+
+{
+  id: 4,
+  name: '母婴用品' },
+
+{
+  id: 5,
+  pid: 1,
+  name: '手机通讯' },
+
+{
+  id: 6,
+  pid: 1,
+  name: '运营商' },
+
+{
+  id: 8,
+  pid: 5,
+  name: '全面屏手机',
+  picture: '/static/temp/cate2.jpg' },
+
+{
+  id: 9,
+  pid: 5,
+  name: '游戏手机',
+  picture: '/static/temp/cate3.jpg' },
+
+{
+  id: 10,
+  pid: 5,
+  name: '老人机',
+  picture: '/static/temp/cate1.jpg' },
+
+{
+  id: 11,
+  pid: 5,
+  name: '拍照手机',
+  picture: '/static/temp/cate4.jpg' },
+
+{
+  id: 12,
+  pid: 5,
+  name: '女性手机',
+  picture: '/static/temp/cate5.jpg' },
+
+{
+  id: 14,
+  pid: 6,
+  name: '合约机',
+  picture: '/static/temp/cate1.jpg' },
+
+{
+  id: 15,
+  pid: 6,
+  name: '选好卡',
+  picture: '/static/temp/cate4.jpg' },
+
+{
+  id: 16,
+  pid: 6,
+  name: '办套餐',
+  picture: '/static/temp/cate5.jpg' },
+
+{
+  id: 17,
+  pid: 2,
+  name: '礼品' },
+
+{
+  id: 18,
+  pid: 2,
+  name: '鲜花' },
+
+{
+  id: 19,
+  pid: 17,
+  name: '公益摆件',
+  picture: '/static/temp/cate7.jpg' },
+
+{
+  id: 20,
+  pid: 17,
+  name: '创意礼品',
+  picture: '/static/temp/cate8.jpg' },
+
+{
+  id: 21,
+  pid: 18,
+  name: '鲜花',
+  picture: '/static/temp/cate9.jpg' },
+
+{
+  id: 22,
+  pid: 18,
+  name: '每周一花',
+  picture: '/static/temp/cate10.jpg' },
+
+{
+  id: 23,
+  pid: 18,
+  name: '卡通花束',
+  picture: '/static/temp/cate11.jpg' },
+
+{
+  id: 24,
+  pid: 18,
+  name: '永生花',
+  picture: '/static/temp/cate12.jpg' },
+
+{
+  id: 25,
+  pid: 3,
+  name: '男装' },
+
+{
+  id: 26,
+  pid: 3,
+  name: '女装' },
+
+{
+  id: 27,
+  pid: 25,
+  name: '男士T恤',
+  picture: '/static/temp/cate13.jpg' },
+
+{
+  id: 28,
+  pid: 25,
+  name: '男士外套',
+  picture: '/static/temp/cate14.jpg' },
+
+{
+  id: 29,
+  pid: 26,
+  name: '裙装',
+  picture: '/static/temp/cate15.jpg' },
+
+{
+  id: 30,
+  pid: 26,
+  name: 'T恤',
+  picture: '/static/temp/cate16.jpg' },
+
+{
+  id: 31,
+  pid: 26,
+  name: '上装',
+  picture: '/static/temp/cate15.jpg' },
+
+{
+  id: 32,
+  pid: 26,
+  name: '下装',
+  picture: '/static/temp/cate16.jpg' },
+
+{
+  id: 33,
+  pid: 4,
+  name: '奶粉' },
+
+{
+  id: 34,
+  pid: 4,
+  name: '营养辅食' },
+
+{
+  id: 35,
+  pid: 4,
+  name: '童装' },
+
+{
+  id: 39,
+  pid: 4,
+  name: '喂养用品' },
+
+{
+  id: 36,
+  pid: 33,
+  name: '有机奶粉',
+  picture: '/static/temp/cate17.jpg' },
+
+{
+  id: 37,
+  pid: 34,
+  name: '果泥/果汁',
+  picture: '/static/temp/cate18.jpg' },
+
+{
+  id: 39,
+  pid: 34,
+  name: '面条/粥',
+  picture: '/static/temp/cate20.jpg' },
+
+{
+  id: 42,
+  pid: 35,
+  name: '婴童衣橱',
+  picture: '/static/temp/cate19.jpg' },
+
+{
+  id: 43,
+  pid: 39,
+  name: '吸奶器',
+  picture: '/static/temp/cate21.jpg' },
+
+{
+  id: 44,
+  pid: 39,
+  name: '儿童餐具',
+  picture: '/static/temp/cate22.jpg' },
+
+{
+  id: 45,
+  pid: 39,
+  name: '牙胶安抚',
+  picture: '/static/temp/cate23.jpg' },
+
+{
+  id: 46,
+  pid: 39,
+  name: '围兜',
+  picture: '/static/temp/cate24.jpg' }];var _default =
+
+
+
+{
+  carouselList: carouselList,
+  cartList: cartList,
+  detailData: detailData,
+  lazyLoadList: lazyLoadList,
+  userInfo: userInfo,
+  shareList: shareList,
+  goodsList: goodsList,
+  orderList: orderList,
+  cateList: cateList };exports.default = _default;
+
+/***/ }),
+
+/***/ 2:
 /*!******************************************************************************************!*\
   !*** ./node_modules/@dcloudio/vue-cli-plugin-uni/packages/mp-vue/dist/mp.runtime.esm.js ***!
   \******************************************************************************************/
@@ -7580,7 +9345,30 @@ internalMixin(Vue);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../../../webpack/buildin/global.js */ 3)))
 
 /***/ }),
-/* 3 */
+
+/***/ 24:
+/*!***********************************************************************************************!*\
+  !*** C:/Users/Apple/Desktop/study/13-网易严选/project_app_wyyx/common/datas/indexCateModule.json ***!
+  \***********************************************************************************************/
+/*! exports provided: 0, 1, 2, 3, 4, 5, 6, 7, default */
+/***/ (function(module) {
+
+module.exports = [{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/c6a5af1034122a96a38fafd4b1ef2e7d.jpg?type=webp&imageView&quality=75&thumbnail=750x0","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"居家生活","id":1005000,"type":0,"subCateList":[{"categoryType":0,"showIndex":1,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1d89de114797fb9237314920695c564d.png","name":"秋冬好物","id":109243003,"frontDesc":"温暖秋冬","type":0,"subCateList":[],"frontName":"秋冬好物"},{"categoryType":0,"showIndex":2,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0fe3073506c10f604c4ed7e0ba65d1f4.png","name":"主题床品","id":109243004,"frontDesc":"设计点亮，品质当道","type":0,"subCateList":[],"frontName":"设计点亮，品质当道"},{"categoryType":0,"showIndex":3,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/02d3e51b8db87c331dc73bef9e217133.png","name":"北欧原木","id":109252033,"frontDesc":"经典北欧风，打造原木家","type":0,"subCateList":[],"frontName":"经典北欧风，打造原木家"},{"categoryType":0,"showIndex":4,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan-item.nosdn.127.net/4ccd6ee87a83918474e7e962b06d96fd.png","name":"餐厨爆款清单","id":109261015,"frontDesc":"烹饪享乐趣","type":0,"subCateList":[],"frontName":"烹饪享乐趣"},{"categoryType":0,"showIndex":6,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ed6400e5be573e1524cdef0b5c9e462d.png","bannerUrl":"","name":"床品件套","id":1008009,"frontDesc":"甄选品质，睡眠美学","type":0,"subCateList":[],"frontName":"甄选品质，睡眠美学"},{"categoryType":0,"showIndex":7,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/96d109867f08a14af62d2390b7787439.png","name":"被枕盖毯","id":109260008,"frontDesc":"陷进柔软，多样选择","type":0,"subCateList":[],"frontName":"陷进柔软，多样选择"},{"categoryType":0,"showIndex":8,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b91e14afc5a138df8dbc3236146d24e6.png","bannerUrl":"","name":"床垫床褥","id":1008008,"frontDesc":"安心托护，美梦时刻","type":0,"subCateList":[],"frontName":"安心托护，美梦时刻"},{"categoryType":0,"showIndex":9,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ef4a874893fb5e76504fb044c2f7cd49.png","name":"抱枕靠垫","id":109260009,"frontDesc":"装点美家，生活美学","type":0,"subCateList":[],"frontName":"装点美家，生活美学"},{"showIndex":10,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0e5da66d87fc9db4279322d59f9b3d5b.png","bannerUrl":"","frontDesc":"装点家的格调","type":0,"frontName":"装点家的格调","categoryType":0,"superCategoryId":1005000,"name":"家饰","iconUrl":"","id":1011004,"subCateList":[]},{"categoryType":0,"showIndex":11,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/d8f74a5d23c731084779b095e80fb3e3.png","bannerUrl":"","name":"居家布艺","id":1008002,"frontDesc":"趣意点缀，家中有格","type":0,"subCateList":[],"frontName":"趣意点缀，家中有格"},{"categoryType":0,"showIndex":12,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/aeecf63c24567c5a7a51b747a7dcf10a.png","name":"客餐厅家具","id":109243006,"frontDesc":"舒适经典，幸福宅家","type":0,"subCateList":[],"frontName":"舒适经典，幸福宅家"},{"categoryType":0,"showIndex":13,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/29a60124243be40301a571e09f8c935c.png","name":"卧室家具","id":109243007,"frontDesc":"天然选材，安心酣睡","type":0,"subCateList":[],"frontName":"天然选材，安心酣睡"},{"categoryType":0,"showIndex":14,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c35578aa38ec1c9e55aa74d9e77287a9.png","name":"办公书房家具","id":109243008,"frontDesc":"人体工学设计，健康办公","type":0,"subCateList":[],"frontName":"人体工学设计，健康办公"},{"categoryType":0,"showIndex":15,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/becde30fadf4ec335cd7ad8078798acf.png","name":"小件家具","id":109243009,"frontDesc":"实用至上，讲究质感","type":0,"subCateList":[],"frontName":"实用至上，讲究质感"},{"categoryType":0,"showIndex":16,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9bc4cae742e2b2709974ad074f897493.png","bannerUrl":"","name":"灯具","id":1008016,"frontDesc":"一盏灯，温暖一个家","type":0,"subCateList":[],"frontName":"一盏灯，温暖一个家"},{"categoryType":0,"showIndex":17,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f2e3e9df2cdb7e790e68356ac763cd58.png","name":"地毯窗帘","id":109261054,"frontDesc":"优质装点，柔软家居","type":0,"subCateList":[],"frontName":"优质装点，柔软家居"},{"categoryType":0,"showIndex":18,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ccf0ff26ca7bf8bbbc8683a740e28ae9.png","bannerUrl":"","name":"收纳","id":1008017,"frontDesc":"收纳神器大集结","type":0,"subCateList":[],"frontName":"收纳神器大集结"},{"categoryType":0,"showIndex":20,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/36d167a99e28b00dd08aa5e45fd33946.png","name":"晾晒除味","id":1092010,"frontDesc":"居家晾晒必备好物","type":0,"subCateList":[],"frontName":"居家晾晒必备好物"},{"categoryType":0,"showIndex":21,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f6eaa94e8920dd4290b9da7c545c8841.png","bannerUrl":"","name":"毛巾浴巾","id":1008001,"frontDesc":"亲肤柔棉，安心品质","type":0,"subCateList":[],"frontName":"亲肤柔棉，安心品质"},{"categoryType":0,"showIndex":22,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3e0c0c0f1d842ae66f4fbfd50a571ac1.png","name":"居家拖鞋","id":109243010,"frontDesc":"慵懒休闲时光，轻松惬意生活","type":0,"subCateList":[],"frontName":"慵懒休闲时光，轻松惬意生活"},{"categoryType":0,"showIndex":23,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3e60f0abe39d4cce0237edffad25c459.png","name":"家庭医疗","id":1092011,"frontDesc":"专业家庭医用好物","type":0,"subCateList":[],"frontName":"专业家庭医用好物"},{"categoryType":0,"showIndex":24,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/17cc6774b480037536a0f360bf207676.png","bannerUrl":"","name":"锅具","id":1005007,"frontDesc":"一口好锅，料理生活一日三餐","type":0,"subCateList":[],"frontName":"一口好锅，炖煮生活一日三餐"},{"categoryType":0,"showIndex":25,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1055eb85d2c5431c8f6623aed74bbbde.png","bannerUrl":"","name":"餐厨配件","id":1008012,"frontDesc":"下厨省力好帮手","type":0,"subCateList":[],"frontName":"下厨省力好帮手"},{"categoryType":0,"showIndex":26,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f17d41a51a2bb3a1b73f927959cd9ae2.png","bannerUrl":"","name":"刀剪砧板","id":1013005,"frontDesc":"传统工艺 源自中国刀城","type":0,"subCateList":[],"frontName":"传统工艺 源自中国刀城"},{"categoryType":0,"showIndex":27,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/338c77be5f292272e43869bcc52c8229.png","bannerUrl":"","name":"餐具","id":1005008,"frontDesc":"皇家道尔顿、日本KEYUCA制造商出品","type":0,"subCateList":[],"frontName":"餐桌上的舞蹈"},{"categoryType":0,"showIndex":28,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b24d4e3c402ecb4a95d7d6e8d77a93ba.png","bannerUrl":"","name":"水具杯壶","id":1007000,"frontDesc":"精工生产制作，匠人手艺","type":0,"subCateList":[],"frontName":"精工生产制作，匠人手艺"},{"categoryType":0,"showIndex":29,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/6395f0efc4c720dbc1bee012af23e56e.png","bannerUrl":"","name":"茶咖酒具","id":1005009,"frontDesc":"严选精巧器具，轻松冲调","type":0,"subCateList":[],"frontName":"严选精巧器具，轻松冲调"},{"categoryType":0,"showIndex":30,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/7d3612daccae482c1c9631992d4ffa44.png","name":"数码办公","id":109249013,"frontDesc":"职场数码办公用品","type":0,"subCateList":[],"frontName":"职场数码办公用品"},{"categoryType":0,"showIndex":31,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/41b1aa9754ea3d7cd29b2c753bdf3dd1.png","name":"办公家具","id":109248001,"frontDesc":"为健康办公生活加油","type":0,"subCateList":[],"frontName":"为健康办公生活加油"},{"categoryType":0,"showIndex":32,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2963d464664ffc426ed8dffd2f44ba16.png","name":"靠枕坐垫","id":109248002,"frontDesc":"让工位比被窝更舒适","type":0,"subCateList":[],"frontName":"让工位比被窝更舒适"},{"categoryType":0,"showIndex":33,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8bceb409edbc6415c91095a82d4d3edf.png","name":"宠物食品","id":1017000,"frontDesc":"用心选料，让爱宠健康成长","type":0,"subCateList":[],"frontName":"用心选料，让爱宠健康成长"},{"categoryType":0,"showIndex":34,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0dc939d1cb0e437b56e392fbf859f768.png","name":"宠物用品","id":109248004,"frontDesc":"贴心设计，照顾爱宠舒适生活","type":0,"subCateList":[],"frontName":"贴心设计，照顾爱宠舒适生活"}]},{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/f247ad2cb1d02624e72248c91af4a4b2.jpg?type=webp&imageView&quality=75&thumbnail=750x0","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"服饰鞋包","id":1010000,"type":0,"subCateList":[{"categoryType":0,"showIndex":1,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e279c3e247614d47404d9d5d88b397c9.png","name":"热销爆款","id":109257004,"frontDesc":"人气好物放心购","type":0,"subCateList":[],"frontName":"人气好物放心购"},{"categoryType":0,"showIndex":2,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/d0a099cb4bfdb9afccf9470719b3611c.png","name":"好物上新","id":109243011,"frontDesc":"新品好物 一手掌握","type":0,"subCateList":[],"frontName":"新品好物 一手掌握"},{"categoryType":0,"showIndex":3,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1fc7bbf077f022659cb4eff564d382fa.png","name":"夏季新品","id":109243013,"frontDesc":"夏季热力爆品 抢先预览","type":0,"subCateList":[],"frontName":"夏季热力爆品 抢先预览"},{"categoryType":0,"showIndex":4,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/fa89d78c2c70477987ec09c56661dc31.png","name":"居家囤货","id":109243014,"frontDesc":"慵懒居家 一秒提升幸福感","type":0,"subCateList":[],"frontName":"慵懒居家 一秒提升幸福感"},{"categoryType":0,"showIndex":5,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f2ab8dca74661d5b7d36f80b14e50a5a.png","name":"抄底特惠","id":109259014,"frontDesc":"抄底特惠 低至5折","type":0,"subCateList":[],"frontName":"抄底特惠"},{"categoryType":0,"showIndex":6,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/10b0537e284e4eb89a9461e583d017db.png","name":"男式衬衫","id":1093008,"frontDesc":"经典百搭 精致设计","type":0,"subCateList":[],"frontName":"经典百搭 精致设计"},{"categoryType":0,"showIndex":7,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2c5a1f681831987ff3d4fb8e63f6d0d6.jpg","name":"男式针织衫/卫衣","id":109214004,"frontDesc":"简约调性 儒雅休闲自如切换","type":0,"subCateList":[],"frontName":"简约调性 儒雅休闲自如切换"},{"categoryType":0,"showIndex":8,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/35b564c2867fc5faed9403cec440bafe.png","name":"男式外套","id":1093012,"frontDesc":"自在潇洒穿着感","type":0,"subCateList":[],"frontName":"自在潇洒穿着感"},{"categoryType":0,"showIndex":9,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/690dee73a00b6922664f727b40a58a3b.png","name":"男式牛仔","id":1068003,"frontDesc":"颠覆牛仔认知 革新你的穿着体验","type":0,"subCateList":[],"frontName":"颠覆牛仔认知 革新你的穿着体验"},{"categoryType":0,"showIndex":10,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/270011056e5216e03d2d054683c2b337.png","name":"女式内衣","id":109272000,"frontDesc":"柔软呵护","type":0,"subCateList":[],"frontName":"柔软呵护"},{"categoryType":0,"showIndex":11,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/aba02a880a47a4a62cd85842ea6eadce.jpg","name":"男式裤装","id":1093009,"frontDesc":"高质感面料 休闲商务两适宜","type":0,"subCateList":[],"frontName":"高质感面料 休闲商务两适宜"},{"categoryType":0,"showIndex":12,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f917b00b07445c46a1df90ccaff2a8de.png","name":"男式T恤/POLO","id":109214000,"frontDesc":"内搭T恤 贴身自在","type":0,"subCateList":[],"frontName":"内搭T恤 贴身自在"},{"categoryType":0,"showIndex":13,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a729319b8b4d127b09402f65c96d421f.jpg","name":"女式针织衫/卫衣","id":109214003,"frontDesc":"体验温柔的质感","type":0,"subCateList":[],"frontName":"体验温柔的质感"},{"categoryType":0,"showIndex":14,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/7a6f1ba8da59a454e7c4a2b7b61ff26a.jpg","name":"女式衬衫","id":109214001,"frontDesc":"职场精致LOOK","type":0,"subCateList":[],"frontName":"职场精致LOOK"},{"categoryType":0,"showIndex":15,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3084ec837a9f38b053b81061cfcdae78.png","name":"女式外套","id":1093010,"frontDesc":"选对风格 只做自己","type":0,"subCateList":[],"frontName":"选对风格 只做自己"},{"categoryType":0,"showIndex":16,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/55ddb8143c911ee1881a6205572c718e.png","name":"女式裤装","id":1093007,"frontDesc":"轻松舒适 送给双腿的温柔力量","type":0,"subCateList":[],"frontName":"轻松舒适 送给双腿的温柔力量"},{"categoryType":0,"showIndex":17,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2f4686765e77abf8213f2b0e127045be.png","name":"女式牛仔","id":109214002,"frontDesc":"基础裤型的舒适之选","type":0,"subCateList":[],"frontName":"基础裤型的舒适之选"},{"categoryType":0,"showIndex":18,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/77ade36fe051e9800409dbfd3f7fa644.jpg","name":"女式T恤/POLO","id":1093006,"frontDesc":"精选材质 穿出质感","type":0,"subCateList":[],"frontName":"精选材质 穿出质感"},{"categoryType":0,"showIndex":19,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2b65c76b9aec77fe724b23199c79e718.png","name":"女式裙装","id":1037007,"frontDesc":"量身裁体的优雅","type":0,"subCateList":[],"frontName":"量身裁体的优雅"},{"categoryType":0,"showIndex":20,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e7fee5bb435eb5d5f094eb9f65df6c86.jpg","name":"男式家居服","id":1093004,"frontDesc":"舒适源自高品质","type":0,"subCateList":[],"frontName":"舒适源自高品质"},{"categoryType":0,"showIndex":21,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/603d7a8d9e2449aaec58ca191d0bea61.jpg","name":"女式家居服","id":1093005,"frontDesc":"享受宅家时光","type":0,"subCateList":[],"frontName":"享受宅家时光"},{"categoryType":0,"showIndex":22,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8207750f810aea25e43c423e6de7f943.png","bannerUrl":"","name":"男式内裤","id":1010002,"frontDesc":"透气舒爽 自由空间","type":0,"subCateList":[],"frontName":"透气舒爽 自由空间"},{"categoryType":0,"showIndex":23,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b330070087bb87cb7586bd4097aa5a65.png","bannerUrl":"","name":"女式内裤","id":1013006,"frontDesc":"温和安全 亲密呵护","type":0,"subCateList":[],"frontName":"温和安全 亲密呵护"},{"categoryType":0,"showIndex":24,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/59122ca632ba972f02d8621458da74c4.png","name":"女式文胸/套装","id":1093011,"frontDesc":"贴身关怀 少束缚","type":0,"subCateList":[],"frontName":"贴身关怀 少束缚"},{"categoryType":0,"showIndex":25,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/df3c77be2e897ad51fb5cfd2040b7b55.png","name":"男式内衣","id":1093013,"frontDesc":"绅士的第二肌肤","type":0,"subCateList":[],"frontName":"绅士的第二肌肤"},{"categoryType":0,"showIndex":26,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f850599cb9c99a523b0a88160da80eca.png","bannerUrl":"","name":"男袜","id":1008004,"frontDesc":"始于足下的品质生活","type":0,"subCateList":[],"frontName":"始于足下的品质生活"},{"categoryType":0,"showIndex":27,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e888bde27a75c01f67b20c8b3eb3cee3.png","name":"丝袜","id":1034000,"frontDesc":"犹如你腿部的第二层肌肤","type":0,"subCateList":[],"frontName":"犹如你腿部的第二层肌肤"},{"categoryType":0,"showIndex":28,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/27ba0c6e4898bffd723ea4272e6380db.png","bannerUrl":"","name":"女袜/连裤袜","id":109273001,"frontDesc":"始于足下的品质生活","type":0,"subCateList":[],"frontName":"始于足下的品质生活"},{"categoryType":0,"showIndex":29,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/5452d909f0caddc1b9a8311968e78a17.png","bannerUrl":"","name":"男鞋","id":1008003,"frontDesc":"匠心打造 轻潮舒适","type":0,"subCateList":[],"frontName":"匠心打造 轻潮舒适"},{"categoryType":0,"showIndex":30,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1a51bbdd24badf39d66b884ea71e665c.png","bannerUrl":"","name":"女鞋","id":1013000,"frontDesc":"优雅 如此舒适","type":0,"subCateList":[],"frontName":"优雅 如此舒适"},{"categoryType":0,"showIndex":31,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2885bf2a48a744cbf6c1aa4a9d0f907b.png","bannerUrl":"","name":"拖鞋","id":1008010,"frontDesc":"慵懒休闲时光 轻松惬意生活","type":0,"subCateList":[],"frontName":"慵懒休闲时光 轻松惬意生活"},{"showIndex":32,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/eedd6de98be2da9e63608b994035bf14.png","bannerUrl":"","frontDesc":"呵护双脚 驱散行走的压力","type":0,"frontName":"呵护双脚 驱散行走的压力","categoryType":0,"superCategoryId":1010000,"name":"鞋配","iconUrl":"","id":1044000,"subCateList":[]},{"categoryType":0,"showIndex":33,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/dbc1125c627b106de9b3d078b97292fb.png","name":"女士包袋","id":1056002,"frontDesc":"包里装着你的整个世界","type":0,"subCateList":[],"frontName":"包里装着你的整个世界"},{"categoryType":0,"showIndex":34,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e8b034f63aac15198f971503a6370947.png","name":"男士包袋","id":1056001,"frontDesc":"懂你的责任也更懂你","type":0,"subCateList":[],"frontName":"懂你的责任也更懂你"},{"categoryType":0,"showIndex":35,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a94a5d317d289f01a93ee093c3975121.png","name":"钱包及小皮件","id":1056003,"frontDesc":"握在手中的精致","type":0,"subCateList":[],"frontName":"握在手中的精致"},{"categoryType":0,"showIndex":36,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/638f6de1cfa9defef5468a952f4efcad.png","name":"行李箱","id":1037000,"frontDesc":"带着梦想即刻出发","type":0,"subCateList":[],"frontName":"带着梦想即刻出发"},{"showIndex":37,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/210c5f72a701ec888efa0c1d885d1de1.png","bannerUrl":"","frontDesc":"璀璨闪耀 品质甄选","type":0,"frontName":"璀璨闪耀 品质甄选","categoryType":0,"superCategoryId":1010000,"name":"奢华珠宝","iconUrl":"","id":1020008,"subCateList":[]},{"categoryType":0,"showIndex":38,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1eb26c281fa9b7b9e386cfd5ce1d67a7.png","name":"时尚饰品","id":109253000,"frontDesc":"精致灵动的小确幸","type":0,"subCateList":[],"frontName":"精致灵动的小确幸"},{"categoryType":0,"showIndex":39,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a83b12528629ec1f6d08e6344739fce7.png","bannerUrl":"","name":"围巾手套","id":1008007,"frontDesc":"冬日出街必备","type":0,"subCateList":[],"frontName":"冬日出街必备"},{"categoryType":0,"showIndex":40,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1d653f706fb834937a3d1c29e5725618.png","name":"眼镜墨镜","id":1036001,"frontDesc":"你和潮流之间就差一个我","type":0,"subCateList":[],"frontName":"你和潮流之间就差一个我"},{"categoryType":0,"showIndex":41,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/52d449042bc437f6179935624f0c1056.png","bannerUrl":"","name":"腰带腕表","id":1010004,"frontDesc":"匠心雕琢细节 细节彰显品位","type":0,"subCateList":[],"frontName":"匠心雕琢细节 细节彰显品位"},{"categoryType":0,"showIndex":42,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/dbee5f088438f7a1538454372788845d.png","name":"帽子发饰","id":109253001,"frontDesc":"时髦 从“头”开始","type":0,"subCateList":[],"frontName":"时髦 从“头”开始"},{"categoryType":0,"showIndex":43,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/01f06c74b0591a8da403199cf27dd875.png","name":"Yessing上装","id":109202000,"frontDesc":"运动生活两相宜","type":0,"subCateList":[],"frontName":"运动生活两相宜"},{"categoryType":0,"showIndex":44,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/6a68adf468654a26d916fcaf5a4ab5bd.png","name":"Yessing下装","id":109214006,"frontDesc":"时尚下装 元气满满","type":0,"subCateList":[],"frontName":"时尚下装 元气满满"},{"categoryType":0,"showIndex":45,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9fe3213589cf74af2ec8ec3ce5322ada.png","name":"女式上装","id":109255016,"frontDesc":"一步获取元气女神","type":0,"subCateList":[],"frontName":"一步获取元气女神"},{"categoryType":0,"showIndex":46,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/d0c83b8c8429de534a5945e2a6135a8a.png","name":"男式上装","id":109255014,"frontDesc":"运动休闲型男魅力","type":0,"subCateList":[],"frontName":"运动休闲型男魅力"},{"categoryType":0,"showIndex":47,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/353876f9db324dc0976ccef7bc834451.png","name":"女式下装","id":109255017,"frontDesc":"好穿易搭轻松减龄","type":0,"subCateList":[],"frontName":"好穿易搭轻松减龄"},{"categoryType":0,"showIndex":48,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/25a81eb6ab646d8a294f3a51d7dc231f.png","name":"男式下装","id":109255015,"frontDesc":"时尚生活有型有款","type":0,"subCateList":[],"frontName":"时尚生活有型有款"},{"categoryType":0,"showIndex":49,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8ebf546b13d24f2dc3c08521b592313f.png","name":"免烫系列","id":109263000,"frontDesc":"舒适免烫 时刻平整","type":0,"subCateList":[],"frontName":"舒适免烫 时刻平整"},{"categoryType":0,"showIndex":50,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a9db6faaa689c4dfcc37ef80d0552b1a.png","name":"棉麻系列","id":109263002,"frontDesc":"透气棉麻 清楚不羁","type":0,"subCateList":[],"frontName":"透气棉麻 清楚不羁"},{"categoryType":0,"showIndex":51,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/cc358f426cbe81d9e806c6b7c2fb64aa.png","name":"真丝系列","id":109263003,"frontDesc":"生活质感更考究","type":0,"subCateList":[],"frontName":"生活质感更考究"},{"categoryType":0,"showIndex":52,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/674af56699e3ccf525f4d65b7bab5446.png","name":"莫代尔系列","id":109263004,"frontDesc":"舒适不同凡响","type":0,"subCateList":[],"frontName":"舒适不同凡响"},{"categoryType":0,"showIndex":53,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9f7531cbaa489ec85a91a3a7dae92e21.png","name":"几何森林","id":109263005,"frontDesc":"绮梦穿梭 视觉世界","type":0,"subCateList":[],"frontName":"绮梦穿梭 视觉世界"},{"categoryType":0,"showIndex":54,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f08b4c04de93a6896f4e02df44ab457b.png","name":"海洋环保","id":109269000,"frontDesc":"海洋垃圾再生面料 时尚又环保","type":0,"subCateList":[],"frontName":"海洋环保"}]},{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/b2595d342733647008a941ad3ba9914d.jpg?type=webp&imageView&quality=75&thumbnail=750x0","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"美食酒水","id":1005002,"type":0,"subCateList":[{"showIndex":1,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/85bf41ca68dc4fe79892344af5887e56.png","bannerUrl":"","frontDesc":"春节宅家囤美食，放假期间正常发货","type":0,"frontName":"春节宅家囤美食，放假期间正常发货","categoryType":0,"superCategoryId":1005002,"name":"宅家囤美食","iconUrl":"","id":109271000,"subCateList":[]},{"categoryType":0,"showIndex":2,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/eefce6cae6d9f89b309612f70a80c3e0.png","name":"居家保健","id":109273000,"frontDesc":"宅家吃好物，强身养生抵抗力棒","type":0,"subCateList":[],"frontName":"宅家吃好物，强身养生抵抗力棒"},{"categoryType":0,"showIndex":3,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/6282955a3db5db7c0ee06e9d560c165f.png","name":"上新美味","id":109253007,"frontDesc":"为你寻遍世间美味，让你品尝第一口好物","type":0,"subCateList":[],"frontName":"为你寻遍世间美味，让你品尝第一口好物"},{"categoryType":0,"showIndex":4,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/59fa0a9ddd1264dbc6f4cb8979357007.png","name":"大家都在买","id":109253008,"frontDesc":"网友购物车里的美食的TOP榜","type":0,"subCateList":[],"frontName":"网友购物车里的美食的TOP榜"},{"categoryType":0,"showIndex":5,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2e753a8f0977fd09a74ccea4f0c6192c.png","bannerUrl":"","name":"饼干糕点","id":1008015,"frontDesc":"无人工添加香精、防腐剂","type":0,"subCateList":[],"frontName":"四季糕点，用心烘焙"},{"categoryType":0,"showIndex":6,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/6941ede8541ceeb432e8da16e200152b.png","bannerUrl":"","name":"小食糖巧","id":1005011,"frontDesc":"原香鲜材，以小食之味，带来味蕾惊喜","type":0,"subCateList":[],"frontName":"原香鲜材，以小食之味，带来味蕾惊喜"},{"categoryType":0,"showIndex":7,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/18dc905db6c49fbf55b2709078875cdb.png","name":"肉类零食","id":1035003,"frontDesc":"真嗜肉者，都爱这一味，或麻辣鲜香、或五味俱全，都是佳肴美馔真滋味","type":0,"subCateList":[],"frontName":"真嗜肉者，都爱这一味，佳肴美馔真滋味"},{"categoryType":0,"showIndex":8,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/46b5256193d052612ecb9fb22d7f4b88.png","bannerUrl":"","name":"坚果炒货","id":1005010,"frontDesc":"精选原产地，美味加营养","type":0,"subCateList":[],"frontName":"精选原产地，美味加营养"},{"showIndex":9,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/dfc7d79ca21ee0f55428c8be218da5d3.png","bannerUrl":"","frontDesc":"品尝与收获到的是自然的味道","type":0,"frontName":"品尝与收获到的是自然的味道","categoryType":0,"superCategoryId":1005002,"name":"蜜饯果干","iconUrl":"","id":1027001,"subCateList":[]},{"categoryType":0,"showIndex":10,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8d4523c21259f514d378ad7431cd4a75.png","bannerUrl":"","name":"冲调饮品","id":1005013,"frontDesc":"以用料天然之美，尽享闲雅之意","type":0,"subCateList":[],"frontName":"以用料天然之美，尽享闲雅之意"},{"categoryType":0,"showIndex":11,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/edb41097ac4cc34ffd08d02f125c98e8.jpg","name":"传统茗茶","id":1027000,"frontDesc":"一品茶香，品茗即是观心，饮茶涤净尘虑","type":0,"subCateList":[],"frontName":"一品茶香，品茗即是观心，饮茶涤净尘虑"},{"showIndex":12,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/01a25fc0ec89278943d488eba3b959e1.jpg","bannerUrl":"","frontDesc":"人生圆满，不过赠好友一盒茶礼，品味畅谈","type":0,"frontName":"人生圆满，不过赠好友一盒茶礼，品味畅谈","categoryType":0,"superCategoryId":1005002,"name":"茗茶礼盒","iconUrl":"","id":109260000,"subCateList":[]},{"categoryType":0,"showIndex":13,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/bd65e6d2bd8985e55d38c06f173a6fb5.jpg","name":"茶包花茶","id":109206006,"frontDesc":"办公室必备茶包花茶","type":0,"subCateList":[],"frontName":"办公室必备茶包花茶"},{"categoryType":0,"showIndex":14,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0a66214a911887c854cb75e4112c07ed.png","name":"滋补食材","id":1054001,"frontDesc":"营养滋补，只为健康","type":0,"subCateList":[],"frontName":"营养滋补，只为健康"},{"categoryType":0,"showIndex":15,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/65fa4fbdbff206271c27179844e9297a.png","name":"保健品","id":109206016,"frontDesc":"保健佳品","type":0,"subCateList":[],"frontName":"保健佳品"},{"categoryType":0,"showIndex":16,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/25428a7b8047d4e35ab58367bf44d030.png","name":"乳品饮料","id":109206008,"frontDesc":"四季饮料，欢乐共享","type":0,"subCateList":[],"frontName":"四季饮料，欢乐共享"},{"categoryType":0,"showIndex":17,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e2ec593d7d5feae8a2f227892d08b081.png","name":"酒类","id":1053001,"frontDesc":"美酒佳酿，用心典藏","type":0,"subCateList":[],"frontName":"美酒佳酿，用心典藏"},{"categoryType":0,"showIndex":18,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e486923c1ffa14ad47672c6d495be8ed.png","name":"名酒馆","id":109264007,"frontDesc":"寻遍全球，甄选世界好酒","type":0,"subCateList":[],"frontName":"名酒馆"},{"categoryType":0,"showIndex":19,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/7ecc7eab5519a1bf49fd2b6f4ad433ec.png","name":"米面粮油","id":109206007,"frontDesc":"米面粮油，家庭必备","type":0,"subCateList":[],"frontName":"米面粮油，家庭必备"},{"categoryType":0,"showIndex":20,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/7154cb8de296a6d6acb16022d2725189.png","name":"方便食品","id":109201001,"frontDesc":"健康方便食品","type":0,"subCateList":[],"frontName":"健康方便食品"},{"categoryType":0,"showIndex":21,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4daf3eb8c49f473596bb15a71edc510f.png","bannerUrl":"","name":"南北干货","id":1005012,"frontDesc":"天时地利人和，寻找这个时节这个地点的味道","type":0,"subCateList":[],"frontName":"天时地利人和，寻找这个时节这个地点的味道"},{"categoryType":0,"showIndex":22,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/339889b1f38aba8b4a63c472e782d1ee.png","name":"调味酱菜","id":1036003,"frontDesc":"烹饪必备，美食调味","type":0,"subCateList":[],"frontName":"烹饪必备，美食调味"},{"categoryType":0,"showIndex":23,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e370d525c0bc5c35173fd72f2b598403.jpg","name":"水果蔬菜","id":109264008,"frontDesc":"应季果蔬，应有尽有","type":0,"subCateList":[],"frontName":"水果蔬菜"},{"categoryType":0,"showIndex":24,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/d3e0c79acff00d7b481e003816d5c105.png","name":"肉蛋海鲜","id":109206009,"frontDesc":"新鲜肉质，新鲜体验","type":0,"subCateList":[],"frontName":"肉蛋海鲜"},{"categoryType":0,"showIndex":25,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/075e800278eea9266f2d839f4c6cb5a2.png","name":"冷冻冷藏","id":109264009,"frontDesc":"冷冻美食，冷藏好味道","type":0,"subCateList":[],"frontName":"冷冻冷藏"},{"showIndex":26,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0a35aef69fd20761d113f4dc54f4ef2c.png","bannerUrl":"","frontDesc":"安全配送，新鲜直达","type":0,"frontName":"安全配送，新鲜直达","categoryType":0,"superCategoryId":1005002,"name":"网易黑猪","iconUrl":"","id":1008014,"subCateList":[]},{"categoryType":0,"showIndex":27,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ed9fda295d73fa8bbd0b9ea428329c1b.png","name":"全球美食","id":109206010,"frontDesc":"全球制造，环球美食","type":0,"subCateList":[],"frontName":"全球制造，环球美食"}]},{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/6b1ebd19470cea9a7b8e81a52485f414.jpg?type=webp&imageView&quality=75&thumbnail=750x0","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"个护清洁","id":1013001,"type":0,"subCateList":[{"categoryType":0,"showIndex":1,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0af70c043ee2418c63eb74135084b215.png","name":"爆款榜单","id":109256007,"frontDesc":"精选口碑尖货","type":0,"subCateList":[],"frontName":"精选口碑尖货"},{"categoryType":0,"showIndex":2,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ad777c7b8e1e53040bfe7e46a93f5950.png","name":"面部护理","id":1020001,"frontDesc":"温和无刺激的呵护","type":0,"subCateList":[],"frontName":"温和无刺激的呵护"},{"categoryType":0,"showIndex":3,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ffce24773c1b680572353d1d864da1e7.jpg","name":"新品尝鲜","id":109256008,"frontDesc":"新品速递，等你来试","type":0,"subCateList":[],"frontName":"新品速递，等你来试"},{"categoryType":0,"showIndex":4,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/52bca59c658299046c4df435c3abee1c.png","name":"基础护肤","id":109256010,"frontDesc":"高效补水，深层修护","type":0,"subCateList":[],"frontName":"高效补水，深层修护"},{"categoryType":0,"showIndex":5,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e3211f79704b02298656ec8c99b6a70d.png","name":"卸妆洁面","id":109256009,"frontDesc":"温和配方，养卸一体","type":0,"subCateList":[],"frontName":"温和配方，养卸一体"},{"categoryType":0,"showIndex":6,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/52068e062728c10f4d4da30fed9d3280.png","name":"护肤工具","id":109256011,"frontDesc":"智能美颜，匠心工艺","type":0,"subCateList":[],"frontName":"智能美颜，匠心工艺"},{"categoryType":0,"showIndex":7,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1ac9a9eee6be87a02faaea2e3abfec25.png","bannerUrl":"","name":"洗发护发","id":1013003,"frontDesc":"护发超有效小秘诀","type":0,"subCateList":[],"frontName":"呵护秀发，柔顺不同发质"},{"categoryType":0,"showIndex":8,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/cf842f27c11f1587ca55d20035c1caba.png","name":"身体护理","id":1037002,"frontDesc":"呵护肌肤，天然温和","type":0,"subCateList":[],"frontName":"呵护肌肤，天然温和"},{"categoryType":0,"showIndex":9,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/cef1d1b9f26a01037d705443e585d313.png","name":"口腔护理","id":1037003,"frontDesc":"健康口腔，品质生活","type":0,"subCateList":[],"frontName":"健康口腔，品质生活"},{"categoryType":0,"showIndex":10,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/13d7d7e9fa5f59227f8d5c4be153a957.png","name":"女性护理","id":109208003,"frontDesc":"品质之选，温柔呵护","type":0,"subCateList":[],"frontName":"品质之选，温柔呵护"},{"categoryType":0,"showIndex":11,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/5f91b77da79bb06f72973ecbb63c6a64.png","bannerUrl":"","name":"彩妆修容","id":1013002,"frontDesc":"为你的面容添色","type":0,"subCateList":[],"frontName":"为你的面容添色"},{"categoryType":0,"showIndex":12,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/fd2d0e6a87331d18ec67e77cd0f09c5b.png","name":"美妆工具","id":109243017,"frontDesc":"选对工具，精致妆容","type":0,"subCateList":[],"frontName":"选对工具，精致妆容"},{"categoryType":0,"showIndex":13,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e4c674c49a1a7da65fda7d50e2a32328.png","bannerUrl":"","name":"香水香氛","id":1013004,"frontDesc":"提炼纯净，清雅不腻","type":0,"subCateList":[],"frontName":"提炼纯净，清雅不腻"},{"categoryType":0,"showIndex":14,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/31856d567e5c2de30f2d06c03994148c.png","name":"个护电器","id":109248003,"frontDesc":"科技护理，创享精致生活","type":0,"subCateList":[],"frontName":"科技护理，创享精致生活"},{"categoryType":0,"showIndex":15,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8efe5dc20ae937faa0f8918678728f3d.png","name":"口腔护理电器","id":109254053,"frontDesc":"专业高效护理口腔","type":0,"subCateList":[],"frontName":"专业高效护理口腔"},{"categoryType":0,"showIndex":16,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/be5d2abe1db1b8efe84bb48250d2899c.png","name":"面部护理电器","id":109254054,"frontDesc":"让你变美的仪器们","type":0,"subCateList":[],"frontName":"让你变美的仪器们"},{"categoryType":0,"showIndex":17,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/539ea18e491d8e0c98152eed1d300f54.png","name":"头发护理电器","id":109254055,"frontDesc":"头发亮泽光彩，随心造型","type":0,"subCateList":[],"frontName":"头发亮泽光彩，随心造型"},{"categoryType":0,"showIndex":18,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/fb99d01e5fc25568f97b6cf93012b1d2.png","name":"身体护理电器","id":109254056,"frontDesc":"爱护身体，方寸间蕴出肌肤之美","type":0,"subCateList":[],"frontName":"爱护身体，方寸间蕴出肌肤之美"},{"categoryType":0,"showIndex":19,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/921337182aa5a4540ab0632c1fb6ad89.png","name":"纸品湿巾","id":1037001,"frontDesc":"和风设计，温和清洁","type":0,"subCateList":[],"frontName":"和风设计，温和清洁"},{"categoryType":0,"showIndex":20,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/869ab6b70b45716c9ffd35ed55669855.png","name":"纸品","id":109256012,"frontDesc":"和风设计，原生木浆","type":0,"subCateList":[],"frontName":"和风设计，原生木浆"},{"categoryType":0,"showIndex":21,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1275d57ba465ea26488f3be701295099.png","name":"湿巾","id":109256013,"frontDesc":"温和致净，亲密呵护","type":0,"subCateList":[],"frontName":"温和致净，亲密呵护"},{"categoryType":0,"showIndex":22,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e40f60a3fe682b3317f3672e374dca0b.png","name":"衣物护理","id":109243015,"frontDesc":"洁净衣物，守护全家","type":0,"subCateList":[],"frontName":"洁净衣物，守护全家"},{"categoryType":0,"showIndex":23,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/54f2e4f7a9cb17b61804d4d9a8982889.png","bannerUrl":"","name":"家庭清洁","id":1009000,"frontDesc":"天然材料，温和去除污垢","type":0,"subCateList":[],"frontName":"洁净才能带来清爽心情"},{"categoryType":0,"showIndex":24,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/45d436cc3d818ee3686b9ceb2a6a71e0.png","name":"餐厨清洁","id":109243016,"frontDesc":"高效清洁，省时省心","type":0,"subCateList":[],"frontName":"高效清洁，省时省心"},{"categoryType":0,"showIndex":25,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/44114978a0117bac622cdc3ffdc7b638.png","name":"毛巾浴巾","id":109261055,"frontDesc":"亲肤柔棉，安心品质","type":0,"subCateList":[],"frontName":"亲肤柔棉，安心品质"},{"categoryType":0,"showIndex":26,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/76d4335b8a97c7e2635f66e1b71e4ee1.png","name":"浴室用品","id":1020002,"frontDesc":"环保材料，耐用不发霉","type":0,"subCateList":[],"frontName":"小工具成就美好浴室"},{"categoryType":0,"showIndex":27,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c96383b484c677dacd0c696040a769b4.png","name":"避孕套","id":109255010,"frontDesc":"给爱爱一层安全感","type":0,"subCateList":[],"frontName":"给爱爱一层安全感"},{"categoryType":0,"showIndex":28,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8ea84f70b41e0441b8df48bd2f88b26e.png","name":"女用情趣","id":109255011,"frontDesc":"解锁身体的快乐秘密","type":0,"subCateList":[],"frontName":"解锁身体的快乐秘密"},{"categoryType":0,"showIndex":29,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/5f2f9f911ff905040f6d5c747a5c9bf5.png","name":"男用情趣","id":109255012,"frontDesc":"男儿硬器，尽兴释放自己","type":0,"subCateList":[],"frontName":"男儿硬器，尽兴释放自己"},{"categoryType":0,"showIndex":30,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/72e99034707dc6ffa890b3e82113c8e6.png","name":"润滑液","id":109255013,"frontDesc":"让亲密接触更湿滑畅意","type":0,"subCateList":[],"frontName":"让亲密接触更湿滑畅意"},{"categoryType":0,"showIndex":31,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1adf88cfc906928959e5741e9455790f.png","name":"计生情趣","id":1037004,"frontDesc":"解锁身体里的快乐秘密","type":0,"subCateList":[],"frontName":"解锁身体里的快乐秘密"}]},{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/9794fdd00c6ac9054a13dc7d8b110d1e.jpg?type=webp&imageView&quality=75&thumbnail=750x0","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"母婴亲子","id":1011000,"type":0,"subCateList":[{"categoryType":0,"showIndex":1,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/97f65393f6a4a7b3d91cbe0cd19c617d.png","name":"防疫榜单","id":109259002,"frontDesc":"清洁洗护 科学防疫","type":0,"subCateList":[],"frontName":"清洁洗护 科学防疫"},{"categoryType":0,"showIndex":2,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ad29850918fab29003201e7778bf84ea.png","name":"宅家好物","id":109255006,"frontDesc":"文具玩具 成长好礼","type":0,"subCateList":[],"frontName":"文具玩具 成长好礼"},{"categoryType":0,"showIndex":3,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9dacf066ccf643c91b64cf93dfb9dfb5.png","name":"初春换新","id":1037005,"frontDesc":"服配居家 等你来挑","type":0,"subCateList":[],"frontName":"服配居家 等你来挑"},{"categoryType":0,"showIndex":4,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e16890ca1f2e296261025a896d5c16e0.png","name":"尾货秒杀","id":1034001,"frontDesc":"限量抢购 抄底折扣","type":0,"subCateList":[],"frontName":"限量抢购 抄底折扣"},{"categoryType":0,"showIndex":5,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4da3ff593625177ec09a23228b338290.png","name":"秋日出游","id":109255007,"frontDesc":"秋高气爽 放心出行","type":0,"subCateList":[],"frontName":"秋高气爽 放心出行"},{"categoryType":0,"showIndex":6,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/5be2729ef9a10df2e201b3084b551ae8.png","name":"五折封顶","id":109255008,"frontDesc":"夏日抄底特惠专区","type":0,"subCateList":[],"frontName":"夏日抄底特惠专区"},{"categoryType":0,"showIndex":7,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f3d5a10fbd65c58e0bb54d6e569597f2.png","name":"新手妈妈指南","id":109255009,"frontDesc":"新妈妈装备 一站购全","type":0,"subCateList":[],"frontName":"新妈妈装备 一站购全"},{"categoryType":0,"showIndex":8,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0e94a5a01e13752b6c5d75e13e3b1283.png","name":"卫衣/毛衫","id":1091003,"frontDesc":"舒适穿搭 精彩童年","type":0,"subCateList":[],"frontName":"舒适穿搭 精彩童年"},{"categoryType":0,"showIndex":9,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/24244fafbbde8f6e6215647a03ebbc7c.png","name":"T恤/polo/衬衫","id":1020003,"frontDesc":"必备上衣 百搭精选","type":0,"subCateList":[],"frontName":"必备上衣 百搭精选"},{"categoryType":0,"showIndex":10,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/60a70b35a24ad07449c763a6f2d16434.png","name":"外套/套装","id":109243018,"frontDesc":"甄选衣橱 陪伴左右","type":0,"subCateList":[],"frontName":"甄选衣橱 陪伴左右"},{"categoryType":0,"showIndex":11,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8ae80697a24aefe4069f1066ebe142fc.png","name":"裤子/裙装","id":109243019,"frontDesc":"实用下装 方便活动","type":0,"subCateList":[],"frontName":"实用下装 方便活动"},{"categoryType":0,"showIndex":12,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/cfbe20d66ea16903d786d5a19976d5d0.png","name":"裙装","id":109243020,"frontDesc":"气质裙装 优雅大方","type":0,"subCateList":[],"frontName":"气质裙装 优雅大方"},{"categoryType":0,"showIndex":13,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/6df0eecd6458ca390b1cfefeb910f33b.png","name":"连体衣/礼盒","id":109243021,"frontDesc":"A类无荧光 给宝宝更好的","type":0,"subCateList":[],"frontName":"A类无荧光 给宝宝更好的"},{"categoryType":0,"showIndex":14,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/772eb195bae088cb2c3bef9987ae75b9.png","name":"内衣/配搭","id":1089001,"frontDesc":"孩子衣橱里的配搭好物","type":0,"subCateList":[],"frontName":"孩子衣橱里的配搭好物"},{"categoryType":0,"showIndex":15,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/514726ef6c2ec1d0bd377a903666e9da.png","name":"儿童鞋","id":1037006,"frontDesc":"活力鞋品 孩子必备","type":0,"subCateList":[],"frontName":"活力鞋品 孩子必备"},{"categoryType":0,"showIndex":16,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/cee62d001b384e8f16ba290d37c04e10.png","name":"学步鞋","id":109243022,"frontDesc":"宝宝学步 专业科学","type":0,"subCateList":[],"frontName":"宝宝学步 专业科学"},{"categoryType":0,"showIndex":17,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a1a521de2a5708b3c3f4a93471346f58.png","name":"尿裤纸品","id":109255004,"frontDesc":"呵护宝宝的每寸肌肤","type":0,"subCateList":[],"frontName":"呵护宝宝的每寸肌肤"},{"categoryType":0,"showIndex":18,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b0ae93ae9133420fb688c193462eeabc.png","name":"洗护","id":1020004,"frontDesc":"天然专业 呵护宝宝肌","type":0,"subCateList":[],"frontName":"天然专业 呵护宝宝肌"},{"categoryType":0,"showIndex":19,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/eb8c8e70f88d8cb4866a811a34badb51.png","name":"喂养","id":1020007,"frontDesc":"宝宝吃得香 妈妈才放心","type":0,"subCateList":[],"frontName":"宝宝吃得香 妈妈才放心"},{"categoryType":0,"showIndex":20,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4843c411dec12e6873dc8d6ff0b4b3b1.png","name":"儿童家具收纳","id":109206012,"frontDesc":"有你才有家 成长快乐窝","type":0,"subCateList":[],"frontName":"有你才有家 成长快乐窝"},{"categoryType":0,"showIndex":21,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/cea5a4dcff63ff83c1f34ca576ccb8d9.png","name":"婴童被枕芯类","id":1020005,"frontDesc":"甄选贴肤材质 宝宝舒眠甜梦","type":0,"subCateList":[],"frontName":"甄选贴肤材质 宝宝舒眠甜梦"},{"categoryType":0,"showIndex":22,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c230d5a5edf629bd921ee37dabb5cb03.png","name":"婴童床品套件","id":109245001,"frontDesc":"甄选天然面料 亲肤透气","type":0,"subCateList":[],"frontName":"甄选天然面料 亲肤透气"},{"categoryType":0,"showIndex":23,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/126545cd9cd34dc4e63b815e83ec4a06.png","name":"抱被睡袋","id":109245002,"frontDesc":"贴心设计 好眠助成长","type":0,"subCateList":[],"frontName":"贴心设计 好眠助成长"},{"categoryType":0,"showIndex":24,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9556bfa01dde5eb46cf56a0bbc3c6461.png","name":"推车/安全座椅","id":109243027,"frontDesc":"安全严苛标准 溜娃神器","type":0,"subCateList":[],"frontName":"安全严苛标准 溜娃神器"},{"categoryType":0,"showIndex":25,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/064b9f83a29735b3c6517f6c6be35d47.png","name":"童包/雨具","id":109206013,"frontDesc":"出行必备包包雨具","type":0,"subCateList":[],"frontName":"出行必备包包雨具"},{"categoryType":0,"showIndex":26,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e5ae3db7c2819731768ac50b2ff04d64.png","name":"玩具","id":1020006,"frontDesc":"益智趣味 在玩乐中学习","type":0,"subCateList":[],"frontName":"益智趣味 在玩乐中学习"},{"categoryType":0,"showIndex":27,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/76a23e423710c88ac1070aed906580b2.png","name":"文具","id":1089000,"frontDesc":"本册纸笔 翻译利器","type":0,"subCateList":[],"frontName":"本册纸笔 翻译利器"},{"categoryType":0,"showIndex":28,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/628b0985bf900d543c3aad06d1f40c46.png","name":"图书","id":109243023,"frontDesc":"开拓视野 亲子共读","type":0,"subCateList":[],"frontName":"开拓视野 亲子共读"},{"showIndex":29,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2d96684c2b2dc89df9a001235abd0a6d.png","bannerUrl":"","frontDesc":"妈咪贴身衣物 承诺无荧光剂","type":0,"frontName":"妈咪贴身衣物 承诺无荧光剂","categoryType":0,"superCategoryId":1011000,"name":"孕妈服饰","iconUrl":"","id":1011001,"subCateList":[]},{"categoryType":0,"showIndex":30,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8ab1afb09ce988aef93263280e2c2097.png","name":"妈咪用品","id":109206015,"frontDesc":"新手妈妈 必备用品","type":0,"subCateList":[],"frontName":"新手妈妈 必备用品"},{"categoryType":0,"showIndex":31,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9b7bb9df09836b1cb7e46f9fefb1b2c0.png","name":"孕妈装","id":109206014,"frontDesc":"时尚大方 安全无荧光剂","type":0,"subCateList":[],"frontName":"时尚大方 安全无荧光剂"},{"categoryType":0,"showIndex":32,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b51b268801f04b6f9210967a0136e0bb.png","name":"安全座椅","id":109243026,"frontDesc":"比安全更周全 专业安全","type":0,"subCateList":[],"frontName":"比安全更周全 专业安全"},{"categoryType":0,"showIndex":33,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/7a347426bb41f4e5221001855dcbc65c.png","name":"毛巾口水巾","id":109206011,"frontDesc":"婴童高标准毛巾","type":0,"subCateList":[],"frontName":"婴童高标准毛巾"},{"categoryType":0,"showIndex":34,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c6557651e50d82d7d9f8184f8a0e955b.png","name":"儿童雨具/泳具","id":109255005,"frontDesc":"趣味玩水 放肆一夏","type":0,"subCateList":[],"frontName":"趣味玩水 放肆一夏"},{"categoryType":0,"showIndex":35,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1f93797e2f77cb0e0ac3c153183d2697.png","name":"防走丢包","id":109243024,"frontDesc":"防护牵引 安全出行","type":0,"subCateList":[],"frontName":"防护牵引 安全出行"},{"categoryType":0,"showIndex":36,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/34f22f5e50082da73d91e07794a9afea.png","name":"其它箱包","id":109243025,"frontDesc":"休闲实用 出游必备","type":0,"subCateList":[],"frontName":"休闲实用 出游必备"}]},{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/36929e72018bce053af17a80a262c4bb.jpg?type=webp&imageView&quality=75&thumbnail=750x0","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"运动旅行","id":109243029,"type":0,"subCateList":[{"categoryType":0,"showIndex":1,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ba81ce10c1e0fab23d010736d65ba0a7.jpg","name":"Yessing","id":109256006,"frontDesc":"穿出你的个性态度","type":0,"subCateList":[],"frontName":"穿出你的个性态度"},{"categoryType":0,"showIndex":1,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/87e3129e372b7ebf73767f10be8a15a2.png","name":"男式运动","id":1020010,"frontDesc":"细节讲究 合身剪裁不束缚","type":0,"subCateList":[],"frontName":"细节讲究 合身剪裁不束缚"},{"categoryType":0,"showIndex":3,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/18d5a7a3ed8b3731d4e37394a37a6dd3.png","name":"健身系列","id":109254039,"frontDesc":"静体静心 养生健体","type":0,"subCateList":[],"frontName":"静体静心 养生健体"},{"categoryType":0,"showIndex":4,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2e8953d954d410a2ae2c9321651b85f1.png","name":"出行好物","id":109254040,"frontDesc":"出行好物 贴心相伴","type":0,"subCateList":[],"frontName":"出行好物 贴心相伴"},{"categoryType":0,"showIndex":5,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c2871979efcc7ed2d40bc569c7fe70a2.png","name":"男式运动外套/卫衣","id":109254042,"frontDesc":"运动工作自由切换","type":0,"subCateList":[],"frontName":"运动工作自由切换"},{"categoryType":0,"showIndex":6,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/23cbe4d7d1e3e23d4cc097a67f57b6f9.png","name":"男式运动裤装","id":109254043,"frontDesc":"运动中 让双腿更自如","type":0,"subCateList":[],"frontName":"运动中 让双腿更自如"},{"categoryType":0,"showIndex":7,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/26f8b210ff0dba32cee3e2f374c47e9b.png","name":"男式户外服装","id":109254044,"frontDesc":"防风防水 户外防晒","type":0,"subCateList":[],"frontName":"防风防水 户外防晒"},{"categoryType":0,"showIndex":8,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0ccd33322fda8fc8ad7ccc61b1207afa.png","name":"男式运动T恤","id":109254041,"frontDesc":"经典款式 运动通勤皆可","type":0,"subCateList":[],"frontName":"经典款式 运动通勤皆可"},{"categoryType":0,"showIndex":11,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/dae55f67c05dd3a544c68aaf91e2d2bd.png","name":"女式运动外套/卫衣","id":109254047,"frontDesc":"运动工作自由切换","type":0,"subCateList":[],"frontName":"运动工作自由切换"},{"categoryType":0,"showIndex":12,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3715a4db6b8449843105cd819c1b4fb3.png","name":"女式运动裤装","id":109254048,"frontDesc":"运动中 让双腿更自如","type":0,"subCateList":[],"frontName":"运动中 让双腿更自如"},{"categoryType":0,"showIndex":13,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a49e9afcf7d91826cbaa86c04c94e94d.png","name":"女式户外服装","id":109254049,"frontDesc":"防风防水 户外防晒","type":0,"subCateList":[],"frontName":"防风防水 户外防晒"},{"categoryType":0,"showIndex":14,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/639008fcca7a3a4ecc9ce5cf9e28506e.png","name":"女式运动T恤","id":109254045,"frontDesc":"经典款式 运动通勤皆可","type":0,"subCateList":[],"frontName":"经典款式 运动通勤皆可"},{"categoryType":0,"showIndex":14,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/20c2a3b3b7b1795954c58d8088e6d05e.png","name":"女式运动","id":1035002,"frontDesc":"高质感面料","type":0,"subCateList":[],"frontName":"高质感面料"},{"categoryType":0,"showIndex":15,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f2ccaf4abc6ecf8dca27b50602a61f6a.png","name":"女式运动内衣/泳装","id":109254046,"frontDesc":"运动承托 保护胸部","type":0,"subCateList":[],"frontName":"运动承托 保护胸部"},{"categoryType":0,"showIndex":15,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a1a82637fc8e1ab9eafdd7ae3eec4d4f.png","name":"男式运动下装","id":1015001,"frontDesc":"立体裁剪，专为国人打造","type":0,"subCateList":[],"frontName":"自在而潇洒的穿着感"},{"categoryType":0,"showIndex":16,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4088b6af21f8174909d62084848ef198.png","name":"女式运动下装","id":109214005,"frontDesc":"女士修身运动","type":0,"subCateList":[],"frontName":"女士修身运动"},{"categoryType":0,"showIndex":17,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4415c184ae39afbd59b5e34eed42ed4f.png","name":"男式户外","id":1078000,"frontDesc":"专业休闲运动风","type":0,"subCateList":[],"frontName":"运动休闲多场景任意切换"},{"categoryType":0,"showIndex":18,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9f820db8517536cd0fe2632955198722.png","bannerUrl":"","name":"女式户外","id":1010001,"frontDesc":"户外运动休闲运动","type":0,"subCateList":[],"frontName":"户外运动休闲运动"},{"categoryType":0,"showIndex":19,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/bc18133d4c92124c95c801f5c2582cd2.png","name":"男式运动鞋","id":109249011,"frontDesc":"热血潮流 畅快奔跑","type":0,"subCateList":[],"frontName":"热血潮流 畅快奔跑"},{"categoryType":0,"showIndex":20,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e2bf3f81c3d0916d2f7a14b6d44dcd56.png","name":"女式运动鞋","id":109249012,"frontDesc":"青春运动 轻便舒适","type":0,"subCateList":[],"frontName":"青春运动 轻便舒适"},{"categoryType":0,"showIndex":21,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/63e23cd56352d2cb3c835560e643bf9a.png","name":"旅行用品","id":1020000,"frontDesc":"便携设计 轻便旅途","type":0,"subCateList":[],"frontName":"出行小物 贴心相伴"},{"categoryType":0,"showIndex":22,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3c37a0b380fdcca237d64552db99cce0.png","name":"行李箱","id":109243030,"frontDesc":"带着梦想即刻出发","type":0,"subCateList":[],"frontName":"带着梦想即刻出发"},{"categoryType":0,"showIndex":23,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/cc5ff5a9d325a70b0693795644803d5d.png","name":"颈枕眼罩","id":109261036,"frontDesc":"多功能使用 舒适旅途","type":0,"subCateList":[],"frontName":"多功能使用 舒适旅途"},{"categoryType":0,"showIndex":24,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a97b4100cf9e753d1c51d8f38bdc3a38.png","name":"雨具","id":109261037,"frontDesc":"晴雨两用 随身出行","type":0,"subCateList":[],"frontName":"晴雨两用 随身出行"},{"categoryType":0,"showIndex":25,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b5950f5984ede4241d12ca14620c321a.png","name":"旅行收纳","id":109254051,"frontDesc":"整理你的旅行箱","type":0,"subCateList":[],"frontName":"整理你的旅行箱"},{"categoryType":0,"showIndex":26,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/01ceeee87efb0f66ee19d5b4a2c156e4.png","name":"出行用品","id":109254050,"frontDesc":"让旅途更轻松","type":0,"subCateList":[],"frontName":"让旅途更轻松"},{"categoryType":0,"showIndex":27,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c5550b962058846f3e7e45b137d1ca5f.png","name":"露营野餐","id":109243031,"frontDesc":"趣味露营 享受户外","type":0,"subCateList":[],"frontName":"趣味露营 享受户外"},{"categoryType":0,"showIndex":28,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f821a3c1d8894e89a72d396a19890810.png","name":"徒步登山","id":109261038,"frontDesc":"户外行走 探索无限","type":0,"subCateList":[],"frontName":"户外行走 探索无限"},{"categoryType":0,"showIndex":29,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b91545cb45289cc89e0bcc1a006621b9.png","name":"健身器械","id":109254052,"frontDesc":"打造自己的健身房","type":0,"subCateList":[],"frontName":"打造自己的健身房"},{"categoryType":0,"showIndex":30,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/84464237e022135f1e5e5e1c1c4f9f84.png","name":"按摩护具","id":109243033,"frontDesc":"运动防护 无惧伤害","type":0,"subCateList":[],"frontName":"运动防护 无惧伤害"},{"categoryType":0,"showIndex":31,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0ffac069b042edf1bf24090face6a4bb.png","name":"瑜伽美体","id":109261040,"frontDesc":"静体静心 养生健体","type":0,"subCateList":[],"frontName":"静体静心 养生健体"},{"categoryType":0,"showIndex":32,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2c2f4c3457c2c3c94567cd97157f43c2.png","name":"运动配件","id":109243032,"frontDesc":"运动伴侣 助力训练","type":0,"subCateList":[],"frontName":"运动伴侣 助力训练"},{"categoryType":0,"showIndex":32,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f2bec10d8188a4980f0d5bab26ffa201.png","name":"游泳装备","id":109261041,"frontDesc":"自由泳者","type":0,"subCateList":[],"frontName":"自由泳者"},{"categoryType":0,"showIndex":32,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/12aef6f81b524bd1e9d5aa051266ca65.png","name":"球类运动","id":109261042,"frontDesc":"运动随心","type":0,"subCateList":[],"frontName":"运动随心"}]},{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/3d4fbbc11172e79e3842671c447daea9.jpg?type=webp&imageView&quality=75&thumbnail=750x0","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"数码家电","id":1043000,"type":0,"subCateList":[{"categoryType":0,"showIndex":1,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/00bc575e28c69cd85e59ec39adcb5de6.png","name":"当季热销","id":109255020,"frontDesc":"消毒抑菌/除湿烘干/清洁除螨","type":0,"subCateList":[],"frontName":"消毒抑菌/除湿烘干/清洁除螨"},{"categoryType":0,"showIndex":2,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/d2ac4fa7cf365849707e378f15e7d6e3.png","name":"新品首发","id":109255021,"frontDesc":"率先掌握上新资讯","type":0,"subCateList":[],"frontName":"率先掌握上新资讯"},{"categoryType":0,"showIndex":3,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1ca73b12b6338a54421add710d406364.png","name":"甄选爆款","id":109255019,"frontDesc":"严选用户高好评爆款","type":0,"subCateList":[],"frontName":"严选用户高好评爆款"},{"categoryType":0,"showIndex":4,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/61d16210f6dfff72668ff425b79c7190.png","name":"身体护理","id":109249010,"frontDesc":"爱护身体，方寸间蕴出肌肤之美","type":0,"subCateList":[],"frontName":"爱护身体，方寸间蕴出肌肤之美"},{"categoryType":0,"showIndex":5,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e6c44e8dd451090b324fe127e3e8616d.png","name":"口腔护理","id":109249005,"frontDesc":"清新口气，健康牙齿","type":0,"subCateList":[],"frontName":"清新口气，健康牙齿"},{"categoryType":0,"showIndex":6,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2de6707340d511031a3fcb3d98ae770d.png","name":"面部护理","id":109249006,"frontDesc":"美容护肤，让你闪耀脱颖而出","type":0,"subCateList":[],"frontName":"美容护肤，让你闪耀脱颖而出"},{"categoryType":0,"showIndex":7,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/117270efbbb5f5520dbc609dda5d5b44.png","name":"头发护理","id":109249007,"frontDesc":"头发亮泽光彩，随心造型","type":0,"subCateList":[],"frontName":"头发亮泽光彩，随心造型"},{"categoryType":0,"showIndex":8,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8bdd8292aae3861f52b5739174764d99.png","name":"两季电器","id":109249000,"frontDesc":"冬天温暖舒适，夏天清凉舒爽","type":0,"subCateList":[],"frontName":"冬天温暖舒适，夏天清凉舒爽"},{"categoryType":0,"showIndex":9,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c650bffea04dd2749d04d9f63edae464.png","name":"清洁电器","id":109249002,"frontDesc":"清洁好助手，每天都像住新家","type":0,"subCateList":[],"frontName":"清洁好助手，每天都像住新家"},{"categoryType":0,"showIndex":10,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b0e72093d1d047bbd0de7b3160b1506c.png","name":"衣物护理","id":109249001,"frontDesc":"焕然一新，陶醉在衣物的平顺里","type":0,"subCateList":[],"frontName":"焕然一新，陶醉在衣物的平顺里"},{"categoryType":0,"showIndex":11,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0427066bea93d5639f1ba79672ab846b.png","name":"空气调节","id":109249003,"frontDesc":"除湿/加湿/净化，空气焕然一新","type":0,"subCateList":[],"frontName":"除湿/加湿/净化，空气焕然一新"},{"categoryType":0,"showIndex":12,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/591fe5284130069a3e408517443a78dd.png","name":"厨房电器","id":1023000,"frontDesc":"囿于厨房与爱，准备丰富大餐","type":0,"subCateList":[],"frontName":"囿于厨房与爱，准备丰富大餐"},{"categoryType":0,"showIndex":13,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0a563ba0f5e2c9e75031f5f160aee9ae.png","name":"按摩器","id":109249009,"frontDesc":"你的专属按摩大师","type":0,"subCateList":[],"frontName":"你的专属按摩大师"},{"categoryType":0,"showIndex":14,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e05ec7535fb083138a4afb683c63b45b.png","name":"按摩椅","id":109249004,"frontDesc":"仿真人手按摩，享受全方位放松","type":0,"subCateList":[],"frontName":"仿真人手按摩，享受全方位放松"},{"categoryType":0,"showIndex":15,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/32481c037b206627d500daf078087ad7.png","name":"智能家居","id":109249008,"frontDesc":"智能升级家居，提升生活幸福感","type":0,"subCateList":[],"frontName":"智能升级家居，提升生活幸福感"},{"categoryType":0,"showIndex":16,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/590c1c397c52cee5cc0d13c5ccd3dc34.png","name":"智能出行","id":109255018,"frontDesc":"出行黑科技，陪你探索有趣的世界","type":0,"subCateList":[],"frontName":"出行黑科技，陪你探索有趣的世界"},{"categoryType":0,"showIndex":17,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/47e953a95e4378907b131205ce3cbc45.png","name":"3C数码","id":1022000,"frontDesc":"专为职场精英和学生设计","type":0,"subCateList":[],"frontName":"专为职场精英和学生设计"},{"categoryType":0,"showIndex":18,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/620d2c977da93f5130eb5aed639850a0.png","name":"手机配件","id":109243035,"frontDesc":"高颜值配件，武装随身装备","type":0,"subCateList":[],"frontName":"高颜值配件，武装随身装备"},{"categoryType":0,"showIndex":19,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/09c8b36ba252b486eec081479606baa7.png","name":"车载用品","id":109243036,"frontDesc":"车载神器陪你跨过山和大海","type":0,"subCateList":[],"frontName":"车载神器陪你跨过山和大海"},{"showIndex":20,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9d635abb986bd40f217dba2ac67df7f2.png","bannerUrl":"https://yanxuan.nosdn.127.net/ea626506991f03f638dc32b72212e8a3.png","frontDesc":"找回书写的力量","type":0,"frontName":"找回书写的力量","categoryType":0,"superCategoryId":1043000,"name":"办公文具","iconUrl":"https://yanxuan.nosdn.127.net/8ccf1a360077d2a8e37d33cd6427801c.png","id":109243046,"subCateList":[]},{"showIndex":21,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a2170cc17ed18303f4f18949fea341b9.png","bannerUrl":"","frontDesc":"视听盛宴","type":0,"frontName":"视听盛宴","categoryType":0,"superCategoryId":1043000,"name":"影音娱乐","iconUrl":"","id":1008006,"subCateList":[]},{"categoryType":0,"showIndex":22,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/77847b8066205331eb22c9c363e3740e.png","bannerUrl":"","name":"乐器","id":1028001,"frontDesc":"造乐，开启一段别具一格的音乐历程","type":0,"subCateList":[],"frontName":"造乐，开启一段别具一格的音乐历程"}]},{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/fbdf6fb0eedb27d0adc33c5bc105b5f5.jpg?type=webp&imageView&quality=75&thumbnail=750x0","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"全球特色","id":1019000,"type":0,"subCateList":[{"showIndex":1,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/70ae2b665302d78224b2e209d32f6454.jpg","bannerUrl":"https://yanxuan.nosdn.127.net/3437871ce35a1bb291d461f15a7e2beb.jpg","frontDesc":"健康身体 全球守护","type":0,"frontName":"健康身体 全球守护","categoryType":0,"superCategoryId":1019000,"name":"全球防护","iconUrl":"https://yanxuan.nosdn.127.net/85f8d354cf9c41cf1855685ae2cb9a22.jpg","id":109268001,"subCateList":[]},{"categoryType":0,"showIndex":2,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9b809562dfee86bab55e49638fc0bd92.png","name":"当季星品","id":109254027,"frontDesc":"秋冬暖心 全球好物","type":0,"subCateList":[],"frontName":"秋冬暖心 全球好物"},{"categoryType":0,"showIndex":3,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/d49727b5068e5d07ef12121131ba57f1.png","name":"好评推荐","id":109245000,"frontDesc":"口碑爆款 无限回购","type":0,"subCateList":[],"frontName":"口碑爆款 无限回购"},{"categoryType":0,"showIndex":4,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e98025a8dc0578fce04a78f19b29b5f7.png","name":"礼品点卡","id":1025000,"frontDesc":"严选礼品卡/话费充值/游戏点卡","type":0,"subCateList":[],"frontName":"严选礼品卡/话费充值/游戏点卡"},{"showIndex":5,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3294b591e402e50a859499bf343190cc.png","bannerUrl":"https://yanxuan.nosdn.127.net/e25f623df42af8929ffbc6a8abd2134c.png","frontDesc":"地方特色，匠心独运","type":0,"frontName":"地方特色，匠心独运","categoryType":0,"superCategoryId":1019000,"name":"特色手工艺","iconUrl":"https://yanxuan.nosdn.127.net/c06bf9ac1b93ddaa98091661993b72a9.png","id":109270000,"subCateList":[]},{"categoryType":0,"showIndex":6,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ef0e7cea476170bf5ea27e5fbfaaf063.png","name":"床品家纺","id":109256014,"frontDesc":"产地原料 家居推荐","type":0,"subCateList":[],"frontName":"产地原料 家居推荐"},{"categoryType":0,"showIndex":7,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/efc1a0fa662f5e199c578d24b8b39281.png","name":"餐厨用品","id":109256015,"frontDesc":"匠心名品 艺术烹饪","type":0,"subCateList":[],"frontName":"匠心名品 艺术烹饪"},{"categoryType":0,"showIndex":8,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/6cc34e3f44e2da140a2aca023d2dc61b.png","name":"日用百货","id":109256016,"frontDesc":"品质生活 悦享升级","type":0,"subCateList":[],"frontName":"品质生活 悦享升级"},{"categoryType":0,"showIndex":9,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a131ac5e43cba3d03481221d9e258531.png","name":"美妆个护","id":109256017,"frontDesc":"口碑精选 焕醒美肌","type":0,"subCateList":[],"frontName":"口碑精选 焕醒美肌"},{"categoryType":0,"showIndex":10,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/492c8129ea3933ba389b8cc5a2be78b9.png","name":"口腔护理","id":109256018,"frontDesc":"健康口腔 璀璨笑容","type":0,"subCateList":[],"frontName":"健康口腔 璀璨笑容"},{"categoryType":0,"showIndex":11,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/079e00fe5f2100c8e2e80d8f28677656.png","name":"家清卫浴","id":109256019,"frontDesc":"专业高效清洁","type":0,"subCateList":[],"frontName":"专业高效清洁"},{"categoryType":0,"showIndex":12,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4a00b88682ab9646c1a598914dfb6800.png","name":"休闲美食","id":109256021,"frontDesc":"足不出户 食遍全球","type":0,"subCateList":[],"frontName":"足不出户 食遍全球"},{"categoryType":0,"showIndex":13,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3f482ed16162d2e14090802ca3aa8997.png","name":"营养保健","id":109256020,"frontDesc":"营养健康 保健佳品","type":0,"subCateList":[],"frontName":"营养健康 保健佳品"},{"categoryType":0,"showIndex":14,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/46d8b6bda0dfd1bb0a6d8ea15b5e51fc.png","name":"高级珠宝","id":109256022,"frontDesc":"璀璨闪耀 品质甄选","type":0,"subCateList":[],"frontName":"璀璨闪耀 品质甄选"},{"categoryType":0,"showIndex":15,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1e24297816459c8a3b2d2fb568180695.png","name":"时尚配搭","id":109256023,"frontDesc":"潮流设计 彰显品味","type":0,"subCateList":[],"frontName":"潮流设计 彰显品味"},{"categoryType":0,"showIndex":16,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c39ff69de9baf07222994196d007c335.png","name":"日韩馆","id":1065001,"frontDesc":"日韩制造生活好物","type":0,"subCateList":[],"frontName":"日韩制造生活好物"},{"categoryType":0,"showIndex":17,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/abc716169323f1b7ec9b11f243a1c742.png","name":"东南亚馆","id":1065005,"frontDesc":"东南亚特色好物","type":0,"subCateList":[],"frontName":"东南亚特色好物"},{"categoryType":0,"showIndex":18,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b8e0d041ccff6967364311588f3ef2e1.png","name":"欧美馆","id":1065004,"frontDesc":"欧美制造好物","type":0,"subCateList":[],"frontName":"欧美制造好物"},{"categoryType":0,"showIndex":19,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/06ce9b7401d93bca1869d68adb6e7a61.png","name":"澳新馆","id":1065002,"frontDesc":"澳大利亚、新西兰制造天然好物","type":0,"subCateList":[],"frontName":"澳大利亚、新西兰制造天然好物"},{"showIndex":20,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/750465c2faa5391c217601550563babc.png","bannerUrl":"https://yanxuan.nosdn.127.net/b79c71f0a896c8b650e95500644ef1e9.png","frontDesc":"8地特色，助力扶贫","type":0,"frontName":"8地特色，助力扶贫","categoryType":0,"superCategoryId":1019000,"name":"乡间好物","iconUrl":"https://yanxuan.nosdn.127.net/6f1d81d5cb39310cab92ef97891460e0.png","id":109270001,"subCateList":[]},{"categoryType":0,"showIndex":21,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/11f3825726d6ba6cf683ab529a351902.png","name":"春风馆","id":1065007,"frontDesc":"网易原创情趣品牌，专为亚洲年轻人设计","type":0,"subCateList":[],"frontName":"网易原创情趣品牌，专为亚洲年轻人设计"},{"categoryType":0,"showIndex":22,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3835a4198a9955b6047a44998b92dc6c.png","name":"味央馆","id":1065008,"frontDesc":"网易味央精品黑猪肉","type":0,"subCateList":[],"frontName":"网易味央精品黑猪肉"},{"categoryType":0,"showIndex":23,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0fc461daa1fe3a479a2d745141ebe45b.png","name":"Yessing馆","id":109202001,"frontDesc":"Yessing品牌馆，衣生元气","type":0,"subCateList":[],"frontName":"Yessing品牌馆，衣生元气"},{"categoryType":0,"showIndex":24,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0203a26ab1b38a3a0841eb97d93fa4b5.png","name":"国风馆","id":1038001,"frontDesc":"发现东方美学","type":0,"subCateList":[],"frontName":"发现东方美学"},{"categoryType":0,"showIndex":25,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/915a6f1e93a0f422021325c48863b331.png","name":"东方草木馆","id":1047000,"frontDesc":"大师甄选天下好茶","type":0,"subCateList":[],"frontName":"大师甄选天下好茶"},{"categoryType":0,"showIndex":26,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ef13f4b0eb17ed2c5da7fe816900f7ec.png","name":"礼盒","id":109243037,"frontDesc":"馈赠佳品","type":0,"subCateList":[],"frontName":"馈赠佳品"},{"categoryType":0,"showIndex":27,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/75d351532c2e5cf03cc1c6b37caa6216.png","name":"话费点卡","id":1050000,"frontDesc":"给信仰充值","type":0,"subCateList":[],"frontName":"给信仰充值"},{"categoryType":0,"showIndex":28,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9e8462ef0d9d8a132fe9d5429c0706a7.png","name":"黑胶/CD","id":109257024,"frontDesc":"乐享人生","type":0,"subCateList":[],"frontName":"乐享人生"},{"categoryType":0,"showIndex":29,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/26ee378c85e9bfc7f8c31dffac0117d2.png","name":"童书/育儿","id":109244000,"frontDesc":"为孩子严选好书","type":0,"subCateList":[],"frontName":"为孩子严选好书"},{"categoryType":0,"showIndex":30,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/d11985fe7852e9fe4fcfc281e2ee9e96.png","name":"文学/小说","id":109244001,"frontDesc":"君子不器","type":0,"subCateList":[],"frontName":"君子不器"},{"categoryType":0,"showIndex":31,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/40b88a59cc3d9769f054e2ce8f381e14.png","name":"生活/娱乐","id":109251000,"frontDesc":"把日子过成诗","type":0,"subCateList":[],"frontName":"把日子过成诗"},{"categoryType":0,"showIndex":32,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/30c9826ef1eb4a088270dcc59b2960b0.png","name":"人文/社科","id":109248000,"frontDesc":"遇见思想的火花","type":0,"subCateList":[],"frontName":"遇见思想的火花"},{"categoryType":0,"showIndex":33,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4ec4e12201baabc563a4a39ee856147b.png","name":"技能/成长","id":109252000,"frontDesc":"日益精进","type":0,"subCateList":[],"frontName":"日益精进"},{"categoryType":0,"showIndex":34,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/97ee8a9031cf562a746958347cc90787.png","name":"云音乐周边","id":1065009,"frontDesc":"网易云音乐周边发售","type":0,"subCateList":[],"frontName":"网易云音乐周边发售"},{"categoryType":0,"showIndex":35,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e70587ace9f936e45198514ff8074e8d.png","name":"暴雪周边","id":1066000,"frontDesc":"暴雪周边商品发售","type":0,"subCateList":[],"frontName":"暴雪周边商品发售"},{"categoryType":0,"showIndex":36,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/98f700a137c2f8e63e5e8b8261e2030e.png","name":"我的世界","id":1041001,"frontDesc":"我的世界游戏周边","type":0,"subCateList":[],"frontName":"我的世界游戏周边"},{"categoryType":0,"showIndex":37,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b011aba7843fe35523cd084f02de4d2f.png","name":"梦幻西游","id":1033000,"frontDesc":"梦幻西游精品周边","type":0,"subCateList":[],"frontName":"梦幻西游精品周边"},{"categoryType":0,"showIndex":38,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4615c4af82fb22d5e31cb41249982ea8.png","name":"大话西游","id":1036004,"frontDesc":"大话西游正版周边","type":0,"subCateList":[],"frontName":"大话西游正版周边"},{"categoryType":0,"showIndex":39,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/64196ac59c60923bb4023c8881376ef2.png","name":"阴阳师","id":1039000,"frontDesc":"快到寮里来","type":0,"subCateList":[],"frontName":"欧气，快到寮里来"},{"categoryType":0,"showIndex":40,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/dc5ea3f67a9312a19d685d85aae68474.png","name":"游戏印象","id":1018000,"frontDesc":"网易多款经典游戏周边","type":0,"subCateList":[],"frontName":"网易多款经典游戏周边"},{"categoryType":0,"showIndex":41,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a09ba4fc348225a055a7a3c82e05e49b.png","name":"文创周边","id":1032001,"frontDesc":"大英博物馆等文创周边","type":0,"subCateList":[],"frontName":"大英博物馆等文创周边"},{"categoryType":0,"showIndex":42,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b47bd562bedb8631c27e639da1e92b43.png","name":"影视周边","id":1069000,"frontDesc":"漫威、DC等影视周边","type":0,"subCateList":[],"frontName":"漫威、DC等影视周边"},{"categoryType":0,"showIndex":43,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1785d77ba60a7b7f4d7641c702c3cf5f.png","name":"动漫电玩","id":1069001,"frontDesc":"初音、任天堂等动漫游戏周边","type":0,"subCateList":[],"frontName":"初音、任天堂等动漫游戏周边"},{"categoryType":0,"showIndex":44,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ca7287d399e71f7e10a722fcfcb725b6.png","name":"严选推荐馆","id":1065010,"frontDesc":"严选推荐精品好物","type":0,"subCateList":[],"frontName":"严选推荐精品好物"},{"categoryType":0,"showIndex":45,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e074795f61a83292d0f20eb7d124e2ac.png","bannerUrl":"","name":"文具","id":1012003,"frontDesc":"极简设计，环保材质","type":0,"subCateList":[],"frontName":"找回书写的力量"},{"categoryType":0,"showIndex":46,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a15c33fdefe11388b6f4ed5280919fdd.png","bannerUrl":"","name":"运动户外","id":1008005,"frontDesc":"踏青出游，便携不误好心情","type":0,"subCateList":[],"frontName":"MUJI、Nike等制造商出品"},{"categoryType":0,"showIndex":47,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a1e185658914642b71a7d51170108195.png","name":"韩国馆","id":1065003,"frontDesc":"韩国制造精巧好物","type":0,"subCateList":[],"frontName":"韩国制造精巧好物"}]}];
+
+/***/ }),
+
+/***/ 25:
+/*!*************************************************************************************!*\
+  !*** C:/Users/Apple/Desktop/study/13-网易严选/project_app_wyyx/common/datas/index.json ***!
+  \*************************************************************************************/
+/*! exports provided: tagList, bigPromotionModule, policyDescList, popularItemList, categoryHotSellModule, newItemList, freshmanFlag, flashSaleModule, focusList, sceneLightShoppingGuideModule, kingKongModule, indexActivityModule, default */
+/***/ (function(module) {
+
+module.exports = {"tagList":[{"floorPrice":39.9,"picUrl":"https://yanxuan.nosdn.127.net/133cf0d8a4e10ac8532cad89db0dd794.png","newOnShelf":false,"webIndexVerticalPicUrl":"https://yanxuan.nosdn.127.net/133cf0d8a4e10ac8532cad89db0dd794.png","extra":{"materialContentFrom":1,"materialName":"MUJI制造商","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":4,"materialType":"制造商id","crmUserGroupId":"0","materialId":"45272774","taskId":"54643334"},"simpleDesc":"严选精选了MUJI制造商和生产原料，\n用几乎零利润的价格，剔除品牌溢价，\n让用户享受原品牌的品质生活。","name":"MUJI制造商","appListPicUrl":"https://yanxuan.nosdn.127.net/3743ffe302c32e167fd65179ac109710.jpg","id":1001000},{"floorPrice":9.9,"picUrl":"https://yanxuan.nosdn.127.net/74e2ea8f81004d0a60f90fc8e4649058.png","newOnShelf":true,"webIndexVerticalPicUrl":"https://yanxuan.nosdn.127.net/74e2ea8f81004d0a60f90fc8e4649058.png","simpleDesc":"严选海外团队，寻访日韩欧美等十几个国家，\n从打样到成型，把关数十道工序，\n只为给您带来海外直供的超值好物。","name":"海外制造商","appListPicUrl":"https://yanxuan.nosdn.127.net/f474cbb97dc23e3a6af6255bc3baa7fc.jpg","id":1080000},{"floorPrice":29.9,"picUrl":"https://yanxuan.nosdn.127.net/c097be14110f769d58245cdad73e15c3.png","newOnShelf":false,"webIndexVerticalPicUrl":"https://yanxuan.nosdn.127.net/c097be14110f769d58245cdad73e15c3.png","simpleDesc":"严选寻访Calvin Klein品牌的制造商，\n深入世界领带第一生产地，设计与品质并重，\n致力于给消费者带来优质典雅的服饰用品。","name":"CK制造商","appListPicUrl":"https://yanxuan.nosdn.127.net/61f5523c9988ae6720da4c3c81a37386.jpg","id":1026000},{"floorPrice":169,"picUrl":"https://yanxuan.nosdn.127.net/66a23d776f41cba70d00803a5231124b.png","newOnShelf":false,"webIndexVerticalPicUrl":"https://yanxuan.nosdn.127.net/66a23d776f41cba70d00803a5231124b.png","simpleDesc":"严选为制作品质与颜值兼具的箱包，\n选定新秀丽、CK、Ricardo等品牌合作的制造商，\n拥有国内先进流水线20余条，实力保障品质。","name":"新秀丽制造商","appListPicUrl":"https://yanxuan.nosdn.127.net/42f994296d3393bcb4d54b7db13db5eb.png","id":1001037}],"bigPromotionModule":{"backgroundUrl":"","floorList":[{"layout":2,"cells":[{"subTitleColor":"","schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html","title":"","picUrl":"https://yanxuan.nosdn.127.net/5db28c137605ea7576c986e9c285e1c6.png","itemCnt":20,"itemFrom":1,"subTitle":"","titleColor":"","showPrice":true,"extra":{"resource":{"materialContentFrom":1,"materialName":"抗击疫情 舒适宅家","rcmdSort":false,"taskType":1,"itemFrom":2,"resourcesId":1,"materialType":"首页大促模块","schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html","crmUserGroupId":"0","materialId":"54640074","taskId":"54647396"},"abtest_dis":"0_0","modelType":1},"popupUrl":"","leftTime":0,"itemList":[{"primarySkuPreSellStatus":0,"picUrl":"https://yanxuan-item.nosdn.127.net/e272316176963bd54052126a7657bbb9.png","pieceUnitDesc":"件","pieceNum":0,"colorNum":0,"schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html?_hid=RXAYHzE1soqc&_iid=3538009","primarySkuPreSellPrice":0,"counterPrice":59,"id":3538009,"retailPrice":53},{"primarySkuPreSellStatus":0,"picUrl":"https://yanxuan-item.nosdn.127.net/d57f7ed82ebb2b55bbd66e52b5996577.png","pieceUnitDesc":"件","pieceNum":0,"colorNum":0,"schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html?_hid=PH3zdX6FBYxM&_iid=1019000","primarySkuPreSellPrice":0,"counterPrice":99.9,"id":1019000,"retailPrice":99.9},{"primarySkuPreSellStatus":0,"picUrl":"https://yanxuan-item.nosdn.127.net/38253e4bc864ded67fe49a34fcbf70b0.png","pieceUnitDesc":"件","pieceNum":0,"colorNum":0,"schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html?_hid=WPsstBil0Zdx&_iid=1327000","primarySkuPreSellPrice":0,"counterPrice":119,"id":1327000,"retailPrice":119},{"primarySkuPreSellStatus":0,"picUrl":"https://yanxuan-item.nosdn.127.net/faaac4a8e885f65949e2752b7b4b286f.png","pieceUnitDesc":"件","pieceNum":0,"colorNum":0,"schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html?_hid=wBea8N7d8yen&_iid=1675063","primarySkuPreSellPrice":0,"counterPrice":29.9,"id":1675063,"retailPrice":29.9},{"primarySkuPreSellStatus":0,"picUrl":"https://yanxuan-item.nosdn.127.net/b8d8fad9d32d9709be5bbeff5d0724a1.png","pieceUnitDesc":"件","pieceNum":0,"colorNum":0,"schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html?_hid=LKIiZJU4IE&_iid=1296000","primarySkuPreSellPrice":0,"counterPrice":9,"id":1296000,"retailPrice":9},{"primarySkuPreSellStatus":0,"picUrl":"https://yanxuan-item.nosdn.127.net/ee68e4fe05aa55837e3d55e8b9ae85d6.png","pieceUnitDesc":"件","pieceNum":0,"colorNum":0,"schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html?_hid=fe9XWgSrqx0K&_iid=1586039","primarySkuPreSellPrice":0,"counterPrice":669,"id":1586039,"retailPrice":459},{"primarySkuPreSellStatus":0,"picUrl":"https://yanxuan-item.nosdn.127.net/d361f2992d6c688b7480ef2397ecf3fe.png","pieceUnitDesc":"件","pieceNum":0,"colorNum":0,"schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html?_hid=1Opw4q8GTWKd&_iid=1486021","primarySkuPreSellPrice":0,"counterPrice":59,"id":1486021,"retailPrice":59},{"primarySkuPreSellStatus":0,"picUrl":"https://yanxuan-item.nosdn.127.net/58b7b4a5277dddbfd9b99b07f38b6c20.png","pieceUnitDesc":"件","pieceNum":0,"colorNum":0,"schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html?_hid=BWut4BmB2xHp&_iid=1114010","primarySkuPreSellPrice":0,"counterPrice":19.9,"id":1114010,"retailPrice":19.9},{"primarySkuPreSellStatus":0,"picUrl":"https://yanxuan-item.nosdn.127.net/ae8c3cda95b2a807d0b8518f7145eda4.png","pieceUnitDesc":"件","pieceNum":0,"colorNum":0,"schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html?_hid=yjnNkJCXQKWy&_iid=3815073","primarySkuPreSellPrice":0,"counterPrice":49,"id":3815073,"retailPrice":49},{"primarySkuPreSellStatus":0,"picUrl":"https://yanxuan-item.nosdn.127.net/0b43bd83a86fd132f39e7d76829ed78f.png","pieceUnitDesc":"件","pieceNum":0,"colorNum":0,"schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html?_hid=gc0DysDFRU1T&_iid=3811049","primarySkuPreSellPrice":0,"counterPrice":19,"id":3811049,"retailPrice":19}],"id":"rb10rnjzwE30"}],"columnNum":1,"floorType":0,"style":1,"taskId":54647396,"height":360},{"layout":1,"cells":[{"subTitleColor":"","schemeUrl":"https://act.you.163.com/pub/L62FoIBG4A.html","title":"","picUrl":"https://yanxuan.nosdn.127.net/be539f8235a88cd06a43227aeaf4df02.gif","itemCnt":0,"itemFrom":1,"subTitle":"","titleColor":"","showPrice":false,"extra":{"resource":{"materialContentFrom":1,"materialName":"网易严选防疫物资预约","rcmdSort":false,"taskType":1,"itemFrom":1,"resourcesId":2,"materialType":"首页大促模块","schemeUrl":"https://act.you.163.com/pub/L62FoIBG4A.html","crmUserGroupId":"0","materialId":"54640116","taskId":"54647404"},"modelType":1},"popupUrl":"","leftTime":0,"itemList":[],"id":"L62FoIBG4A"}],"columnNum":1,"floorType":0,"style":4,"taskId":54647404,"height":240},{"layout":1,"cells":[{"subTitleColor":"","schemeUrl":"https://act.you.163.com/act/pub/HW3LkZ184cR5.html","title":"","picUrl":"https://yanxuan.nosdn.127.net/28244c6ae7ef78424ea5317a0d72dd6a.png","itemCnt":0,"itemFrom":1,"subTitle":"","titleColor":"","showPrice":false,"extra":{"resource":{"materialContentFrom":1,"materialName":"抗击疫情 吃喝到家 强健抵抗力","rcmdSort":true,"taskType":1,"itemFrom":1,"resourcesId":3,"materialType":"首页大促模块","schemeUrl":"https://act.you.163.com/act/pub/HW3LkZ184cR5.html","crmUserGroupId":"0","materialId":"54640104","taskId":"54647361"},"modelType":1},"popupUrl":"","leftTime":0,"itemList":[],"id":"HW3LkZ184cR5"},{"subTitleColor":"","schemeUrl":"https://you.163.com/topic/v1/pub/p2tDbYocHKd2.html","title":"","picUrl":"https://yanxuan.nosdn.127.net/15b56691109bba3adf6156fd44f14073.png","itemCnt":0,"itemFrom":1,"subTitle":"","titleColor":"","showPrice":false,"extra":{"resource":{"materialContentFrom":1,"materialName":"科学防护 用心生活","rcmdSort":true,"taskType":1,"itemFrom":1,"resourcesId":3,"materialType":"首页大促模块","schemeUrl":"https://you.163.com/topic/v1/pub/p2tDbYocHKd2.html","crmUserGroupId":"0","materialId":"54640104","taskId":"54647361"},"modelType":1},"popupUrl":"","leftTime":0,"itemList":[],"id":"p2tDbYocHKd2"}],"columnNum":2,"floorType":0,"style":1,"taskId":54647361,"height":279},{"layout":1,"cells":[{"subTitleColor":"","schemeUrl":"https://act.you.163.com/act/pub/KR5ebCKbCQtR.html","title":"","picUrl":"https://yanxuan.nosdn.127.net/83b35324b02e31aa202a12971fa7f8c3.png","itemCnt":0,"itemFrom":1,"subTitle":"","titleColor":"","showPrice":false,"extra":{"resource":{"materialContentFrom":1,"materialName":"宅家玩乐 消灭无聊","rcmdSort":true,"taskType":1,"itemFrom":1,"resourcesId":3,"materialType":"首页大促模块","schemeUrl":"https://act.you.163.com/act/pub/KR5ebCKbCQtR.html","crmUserGroupId":"0","materialId":"54640104","taskId":"54647361"},"modelType":1},"popupUrl":"","leftTime":0,"itemList":[],"id":"KR5ebCKbCQtR"},{"subTitleColor":"","schemeUrl":"https://you.163.com/topic/v1/pub/NOvLN2wFt7PX.html","title":"","picUrl":"https://yanxuan.nosdn.127.net/2c98b2002572ec4cd0824bc810d7d31f.png","itemCnt":0,"itemFrom":1,"subTitle":"","titleColor":"","showPrice":false,"extra":{"resource":{"materialContentFrom":1,"materialName":"抗击疫情 新品快报","rcmdSort":true,"taskType":1,"itemFrom":1,"resourcesId":3,"materialType":"首页大促模块","schemeUrl":"https://you.163.com/topic/v1/pub/NOvLN2wFt7PX.html","crmUserGroupId":"0","materialId":"54640104","taskId":"54647361"},"modelType":1},"popupUrl":"","leftTime":0,"itemList":[],"id":"NOvLN2wFt7PX"}],"columnNum":2,"floorType":0,"style":1,"taskId":54647361,"height":279}],"backgroundColor":"1674e3"},"policyDescList":[{"icon":"https://yanxuan.nosdn.127.net/a03dd909803b9ac032eba58b7253a2f6.png","schemeUrl":"","desc":"网易自营品牌"},{"icon":"https://yanxuan.nosdn.127.net/2d0402ffcd52b3ec3b07422681c42a89.png","schemeUrl":"","desc":"30天无忧退货"},{"icon":"https://yanxuan.nosdn.127.net/eb61ee48e8942dbd1784c9ee75ebe955.png","schemeUrl":"","desc":"48小时快速退款"}],"popularItemList":[],"categoryHotSellModule":{"titleTargetUrl":"","categoryList":[{"categorys":[{"picUrl":"https://yanxuan-item.nosdn.127.net/5ad3990d8d1ca731b56ee11d151facfd.png","itemPicBeanList":[{"itemId":3986451,"picUrl":"https://yanxuan-item.nosdn.127.net/5ad3990d8d1ca731b56ee11d151facfd.png"},{"itemId":3986451,"picUrl":"https://yanxuan-item.nosdn.127.net/5ad3990d8d1ca731b56ee11d151facfd.png"},{"itemId":3986451,"picUrl":"https://yanxuan-item.nosdn.127.net/5ad3990d8d1ca731b56ee11d151facfd.png"},{"itemId":3477011,"picUrl":"https://yanxuan-item.nosdn.127.net/3bd7a2e27f9ced5f72d9ce4c069c7326.png"},{"itemId":3477011,"picUrl":"https://yanxuan-item.nosdn.127.net/3bd7a2e27f9ced5f72d9ce4c069c7326.png"},{"itemId":1318002,"picUrl":"https://yanxuan-item.nosdn.127.net/644a27b8e168b8fe8e43ccaad934b24e.png"},{"itemId":3986451,"picUrl":"https://yanxuan-item.nosdn.127.net/5ad3990d8d1ca731b56ee11d151facfd.png"},{"itemId":3446012,"picUrl":"https://yanxuan-item.nosdn.127.net/d7393e6b604cd89022361c65b1b03183.png"},{"itemId":3446012,"picUrl":"https://yanxuan-item.nosdn.127.net/d7393e6b604cd89022361c65b1b03183.png"},{"itemId":3446012,"picUrl":"https://yanxuan-item.nosdn.127.net/d7393e6b604cd89022361c65b1b03183.png"},{"itemId":3446012,"picUrl":"https://yanxuan-item.nosdn.127.net/d7393e6b604cd89022361c65b1b03183.png"},{"itemId":1625008,"picUrl":"https://yanxuan-item.nosdn.127.net/c89c4c86c6cb31805bd537d8c772a231.png"},{"itemId":1625008,"picUrl":"https://yanxuan-item.nosdn.127.net/c89c4c86c6cb31805bd537d8c772a231.png"},{"itemId":1604016,"picUrl":"https://yanxuan-item.nosdn.127.net/74662d24f6d217b520178c5a6d031457.png"},{"itemId":1604016,"picUrl":"https://yanxuan-item.nosdn.127.net/74662d24f6d217b520178c5a6d031457.png"},{"itemId":1545016,"picUrl":"https://yanxuan-item.nosdn.127.net/6cdb3da46a4b95b36dea89d6d47d3bd9.png"},{"itemId":1545016,"picUrl":"https://yanxuan-item.nosdn.127.net/6cdb3da46a4b95b36dea89d6d47d3bd9.png"},{"itemId":1398016,"picUrl":"https://yanxuan-item.nosdn.127.net/9d581d4ec02cf86ff2a05cf81868f159.png"},{"itemId":1398016,"picUrl":"https://yanxuan-item.nosdn.127.net/9d581d4ec02cf86ff2a05cf81868f159.png"},{"itemId":1674003,"picUrl":"https://yanxuan-item.nosdn.127.net/e30375922143f7fad7465fb56bc5acd6.png"},{"itemId":1674003,"picUrl":"https://yanxuan-item.nosdn.127.net/e30375922143f7fad7465fb56bc5acd6.png"},{"itemId":1674003,"picUrl":"https://yanxuan-item.nosdn.127.net/e30375922143f7fad7465fb56bc5acd6.png"},{"itemId":3988892,"picUrl":"https://yanxuan-item.nosdn.127.net/d691b12d383ea93c2108a383e2b1d3cc.png"},{"itemId":1134066,"picUrl":"https://yanxuan-item.nosdn.127.net/1b8e4a484e128c28a050cd2bc0c64396.png"},{"itemId":1134066,"picUrl":"https://yanxuan-item.nosdn.127.net/1b8e4a484e128c28a050cd2bc0c64396.png"},{"itemId":1572030,"picUrl":"https://yanxuan-item.nosdn.127.net/a4c5c5c63d8e3595f15a95819b2cf758.png"},{"itemId":1572030,"picUrl":"https://yanxuan-item.nosdn.127.net/a4c5c5c63d8e3595f15a95819b2cf758.png"},{"itemId":1535011,"picUrl":"https://yanxuan-item.nosdn.127.net/e37656ecad9a2494f456e222fe7800a2.png"},{"itemId":1535011,"picUrl":"https://yanxuan-item.nosdn.127.net/e37656ecad9a2494f456e222fe7800a2.png"},{"itemId":3815073,"picUrl":"https://yanxuan-item.nosdn.127.net/ae8c3cda95b2a807d0b8518f7145eda4.png"},{"itemId":3815073,"picUrl":"https://yanxuan-item.nosdn.127.net/ae8c3cda95b2a807d0b8518f7145eda4.png"}],"categoryName":"热销榜","targetUrl":"https://m.you.163.com/item/saleRank","showPicUrl":"https://yanxuan-item.nosdn.127.net/5ad3990d8d1ca731b56ee11d151facfd.png","extra":{"operationResource":{"categoryName":"热销榜","itemIdList":["3986451","3986451","3986451","3477011","3477011","1318002","3986451","3446012","3446012","3446012","3446012","1625008","1625008","1604016","1604016","1545016","1545016","1398016","1398016","1674003","1674003","1674003","3988892","1134066","1134066","1572030","1572030","1535011","1535011","3815073","3815073"],"categoryId":"0"},"modelType":5}},{"picUrl":"https://yanxuan-item.nosdn.127.net/167a29187b6f8963c45da5a5eda02598.png","itemPicBeanList":[{"itemId":3988757,"picUrl":"https://yanxuan-item.nosdn.127.net/2057746c0f31ce6faf10ae5a1257a2ba.png"},{"itemId":3481285,"picUrl":"https://yanxuan-item.nosdn.127.net/167a29187b6f8963c45da5a5eda02598.png"},{"itemId":3986076,"picUrl":"https://yanxuan-item.nosdn.127.net/d1132e557a1c2f94673dde8e6c18e4a2.png"},{"itemId":1548001,"picUrl":"https://yanxuan-item.nosdn.127.net/bb9025c24057dfb89403055ac5b9f85c.png"},{"itemId":3987496,"picUrl":"https://yanxuan-item.nosdn.127.net/3e901ce30de874724aefaed030a2436a.png"},{"itemId":3986478,"picUrl":"https://yanxuan-item.nosdn.127.net/eb841bdf69fb606edb8426e9ec659d9f.png"},{"itemId":3987072,"picUrl":"https://yanxuan-item.nosdn.127.net/7436d376016c68bc7b0b20fd26ecddca.png"},{"itemId":3986078,"picUrl":"https://yanxuan-item.nosdn.127.net/1c46042c0d5621efe2f603b173d86cfd.png"},{"itemId":3889009,"picUrl":"https://yanxuan-item.nosdn.127.net/13ec8a8a5f53ce6ae749f7a4ecbea303.png"},{"itemId":3986610,"picUrl":"https://yanxuan-item.nosdn.127.net/db7da2d6bffbc494d4294a4c7f340803.png"},{"itemId":3835007,"picUrl":"https://yanxuan-item.nosdn.127.net/eea064c1198b70f1b80b86c4fc579141.png"},{"itemId":3987561,"picUrl":"https://yanxuan-item.nosdn.127.net/3aeaeca579722ec4bb3f20e9165e2843.png"},{"itemId":3440087,"picUrl":"https://yanxuan-item.nosdn.127.net/41f9f2b2fdf811df27a2b2a115151264.png"},{"itemId":3814061,"picUrl":"https://yanxuan-item.nosdn.127.net/bd1402ac25aaa08776e3333aa89a76e2.png"},{"itemId":3986593,"picUrl":"https://yanxuan-item.nosdn.127.net/1a958527eed0524c9967832bba80266c.png"},{"itemId":3829004,"picUrl":"https://yanxuan-item.nosdn.127.net/f0fb8d25330a9287c4ceed84d1054f1b.png"},{"itemId":3440174,"picUrl":"https://yanxuan-item.nosdn.127.net/ef76f6daebdc9144e16805a256733204.png"},{"itemId":3841017,"picUrl":"https://yanxuan-item.nosdn.127.net/0eaa052d6e85e569a22c84b8ceabf53c.png"},{"itemId":3842002,"picUrl":"https://yanxuan-item.nosdn.127.net/ed97bc1603a6cee30ec37be1f18de066.png"},{"itemId":3887003,"picUrl":"https://yanxuan-item.nosdn.127.net/1a57efba2c5a84b9c1863f1568f5aa3b.png"},{"itemId":3837000,"picUrl":"https://yanxuan-item.nosdn.127.net/93626f99e2ada07262dc927d825f6bf4.png"},{"itemId":3986873,"picUrl":"https://yanxuan-item.nosdn.127.net/c8f29bf1b565722b3e41f1b78a737a78.png"},{"itemId":3452065,"picUrl":"https://yanxuan-item.nosdn.127.net/50b8f1872bbecfebdad2e685cb2bbf9b.png"},{"itemId":3879027,"picUrl":"https://yanxuan-item.nosdn.127.net/23092082bbd97d6254d0771f2108ec6b.png"},{"itemId":3826045,"picUrl":"https://yanxuan-item.nosdn.127.net/e41b15e64ce3aaf2c98bc772ddac0717.png"},{"itemId":3876015,"picUrl":"https://yanxuan-item.nosdn.127.net/169dc00563839b9608ff7adad30554a6.png"},{"itemId":1649004,"picUrl":"https://yanxuan-item.nosdn.127.net/8224171cf2701207ed8f2c2f2b36aa90.png"},{"itemId":3509074,"picUrl":"https://yanxuan-item.nosdn.127.net/1adac0418956931d445e1f6e8dba08f1.png"},{"itemId":1666047,"picUrl":"https://yanxuan-item.nosdn.127.net/cd25ed880fd5b55dd19444a1cc2e0549.png"},{"itemId":1296000,"picUrl":"https://yanxuan-item.nosdn.127.net/b8d8fad9d32d9709be5bbeff5d0724a1.png"},{"itemId":1636013,"picUrl":"https://yanxuan-item.nosdn.127.net/7f76d9225c0fe72da5e4d9f0fc7e2792.png"}],"categoryName":"好评榜","targetUrl":"https://m.you.163.com/item/praiseRank","showPicUrl":"https://yanxuan-item.nosdn.127.net/167a29187b6f8963c45da5a5eda02598.png","extra":{"operationResource":{"categoryName":"好评榜","itemIdList":["3988757","3481285","3986076","1548001","3987496","3986478","3987072","3986078","3889009","3986610","3835007","3987561","3440087","3814061","3986593","3829004","3440174","3841017","3842002","3887003","3837000","3986873","3452065","3879027","3826045","3876015","1649004","3509074","1666047","1296000","1636013"],"categoryId":"0"},"modelType":5}}]},{"categorys":[{"picUrl":"https://yanxuan-item.nosdn.127.net/3bd7a2e27f9ced5f72d9ce4c069c7326.png","itemPicBeanList":[{"itemId":3477011,"picUrl":"https://yanxuan-item.nosdn.127.net/3bd7a2e27f9ced5f72d9ce4c069c7326.png"},{"itemId":1398016,"picUrl":"https://yanxuan-item.nosdn.127.net/9d581d4ec02cf86ff2a05cf81868f159.png"},{"itemId":1572030,"picUrl":"https://yanxuan-item.nosdn.127.net/a4c5c5c63d8e3595f15a95819b2cf758.png"},{"itemId":1535011,"picUrl":"https://yanxuan-item.nosdn.127.net/e37656ecad9a2494f456e222fe7800a2.png"},{"itemId":3815073,"picUrl":"https://yanxuan-item.nosdn.127.net/ae8c3cda95b2a807d0b8518f7145eda4.png"},{"itemId":1535010,"picUrl":"https://yanxuan-item.nosdn.127.net/59eb7e52ab114c894a8179bc2991122b.png"},{"itemId":1667011,"picUrl":"https://yanxuan-item.nosdn.127.net/f4cccc00bf214181daa940a415e7006f.png"},{"itemId":3536062,"picUrl":"https://yanxuan-item.nosdn.127.net/df1cd9bde3b5e7f5839ee1a7445d07e0.png"},{"itemId":3988289,"picUrl":"https://yanxuan-item.nosdn.127.net/0fd9f9e40f287ecfe3b54aaafda914f6.png"},{"itemId":1546002,"picUrl":"https://yanxuan-item.nosdn.127.net/61593601cd7a375c4932f3e9bee3974a.png"},{"itemId":3431002,"picUrl":"https://yanxuan-item.nosdn.127.net/cfba711ea8e5709e7eded536e07c2353.png"},{"itemId":1667007,"picUrl":"https://yanxuan-item.nosdn.127.net/5800035cda4787b4bf8d8da8c151bdc2.png"},{"itemId":3829051,"picUrl":"https://yanxuan-item.nosdn.127.net/858cc027d5dae682799a633cd331a29a.png"},{"itemId":1468002,"picUrl":"https://yanxuan-item.nosdn.127.net/bd2842f9eda908dae2d71f980eeb282e.png"},{"itemId":3827015,"picUrl":"https://yanxuan-item.nosdn.127.net/3d97f83a2dad069a504bb4ae0296f9ca.png"},{"itemId":3988762,"picUrl":"https://yanxuan-item.nosdn.127.net/f346d2ec9b751e79e36461fa497f0802.png"},{"itemId":3411026,"picUrl":"https://yanxuan-item.nosdn.127.net/69b84734318007147dfed06136a452a2.png"},{"itemId":1685016,"picUrl":"https://yanxuan-item.nosdn.127.net/48f3d7c6c7f345c5cbe9142082cf22da.png"},{"itemId":1146006,"picUrl":"https://yanxuan-item.nosdn.127.net/6763c33e5242040e7e678630b4e6eba5.png"},{"itemId":3987262,"picUrl":"https://yanxuan-item.nosdn.127.net/4b7e018166760dca3c4db0197603201d.png"},{"itemId":1146007,"picUrl":"https://yanxuan-item.nosdn.127.net/0188adf6cdc4c1159fe647fa5092cb0f.png"},{"itemId":3464032,"picUrl":"https://yanxuan-item.nosdn.127.net/1dc64c483ca555e291b2efda6d187c7f.png"},{"itemId":3408026,"picUrl":"https://yanxuan-item.nosdn.127.net/10d1e7f4306328d551724235120a9e3f.png"},{"itemId":1097000,"picUrl":"https://yanxuan-item.nosdn.127.net/6e05a3a46a46a34e7fa5b86c122a0787.png"},{"itemId":1321000,"picUrl":"https://yanxuan-item.nosdn.127.net/39e5df244905c79abf947fb4a534699d.png"},{"itemId":3807037,"picUrl":"https://yanxuan-item.nosdn.127.net/dfaf80d547d4c4f76aa13c492a9f3b7e.png"},{"itemId":1417023,"picUrl":"https://yanxuan-item.nosdn.127.net/6f8849cd376ea181f977f0ae40f309eb.png"},{"itemId":3478058,"picUrl":"https://yanxuan-item.nosdn.127.net/e03b4bda61111be8002a3954b668152b.png"}],"categoryName":"美食酒水榜","targetUrl":"https://m.you.163.com/item/saleRank?categoryId=1005002","showPicUrl":"https://yanxuan-item.nosdn.127.net/3bd7a2e27f9ced5f72d9ce4c069c7326.png","extra":{"operationResource":{"categoryName":"美食酒水","itemIdList":["3477011","1398016","1572030","1535011","3815073","1535010","1667011","3536062","3988289","1546002","3431002","1667007","3829051","1468002","3827015","3988762","3411026","1685016","1146006","3987262","1146007","3464032","3408026","1097000","1321000","3807037","1417023","3478058"],"categoryId":"1005002"},"modelType":5}},{"picUrl":"https://yanxuan-item.nosdn.127.net/644a27b8e168b8fe8e43ccaad934b24e.png","itemPicBeanList":[{"itemId":1318002,"picUrl":"https://yanxuan-item.nosdn.127.net/644a27b8e168b8fe8e43ccaad934b24e.png"},{"itemId":1625008,"picUrl":"https://yanxuan-item.nosdn.127.net/c89c4c86c6cb31805bd537d8c772a231.png"},{"itemId":1545016,"picUrl":"https://yanxuan-item.nosdn.127.net/6cdb3da46a4b95b36dea89d6d47d3bd9.png"},{"itemId":1674003,"picUrl":"https://yanxuan-item.nosdn.127.net/e30375922143f7fad7465fb56bc5acd6.png"},{"itemId":1116033,"picUrl":"https://yanxuan-item.nosdn.127.net/91a264d84fed57f97c48dc107370e941.png"},{"itemId":3829116,"picUrl":"https://yanxuan-item.nosdn.127.net/4fc7ea43e829af4ed31e09673f68db89.png"},{"itemId":1110003,"picUrl":"https://yanxuan-item.nosdn.127.net/9a33f08a3b0f5c06fdf4c586d51b2f7c.png"},{"itemId":1418015,"picUrl":"https://yanxuan-item.nosdn.127.net/98b31f57668b2b5b4f3adba5c3d96723.png"},{"itemId":3408074,"picUrl":"https://yanxuan-item.nosdn.127.net/609452a430143ec9e691abddb067ec67.png"},{"itemId":1435024,"picUrl":"https://yanxuan-item.nosdn.127.net/0bd018282b7ba6db74b21f8c0daed220.png"},{"itemId":1624016,"picUrl":"https://yanxuan-item.nosdn.127.net/eed2ed6e83189517ba35f3781271f773.png"},{"itemId":3413004,"picUrl":"https://yanxuan-item.nosdn.127.net/30fe9253a061b5c4c7c389b7caf24a67.png"},{"itemId":1602000,"picUrl":"https://yanxuan-item.nosdn.127.net/05b82f4f46da9dc58dc873b365598292.png"},{"itemId":1045004,"picUrl":"https://yanxuan-item.nosdn.127.net/a2585d4686f7cba87f3f12a7e6d45b50.png"},{"itemId":1108008,"picUrl":"https://yanxuan-item.nosdn.127.net/0fecbab07b9a3522015958ba8f31e27a.png"},{"itemId":3828015,"picUrl":"https://yanxuan-item.nosdn.127.net/ab098b429e5a1f9715d938cd7d54f26a.png"},{"itemId":3439006,"picUrl":"https://yanxuan-item.nosdn.127.net/073f16bf0c7ad8634c3abb7636e063c2.png"},{"itemId":3986654,"picUrl":"https://yanxuan-item.nosdn.127.net/197283c8f697f9063674779345ccbabe.png"},{"itemId":3407081,"picUrl":"https://yanxuan-item.nosdn.127.net/75085afc77fc5bc5e74a35e6838b1846.png"},{"itemId":1666005,"picUrl":"https://yanxuan-item.nosdn.127.net/32609b32caf1c24b5f8b8262fd9c21dc.png"},{"itemId":3425016,"picUrl":"https://yanxuan-item.nosdn.127.net/e20c17ba8be5eaa596303bc47ebefc32.png"},{"itemId":1088001,"picUrl":"https://yanxuan-item.nosdn.127.net/24493db956be11a09de5e71d389010c7.png"},{"itemId":3823052,"picUrl":"https://yanxuan-item.nosdn.127.net/280cfa5d1739fe7f079933ea133e9841.png"},{"itemId":1149000,"picUrl":"https://yanxuan-item.nosdn.127.net/16b4d581afc5a9cd36e8adc8ed6ceb4f.png"},{"itemId":1435025,"picUrl":"https://yanxuan-item.nosdn.127.net/a7f4693aa7f7c1683340c6cd64286529.png"},{"itemId":1630007,"picUrl":"https://yanxuan-item.nosdn.127.net/86989f8cb0ece3d5ebf903b988abae79.png"},{"itemId":1619034,"picUrl":"https://yanxuan-item.nosdn.127.net/fcac9df3f0cc28e91b3daaf703a3ab7c.png"},{"itemId":3440021,"picUrl":"https://yanxuan-item.nosdn.127.net/12bd7528fc75e16b775fa2cb1024f80a.jpg"}],"categoryName":"居家生活榜","targetUrl":"https://m.you.163.com/item/saleRank?categoryId=1005000","showPicUrl":"https://yanxuan-item.nosdn.127.net/644a27b8e168b8fe8e43ccaad934b24e.png","extra":{"operationResource":{"categoryName":"居家生活","itemIdList":["1318002","1625008","1545016","1674003","1116033","3829116","1110003","1418015","3408074","1435024","1624016","3413004","1602000","1045004","1108008","3828015","3439006","3986654","3407081","1666005","3425016","1088001","3823052","1149000","1435025","1630007","1619034","3440021"],"categoryId":"1005000"},"modelType":5}},{"picUrl":"https://yanxuan-item.nosdn.127.net/7806718d4928df310d5c64300183664d.png","itemPicBeanList":[{"itemId":3986451,"picUrl":"https://yanxuan-item.nosdn.127.net/5ad3990d8d1ca731b56ee11d151facfd.png"},{"itemId":1652019,"picUrl":"https://yanxuan-item.nosdn.127.net/7806718d4928df310d5c64300183664d.png"},{"itemId":1113001,"picUrl":"https://yanxuan-item.nosdn.127.net/431a09a43914483f4d70aeda8ecb8a59.png"},{"itemId":3829116,"picUrl":"https://yanxuan-item.nosdn.127.net/4fc7ea43e829af4ed31e09673f68db89.png"},{"itemId":3826011,"picUrl":"https://yanxuan-item.nosdn.127.net/901be61b95ed8dfc89947125cbdc603b.png"},{"itemId":1333015,"picUrl":"https://yanxuan-item.nosdn.127.net/24dd7f6f16154871f09e86766cc92a94.png"},{"itemId":1077003,"picUrl":"https://yanxuan-item.nosdn.127.net/a10ed5c19533c9e1e2abf1d8cb843c24.png"},{"itemId":3402020,"picUrl":"https://yanxuan-item.nosdn.127.net/2c0147161faaa160cf10b6770f1e290d.png"},{"itemId":1418015,"picUrl":"https://yanxuan-item.nosdn.127.net/98b31f57668b2b5b4f3adba5c3d96723.png"},{"itemId":3434003,"picUrl":"https://yanxuan-item.nosdn.127.net/fd9ab8ca4a9e89cb71d24ef2c27783c0.png"},{"itemId":1501008,"picUrl":"https://yanxuan-item.nosdn.127.net/fbae3a43b448d2e6e6671936ba665b99.png"},{"itemId":1657008,"picUrl":"https://yanxuan-item.nosdn.127.net/107dae4c67a6247355771369b8182725.png"},{"itemId":1683007,"picUrl":"https://yanxuan-item.nosdn.127.net/1f93923086cbb7d63be958c920289f05.png"},{"itemId":1127007,"picUrl":"https://yanxuan-item.nosdn.127.net/ecef155d279e1a485b4f31f87daa3698.png"},{"itemId":1540017,"picUrl":"https://yanxuan-item.nosdn.127.net/7137bfc9887a2baf0c9188f7a62c5e6e.png"},{"itemId":3416001,"picUrl":"https://yanxuan-item.nosdn.127.net/899d91ae4b28e9bb42d617aa6691276d.png"},{"itemId":1154003,"picUrl":"https://yanxuan-item.nosdn.127.net/7a0e064c1fd99b5eb16608bca9b7aa0d.png"},{"itemId":3408014,"picUrl":"https://yanxuan-item.nosdn.127.net/0434f5cb29b2c6c6ade2f1c0487ae97c.png"},{"itemId":3988757,"picUrl":"https://yanxuan-item.nosdn.127.net/2057746c0f31ce6faf10ae5a1257a2ba.png"},{"itemId":3406010,"picUrl":"https://yanxuan-item.nosdn.127.net/85b1bd60c128affe100068ed20037787.png"},{"itemId":1085007,"picUrl":"https://yanxuan-item.nosdn.127.net/05eed5e90b2d6002600dddd4dd66260d.png"},{"itemId":3407065,"picUrl":"https://yanxuan-item.nosdn.127.net/8710b394afc12ff039fac08dfb9333bb.png"},{"itemId":3444027,"picUrl":"https://yanxuan-item.nosdn.127.net/846dacb553fd65090b6fc9c3eef06cdf.png"},{"itemId":3850013,"picUrl":"https://yanxuan-item.nosdn.127.net/cff84f8844c856004e8de2595b76f570.png"},{"itemId":1637002,"picUrl":"https://yanxuan-item.nosdn.127.net/f5b1cba9a449797089d43cfe6939933d.png"},{"itemId":3506034,"picUrl":"https://yanxuan-item.nosdn.127.net/71e2c597d7c02912c9fe635cdc2a9c0d.png"},{"itemId":3835007,"picUrl":"https://yanxuan-item.nosdn.127.net/eea064c1198b70f1b80b86c4fc579141.png"},{"itemId":3987388,"picUrl":"https://yanxuan-item.nosdn.127.net/c97ed9ccfdf8441a8a6f54727ea149b8.png"},{"itemId":3527154,"picUrl":"https://yanxuan-item.nosdn.127.net/02dd07dbee4575a71afa30fd680a6ec7.png"},{"itemId":1389000,"picUrl":"https://yanxuan-item.nosdn.127.net/64c3915f7edb71c10dbfbd18441f271c.png"}],"categoryName":"个护清洁榜","targetUrl":"https://m.you.163.com/item/saleRank?categoryId=1013001","showPicUrl":"https://yanxuan-item.nosdn.127.net/7806718d4928df310d5c64300183664d.png","extra":{"operationResource":{"categoryName":"个护清洁","itemIdList":["3986451","1652019","1113001","3829116","3826011","1333015","1077003","3402020","1418015","3434003","1501008","1657008","1683007","1127007","1540017","3416001","1154003","3408014","3988757","3406010","1085007","3407065","3444027","3850013","1637002","3506034","3835007","3987388","3527154","1389000"],"categoryId":"1013001"},"modelType":5}},{"picUrl":"https://yanxuan-item.nosdn.127.net/d7393e6b604cd89022361c65b1b03183.png","itemPicBeanList":[{"itemId":3446012,"picUrl":"https://yanxuan-item.nosdn.127.net/d7393e6b604cd89022361c65b1b03183.png"},{"itemId":1545016,"picUrl":"https://yanxuan-item.nosdn.127.net/6cdb3da46a4b95b36dea89d6d47d3bd9.png"},{"itemId":3988892,"picUrl":"https://yanxuan-item.nosdn.127.net/d691b12d383ea93c2108a383e2b1d3cc.png"},{"itemId":3413006,"picUrl":"https://yanxuan-item.nosdn.127.net/cf6cbe1d80601f109a85fd48cbe27478.png"},{"itemId":1632002,"picUrl":"https://yanxuan-item.nosdn.127.net/6035c5adac64b2c2913e81661a2ea0f9.png"},{"itemId":1624001,"picUrl":"https://yanxuan-item.nosdn.127.net/51348ec7731f5ed5c4bb9e0bed88717c.png"},{"itemId":3987138,"picUrl":"https://yanxuan-item.nosdn.127.net/d85a7584368da59994f84651affc4dab.png"},{"itemId":3827023,"picUrl":"https://yanxuan-item.nosdn.127.net/a517938254c7d2f480827debf355127a.png"},{"itemId":1624016,"picUrl":"https://yanxuan-item.nosdn.127.net/eed2ed6e83189517ba35f3781271f773.png"},{"itemId":1127007,"picUrl":"https://yanxuan-item.nosdn.127.net/ecef155d279e1a485b4f31f87daa3698.png"},{"itemId":1154003,"picUrl":"https://yanxuan-item.nosdn.127.net/7a0e064c1fd99b5eb16608bca9b7aa0d.png"},{"itemId":3408014,"picUrl":"https://yanxuan-item.nosdn.127.net/0434f5cb29b2c6c6ade2f1c0487ae97c.png"},{"itemId":3827027,"picUrl":"https://yanxuan-item.nosdn.127.net/6628f73e4ff16ae5fdb12f5be75c5557.png"},{"itemId":1327018,"picUrl":"https://yanxuan-item.nosdn.127.net/e9730c230d3df388ce6c32e037642c2d.png"},{"itemId":1401002,"picUrl":"https://yanxuan-item.nosdn.127.net/ca3c524b92922b9b03fdd7dc965c9401.png"},{"itemId":1685001,"picUrl":"https://yanxuan-item.nosdn.127.net/c7feab536c0d0fa95ed12d987e9bd667.png"},{"itemId":1401006,"picUrl":"https://yanxuan-item.nosdn.127.net/5e702b909a7d0cf391bfa8d3fce03c92.png"},{"itemId":3407065,"picUrl":"https://yanxuan-item.nosdn.127.net/8710b394afc12ff039fac08dfb9333bb.png"},{"itemId":1637002,"picUrl":"https://yanxuan-item.nosdn.127.net/f5b1cba9a449797089d43cfe6939933d.png"},{"itemId":1663026,"picUrl":"https://yanxuan-item.nosdn.127.net/db3837ad978e07ab908fbd3814eb1104.png"},{"itemId":3534014,"picUrl":"https://yanxuan-item.nosdn.127.net/75ce66f46c287cc512749f9e8328f0b3.png"},{"itemId":3835007,"picUrl":"https://yanxuan-item.nosdn.127.net/eea064c1198b70f1b80b86c4fc579141.png"},{"itemId":3527154,"picUrl":"https://yanxuan-item.nosdn.127.net/02dd07dbee4575a71afa30fd680a6ec7.png"},{"itemId":1505029,"picUrl":"https://yanxuan-item.nosdn.127.net/ea9af61f4504871f72c4b9ef38ca4799.png"},{"itemId":3986478,"picUrl":"https://yanxuan-item.nosdn.127.net/eb841bdf69fb606edb8426e9ec659d9f.png"},{"itemId":3986451,"picUrl":"https://yanxuan-item.nosdn.127.net/5ad3990d8d1ca731b56ee11d151facfd.png"},{"itemId":3839008,"picUrl":"https://yanxuan-item.nosdn.127.net/ea324a88d74978c5a11fe99ece5734ae.png"},{"itemId":3986456,"picUrl":"https://yanxuan-item.nosdn.127.net/dd2e334e302eaaa35eb1e32962fa2270.png"},{"itemId":1497001,"picUrl":"https://yanxuan-item.nosdn.127.net/7c850ef50fc408c4eab4d7abdb920da3.png"}],"categoryName":"数码家电榜","targetUrl":"https://m.you.163.com/item/saleRank?categoryId=1043000","showPicUrl":"https://yanxuan-item.nosdn.127.net/d7393e6b604cd89022361c65b1b03183.png","extra":{"operationResource":{"categoryName":"数码家电","itemIdList":["3446012","1545016","3988892","3413006","1632002","1624001","3987138","3827023","1624016","1127007","1154003","3408014","3827027","1327018","1401002","1685001","1401006","3407065","1637002","1663026","3534014","3835007","3527154","1505029","3986478","3986451","3839008","3986456","1497001"],"categoryId":"1043000"},"modelType":5}},{"picUrl":"https://yanxuan-item.nosdn.127.net/073f16bf0c7ad8634c3abb7636e063c2.png","itemPicBeanList":[{"itemId":3439006,"picUrl":"https://yanxuan-item.nosdn.127.net/073f16bf0c7ad8634c3abb7636e063c2.png"},{"itemId":1165077,"picUrl":"https://yanxuan-item.nosdn.127.net/e3601637765b05a45663e8769f543c2a.png"},{"itemId":1619034,"picUrl":"https://yanxuan-item.nosdn.127.net/fcac9df3f0cc28e91b3daaf703a3ab7c.png"},{"itemId":3815050,"picUrl":"https://yanxuan-item.nosdn.127.net/9c77ddefae8fa0f16d8a43bf0aa1513d.png"},{"itemId":1021020,"picUrl":"https://yanxuan-item.nosdn.127.net/445689c4faa55f8186c500e68bff73d6.png"},{"itemId":3544005,"picUrl":"https://yanxuan-item.nosdn.127.net/451ebe1c8725d9490ca7e2aa27b05a0f.png"},{"itemId":1092026,"picUrl":"https://yanxuan-item.nosdn.127.net/58fdbceab428754d9b8e8b3019d84c4e.png"},{"itemId":1579024,"picUrl":"https://yanxuan-item.nosdn.127.net/fc6cc915cd1908496330bc6565e02a95.png"},{"itemId":3807047,"picUrl":"https://yanxuan-item.nosdn.127.net/d2dd346577e3e12bd2be6f2876bfd0a5.png"},{"itemId":3988685,"picUrl":"https://yanxuan-item.nosdn.127.net/d2a6ef279ffdde2da008b5e0ecc077da.png"},{"itemId":3989003,"picUrl":"https://yanxuan-item.nosdn.127.net/d4464eb557bfc669e723b6446c75425a.png"},{"itemId":3438018,"picUrl":"https://yanxuan-item.nosdn.127.net/864633a00a776555b1c53abd50df0a40.png"},{"itemId":3987228,"picUrl":"https://yanxuan-item.nosdn.127.net/d0a9acac56c9a656d133be31082442ff.png"},{"itemId":3844004,"picUrl":"https://yanxuan-item.nosdn.127.net/5f3c4891e0f21c9e8148b9c1125a0c33.png"},{"itemId":3829003,"picUrl":"https://yanxuan-item.nosdn.127.net/a8eea196aa7c107b2814cfa2976caec6.png"},{"itemId":1114010,"picUrl":"https://yanxuan-item.nosdn.127.net/58b7b4a5277dddbfd9b99b07f38b6c20.png"},{"itemId":3827062,"picUrl":"https://yanxuan-item.nosdn.127.net/e628bb179d408c27d6a001c01ba507da.png"},{"itemId":3803003,"picUrl":"https://yanxuan-item.nosdn.127.net/dd17a2568c133b642930acbfe6923d32.png"},{"itemId":3804052,"picUrl":"https://yanxuan-item.nosdn.127.net/e49e636cb6049b12822bee7e96c0adad.png"},{"itemId":1638000,"picUrl":"https://yanxuan-item.nosdn.127.net/671b2fc5d8a5fd7c8ed3527482a50507.png"},{"itemId":3827036,"picUrl":"https://yanxuan-item.nosdn.127.net/755bdc78a25c9e0e8a4652de863af649.png"},{"itemId":1306027,"picUrl":"https://yanxuan-item.nosdn.127.net/271eb0b3d94e80579afdeb614cc240ad.png"},{"itemId":3879023,"picUrl":"https://yanxuan-item.nosdn.127.net/5e051676b8a7a8006fadee20186d07be.png"},{"itemId":1056000,"picUrl":"https://yanxuan-item.nosdn.127.net/7be46223373b04fc2f42e0bd2add4d61.png"},{"itemId":1164006,"picUrl":"https://yanxuan-item.nosdn.127.net/e9de2a3b586c3cbed7fd621d7810d2f4.png"},{"itemId":1647014,"picUrl":"https://yanxuan-item.nosdn.127.net/68659daa403d8ec16bc898b744448936.png"},{"itemId":1269023,"picUrl":"https://yanxuan-item.nosdn.127.net/3a33addfccd4a624a9d86b04c0717ef9.png"},{"itemId":1165015,"picUrl":"https://yanxuan-item.nosdn.127.net/17c3596d257753108d1d471b8ea4d385.png"},{"itemId":3430055,"picUrl":"https://yanxuan-item.nosdn.127.net/e7c9f9a6dd880e47ba8287d1ba89b61d.png"},{"itemId":3826032,"picUrl":"https://yanxuan-item.nosdn.127.net/762201923f701baa5325df5762684e50.png"}],"categoryName":"服饰鞋包榜","targetUrl":"https://m.you.163.com/item/saleRank?categoryId=1010000","showPicUrl":"https://yanxuan-item.nosdn.127.net/073f16bf0c7ad8634c3abb7636e063c2.png","extra":{"operationResource":{"categoryName":"服饰鞋包","itemIdList":["3439006","1165077","1619034","3815050","1021020","3544005","1092026","1579024","3807047","3988685","3989003","3438018","3987228","3844004","3829003","1114010","3827062","3803003","3804052","1638000","3827036","1306027","3879023","1056000","1164006","1647014","1269023","1165015","3430055","3826032"],"categoryId":"1010000"},"modelType":5}},{"picUrl":"https://yanxuan-item.nosdn.127.net/4b72ba8cdcf9eccd3ed1e6be35b09ab8.png","itemPicBeanList":[{"itemId":1076017,"picUrl":"https://yanxuan-item.nosdn.127.net/4b72ba8cdcf9eccd3ed1e6be35b09ab8.png"},{"itemId":3446012,"picUrl":"https://yanxuan-item.nosdn.127.net/d7393e6b604cd89022361c65b1b03183.png"},{"itemId":1674003,"picUrl":"https://yanxuan-item.nosdn.127.net/e30375922143f7fad7465fb56bc5acd6.png"},{"itemId":1546002,"picUrl":"https://yanxuan-item.nosdn.127.net/61593601cd7a375c4932f3e9bee3974a.png"},{"itemId":3431002,"picUrl":"https://yanxuan-item.nosdn.127.net/cfba711ea8e5709e7eded536e07c2353.png"},{"itemId":1076018,"picUrl":"https://yanxuan-item.nosdn.127.net/82de8fdea1c8bba21b26099612ff5605.png"},{"itemId":1683007,"picUrl":"https://yanxuan-item.nosdn.127.net/1f93923086cbb7d63be958c920289f05.png"},{"itemId":1685016,"picUrl":"https://yanxuan-item.nosdn.127.net/48f3d7c6c7f345c5cbe9142082cf22da.png"},{"itemId":1602000,"picUrl":"https://yanxuan-item.nosdn.127.net/05b82f4f46da9dc58dc873b365598292.png"},{"itemId":1076015,"picUrl":"https://yanxuan-item.nosdn.127.net/e1d87f845a5773665bd7042d28cbf11a.png"},{"itemId":3464032,"picUrl":"https://yanxuan-item.nosdn.127.net/1dc64c483ca555e291b2efda6d187c7f.png"},{"itemId":3807037,"picUrl":"https://yanxuan-item.nosdn.127.net/dfaf80d547d4c4f76aa13c492a9f3b7e.png"},{"itemId":1076016,"picUrl":"https://yanxuan-item.nosdn.127.net/a31d7ecdec0f914e1c375fac666c1183.png"},{"itemId":3806051,"picUrl":"https://yanxuan-item.nosdn.127.net/13610915f5e3cdcc1bff067a1e967cb4.png"},{"itemId":3827027,"picUrl":"https://yanxuan-item.nosdn.127.net/6628f73e4ff16ae5fdb12f5be75c5557.png"},{"itemId":1666005,"picUrl":"https://yanxuan-item.nosdn.127.net/32609b32caf1c24b5f8b8262fd9c21dc.png"},{"itemId":1354000,"picUrl":"https://yanxuan-item.nosdn.127.net/d3fa5c27c960809f119e42dab99fed4d.png"},{"itemId":1149000,"picUrl":"https://yanxuan-item.nosdn.127.net/16b4d581afc5a9cd36e8adc8ed6ceb4f.png"},{"itemId":3444027,"picUrl":"https://yanxuan-item.nosdn.127.net/846dacb553fd65090b6fc9c3eef06cdf.png"},{"itemId":3850013,"picUrl":"https://yanxuan-item.nosdn.127.net/cff84f8844c856004e8de2595b76f570.png"},{"itemId":1637002,"picUrl":"https://yanxuan-item.nosdn.127.net/f5b1cba9a449797089d43cfe6939933d.png"},{"itemId":3528024,"picUrl":"https://yanxuan-item.nosdn.127.net/afa5ffed53da00d519fdb1bc765cdf38.png"},{"itemId":3534014,"picUrl":"https://yanxuan-item.nosdn.127.net/75ce66f46c287cc512749f9e8328f0b3.png"},{"itemId":3987388,"picUrl":"https://yanxuan-item.nosdn.127.net/c97ed9ccfdf8441a8a6f54727ea149b8.png"},{"itemId":1389000,"picUrl":"https://yanxuan-item.nosdn.127.net/64c3915f7edb71c10dbfbd18441f271c.png"},{"itemId":1023014,"picUrl":"https://yanxuan-item.nosdn.127.net/056e0e74a683d7e0011bd583d0084b7c.png"},{"itemId":3986195,"picUrl":"https://yanxuan-item.nosdn.127.net/ff51113995d5c8e1a78fb4a93b0765ec.png"},{"itemId":3986552,"picUrl":"https://yanxuan-item.nosdn.127.net/364bb4175dd73987f11dc1a701e28a2f.png"},{"itemId":1494003,"picUrl":"https://yanxuan-item.nosdn.127.net/0ac21674d619c4558d99c0f380fd5b71.png"},{"itemId":3398008,"picUrl":"https://yanxuan-item.nosdn.127.net/dfc5f3de3aeaf0b4616c644b23df35a8.png"}],"categoryName":"全球特色榜","targetUrl":"https://m.you.163.com/item/saleRank?categoryId=1019000","showPicUrl":"https://yanxuan-item.nosdn.127.net/4b72ba8cdcf9eccd3ed1e6be35b09ab8.png","extra":{"operationResource":{"categoryName":"全球特色","itemIdList":["1076017","3446012","1674003","1546002","3431002","1076018","1683007","1685016","1602000","1076015","3464032","3807037","1076016","3806051","3827027","1666005","1354000","1149000","3444027","3850013","1637002","3528024","3534014","3987388","1389000","1023014","3986195","3986552","1494003","3398008"],"categoryId":"1019000"},"modelType":5}},{"picUrl":"https://yanxuan-item.nosdn.127.net/74662d24f6d217b520178c5a6d031457.png","itemPicBeanList":[{"itemId":1604016,"picUrl":"https://yanxuan-item.nosdn.127.net/74662d24f6d217b520178c5a6d031457.png"},{"itemId":1134066,"picUrl":"https://yanxuan-item.nosdn.127.net/1b8e4a484e128c28a050cd2bc0c64396.png"},{"itemId":1606002,"picUrl":"https://yanxuan-item.nosdn.127.net/f444ac11115a8249a92dc95dccad6e07.png"},{"itemId":1572013,"picUrl":"https://yanxuan-item.nosdn.127.net/7e4db021bc68c9af8eddecdb1aa96c36.png"},{"itemId":1116034,"picUrl":"https://yanxuan-item.nosdn.127.net/cfd2ab8d2ea2188ff422c5c91c1d920c.png"},{"itemId":1552005,"picUrl":"https://yanxuan-item.nosdn.127.net/00382181864967c1125b75bd5289c8d3.png"},{"itemId":3986078,"picUrl":"https://yanxuan-item.nosdn.127.net/1c46042c0d5621efe2f603b173d86cfd.png"},{"itemId":3986728,"picUrl":"https://yanxuan-item.nosdn.127.net/17967f3d15414239a5c3c33a7892f301.png"},{"itemId":1145038,"picUrl":"https://yanxuan-item.nosdn.127.net/80c440036a9c27cac336a7e50be53484.png"},{"itemId":1506021,"picUrl":"https://yanxuan-item.nosdn.127.net/98f00e8b15f30c11e3e64f1da7fba591.png"},{"itemId":1295000,"picUrl":"https://yanxuan-item.nosdn.127.net/4467776eb370a1d46e0dac48a6ae9893.png"},{"itemId":3986076,"picUrl":"https://yanxuan-item.nosdn.127.net/d1132e557a1c2f94673dde8e6c18e4a2.png"},{"itemId":1621036,"picUrl":"https://yanxuan-item.nosdn.127.net/d77d0a70cfa7efdf313b3a03dbfb699b.png"},{"itemId":1542005,"picUrl":"https://yanxuan-item.nosdn.127.net/d044967f76d92def0fb74ce862c10e73.png"},{"itemId":1519013,"picUrl":"https://yanxuan-item.nosdn.127.net/a7282c351cd083c116449a7eec8e7ee0.png"},{"itemId":1572014,"picUrl":"https://yanxuan-item.nosdn.127.net/209d87bdf39b3854b6baaaf70ee58067.png"},{"itemId":3440174,"picUrl":"https://yanxuan-item.nosdn.127.net/ef76f6daebdc9144e16805a256733204.png"},{"itemId":1686131,"picUrl":"https://yanxuan-item.nosdn.127.net/4b051d129f25cbb48989b7c50f5b8f2c.png"},{"itemId":3465086,"picUrl":"https://yanxuan-item.nosdn.127.net/eee600116ae63125c7039ae22363efdc.png"},{"itemId":1683030,"picUrl":"https://yanxuan-item.nosdn.127.net/24999493f12f64dfa49d32c2a980dc35.png"},{"itemId":1687102,"picUrl":"https://yanxuan-item.nosdn.127.net/f694a24583a2f174ac5ec8f8e92d4c26.png"},{"itemId":3444037,"picUrl":"https://yanxuan-item.nosdn.127.net/b7479401c6bcf1e793efff5a771d9e27.png"},{"itemId":3407077,"picUrl":"https://yanxuan-item.nosdn.127.net/30a1c84b7810a5765974e577e2554930.png"},{"itemId":1087003,"picUrl":"https://yanxuan-item.nosdn.127.net/e1ae521258e83b2e1f0654725a6e0613.png"},{"itemId":3518001,"picUrl":"https://yanxuan-item.nosdn.127.net/31e5fe96e442201b115ff56cd2780465.png"},{"itemId":1561001,"picUrl":"https://yanxuan-item.nosdn.127.net/0064e22029d052276c2f8e49b1f3973d.png"},{"itemId":3465083,"picUrl":"https://yanxuan-item.nosdn.127.net/a43c2c9578659e7f8a36018a070ae0dc.jpg"},{"itemId":3551096,"picUrl":"https://yanxuan-item.nosdn.127.net/48e950097b26963768f1406b594cf19c.png"},{"itemId":3844033,"picUrl":"https://yanxuan-item.nosdn.127.net/3ddebc9df09f6b10b9b301d1edf2c303.png"},{"itemId":1296000,"picUrl":"https://yanxuan-item.nosdn.127.net/b8d8fad9d32d9709be5bbeff5d0724a1.png"}],"categoryName":"母婴亲子榜","targetUrl":"https://m.you.163.com/item/saleRank?categoryId=1011000","showPicUrl":"https://yanxuan-item.nosdn.127.net/74662d24f6d217b520178c5a6d031457.png","extra":{"operationResource":{"categoryName":"母婴亲子","itemIdList":["1604016","1134066","1606002","1572013","1116034","1552005","3986078","3986728","1145038","1506021","1295000","3986076","1621036","1542005","1519013","1572014","3440174","1686131","3465086","1683030","1687102","3444037","3407077","1087003","3518001","1561001","3465083","3551096","3844033","1296000"],"categoryId":"1011000"},"modelType":5}},{"picUrl":"https://yanxuan-item.nosdn.127.net/a9d6de39ab17ab82d5424205dafc4136.png","itemPicBeanList":[{"itemId":1690003,"picUrl":"https://yanxuan-item.nosdn.127.net/a9d6de39ab17ab82d5424205dafc4136.png"},{"itemId":3988074,"picUrl":"https://yanxuan-item.nosdn.127.net/605284004e9bc314b081bea86e22faab.jpg"},{"itemId":3988462,"picUrl":"https://yanxuan-item.nosdn.127.net/797a29814fea9f623efb204d96fd3e3e.png"},{"itemId":3548011,"picUrl":"https://yanxuan-item.nosdn.127.net/3a4f384b28c9d98f5e78080cfb4180dd.png"},{"itemId":3498011,"picUrl":"https://yanxuan-item.nosdn.127.net/84334e0d0a33897bb8f5fee654fa0cee.jpg"},{"itemId":3815050,"picUrl":"https://yanxuan-item.nosdn.127.net/9c77ddefae8fa0f16d8a43bf0aa1513d.png"},{"itemId":1092026,"picUrl":"https://yanxuan-item.nosdn.127.net/58fdbceab428754d9b8e8b3019d84c4e.png"},{"itemId":3986845,"picUrl":"https://yanxuan-item.nosdn.127.net/df6809f00fcf5c333dc73828180b68fb.png"},{"itemId":3814094,"picUrl":"https://yanxuan-item.nosdn.127.net/6fd807743e8e25472aca8b6b0b8f3039.png"},{"itemId":1667018,"picUrl":"https://yanxuan-item.nosdn.127.net/b47e916d628ff9a755ba4cbaa61047c4.png"},{"itemId":3406006,"picUrl":"https://yanxuan-item.nosdn.127.net/9e5ae955b287d65e2a7ba5b868b81f2b.png"},{"itemId":1459005,"picUrl":"https://yanxuan-item.nosdn.127.net/c442593e0cf25a42d37941554b587418.png"},{"itemId":1621018,"picUrl":"https://yanxuan-item.nosdn.127.net/b051b5aa933cde8d952905becd2046d8.png"},{"itemId":1306027,"picUrl":"https://yanxuan-item.nosdn.127.net/271eb0b3d94e80579afdeb614cc240ad.png"},{"itemId":3507202,"picUrl":"https://yanxuan-item.nosdn.127.net/3246fe9bab23cb76c64dde0d15bba98f.png"},{"itemId":1245014,"picUrl":"https://yanxuan-item.nosdn.127.net/068b1375219cec84915cebcb8488f693.png"},{"itemId":3490048,"picUrl":"https://yanxuan-item.nosdn.127.net/9bd9a7f5e71a42fc38b54163aab1ecb8.png"},{"itemId":1281002,"picUrl":"https://yanxuan-item.nosdn.127.net/2da94f0a57bd6e9b5270bd2246564dde.png"},{"itemId":1436030,"picUrl":"https://yanxuan-item.nosdn.127.net/ebc0e2183705ee6f8aa572ecf6ad87a1.png"},{"itemId":1306026,"picUrl":"https://yanxuan-item.nosdn.127.net/63967eb40b0af505f1fd066442952bab.png"},{"itemId":1114011,"picUrl":"https://yanxuan-item.nosdn.127.net/0fe562392cd8af853a565fb5c302fe3f.png"},{"itemId":1092025,"picUrl":"https://yanxuan-item.nosdn.127.net/07fbaf7a9dd2c7fdf751eacb0248197c.png"},{"itemId":3843007,"picUrl":"https://yanxuan-item.nosdn.127.net/6025face64c792f05772c398e63b0cc8.png"},{"itemId":1156006,"picUrl":"https://yanxuan-item.nosdn.127.net/61b90e0df4c551cb05f7c601646bf2f7.png"},{"itemId":3810003,"picUrl":"https://yanxuan-item.nosdn.127.net/6c7f73dbf8ae911fefaeef6ecea8a054.jpg"},{"itemId":1446001,"picUrl":"https://yanxuan-item.nosdn.127.net/7a151bad1d4dde3015d5471c4fd6e172.png"},{"itemId":1555000,"picUrl":"https://yanxuan-item.nosdn.127.net/57103d892fa09deae9ef9e56c301f14a.png"},{"itemId":1085019,"picUrl":"https://yanxuan-item.nosdn.127.net/c27abf14fa51f922122d9c81d7e68bd8.png"},{"itemId":1023001,"picUrl":"https://yanxuan-item.nosdn.127.net/f313e44efaff1acfe83745f1a3da40ec.png"}],"categoryName":"运动旅行榜","targetUrl":"https://m.you.163.com/item/saleRank?categoryId=109243029","showPicUrl":"https://yanxuan-item.nosdn.127.net/a9d6de39ab17ab82d5424205dafc4136.png","extra":{"operationResource":{"categoryName":"运动旅行","itemIdList":["1690003","3988074","3988462","3548011","3498011","3815050","1092026","3986845","3814094","1667018","3406006","1459005","1621018","1306027","3507202","1245014","3490048","1281002","1436030","1306026","1114011","1092025","3843007","1156006","3810003","1446001","1555000","1085019","1023001"],"categoryId":"109243029"},"modelType":5}}]}],"title":"类目热销榜"},"newItemList":[{"goodCmtCount":0,"couponConflict":true,"scenePicUrl":"https://yanxuan-item.nosdn.127.net/00672a49574126cce712b9f5d5354391.jpg","listPicUrl":"https://yanxuan-item.nosdn.127.net/cc66ac0e306d77a241f6fd9ac34b2a00.png","tagId":0,"simpleDesc":"轻松手剥，多汁化渣","primarySkuPreSellPrice":0,"limitedFlag":204,"newItemFlag":true,"showPicUrl":"https://yanxuan-item.nosdn.127.net/0fd9f9e40f287ecfe3b54aaafda914f6.png","itemTagList":[{"itemId":3988289,"tagId":0,"freshmanExclusive":false,"name":"新品","subType":0,"forbidJump":false,"type":1},{"itemId":3988289,"tagId":128129559,"freshmanExclusive":false,"name":"特价","subType":204,"forbidJump":false,"type":2}],"primarySkuPreSellStatus":0,"pieceNum":0,"extra":{"resource":{"materialType":"商品id","materialId":"54639954","itemId":"3988289","materialContentFrom":1,"materialName":"赏味正当时，春见耙耙柑 5斤","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":1,"itemIdList":["3988289"],"crmUserGroupId":"0","taskId":"54646758"},"modelType":1},"id":3988289,"sellVolume":678,"isCouponConflict":true,"colorNum":0,"primaryPicUrl":"https://yanxuan-item.nosdn.127.net/0fd9f9e40f287ecfe3b54aaafda914f6.png","displaySkuId":300197090,"pieceUnitDesc":"件","resourcesId":0,"discountFlag":false,"name":"赏味正当时，春见耙耙柑 5斤","productPlace":"","counterPrice":69,"couponPrice":0,"cutFlag":false,"retailPrice":59,"primary":true,"status":2},{"goodCmtCount":0,"couponConflict":true,"scenePicUrl":"https://yanxuan-item.nosdn.127.net/ed57e215a3a926fbc8577b58fd6463d0.jpg","listPicUrl":"https://yanxuan-item.nosdn.127.net/e83757662dab293c7af8da0e599a5eb4.png","tagId":0,"simpleDesc":"高达30%的免疫球蛋白","primarySkuPreSellPrice":0,"limitedFlag":204,"newItemFlag":true,"showPicUrl":"https://yanxuan-item.nosdn.127.net/f346d2ec9b751e79e36461fa497f0802.png","itemTagList":[{"itemId":3988762,"tagId":0,"freshmanExclusive":false,"name":"新品","subType":0,"forbidJump":false,"type":1},{"itemId":3988762,"tagId":128129529,"freshmanExclusive":false,"name":"特价","subType":204,"forbidJump":false,"type":2}],"primarySkuPreSellStatus":0,"pieceNum":0,"extra":{"resource":{"materialType":"商品id","materialId":"54639819","itemId":"3988762","materialContentFrom":1,"materialName":"富含免疫球蛋白，纯牛初乳粉 1克*30袋*2罐","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":2,"itemIdList":["3988762"],"crmUserGroupId":"0","taskId":"54646759"},"modelType":1},"id":3988762,"sellVolume":510,"isCouponConflict":true,"colorNum":0,"primaryPicUrl":"https://yanxuan-item.nosdn.127.net/f346d2ec9b751e79e36461fa497f0802.png","displaySkuId":300198968,"pieceUnitDesc":"件","resourcesId":0,"discountFlag":false,"name":"富含免疫球蛋白，纯牛初乳粉 1克*30袋*2罐","productPlace":"","counterPrice":399,"couponPrice":0,"cutFlag":false,"retailPrice":298,"primary":true,"status":2},{"goodCmtCount":0,"couponConflict":true,"scenePicUrl":"https://yanxuan-item.nosdn.127.net/38a509d18e8c388173f560ceb51e00a6.jpg","listPicUrl":"https://yanxuan-item.nosdn.127.net/ebfdce31ffb1a2c1d297ba4cbc47c99d.png","tagId":0,"simpleDesc":"采用紫外灯深层照射水雾，确保水雾纯净清新","primarySkuPreSellPrice":0,"limitedFlag":0,"newItemFlag":true,"showPicUrl":"https://yanxuan-item.nosdn.127.net/b924f1025d1aa8bc437b97e23201f81a.jpg","itemTagList":[{"itemId":3988903,"tagId":0,"freshmanExclusive":false,"name":"新品","subType":0,"forbidJump":false,"type":1}],"primarySkuPreSellStatus":0,"pieceNum":0,"extra":{"resource":{"materialType":"商品id","materialId":"54639955","itemId":"3988903","materialContentFrom":1,"materialName":"【UV紫外线杀菌】水质净化加湿器 5L大容量","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":3,"itemIdList":["3988903"],"crmUserGroupId":"0","taskId":"54646760"},"modelType":1},"id":3988903,"sellVolume":598,"isCouponConflict":true,"colorNum":0,"primaryPicUrl":"https://yanxuan-item.nosdn.127.net/b924f1025d1aa8bc437b97e23201f81a.jpg","displaySkuId":300200082,"pieceUnitDesc":"件","resourcesId":0,"discountFlag":false,"name":"【UV紫外线杀菌】水质净化加湿器 5L大容量","productPlace":"","couponPrice":0,"cutFlag":false,"retailPrice":139,"primary":true,"status":2},{"goodCmtCount":0,"couponConflict":true,"scenePicUrl":"https://yanxuan-item.nosdn.127.net/22e3d3086c99647e7abb9acf7ec49d88.jpg","listPicUrl":"https://yanxuan-item.nosdn.127.net/0841f96ee9a6f05bceb358b15cb8da25.png","tagId":0,"simpleDesc":"三重玻尿酸深层补水 长效锁水 肌肤水润透白","primarySkuPreSellPrice":0,"limitedFlag":0,"newItemFlag":false,"showPicUrl":"https://yanxuan-item.nosdn.127.net/c97ed9ccfdf8441a8a6f54727ea149b8.png","itemTagList":[{"itemId":3987388,"tagId":0,"freshmanExclusive":false,"name":"满88顺丰包邮","subType":0,"forbidJump":false,"type":0}],"primarySkuPreSellStatus":0,"pieceNum":0,"extra":{"resource":{"materialType":"商品id","materialId":"54639456","itemId":"3987388","materialContentFrom":1,"materialName":"敷出水润仙女肌 西班牙玻尿酸深层补水面膜","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":4,"itemIdList":["3987388"],"crmUserGroupId":"0","taskId":"54646761"},"modelType":1},"id":3987388,"sellVolume":236,"isCouponConflict":true,"colorNum":0,"primaryPicUrl":"https://yanxuan-item.nosdn.127.net/c97ed9ccfdf8441a8a6f54727ea149b8.png","displaySkuId":300192878,"pieceUnitDesc":"件","resourcesId":0,"discountFlag":false,"name":"敷出水润仙女肌 西班牙玻尿酸深层补水面膜","productPlace":"","couponPrice":0,"cutFlag":false,"retailPrice":159,"primary":true,"status":2},{"goodCmtCount":0,"couponConflict":true,"scenePicUrl":"https://yanxuan-item.nosdn.127.net/7e47621006f247f02601bf96e407c96c.png","listPicUrl":"https://yanxuan-item.nosdn.127.net/dc413d2d5e81dc11997b8a0ca0abab2f.png","tagId":0,"simpleDesc":"99.99%高效环保杀菌，每天都用新牙刷！","primarySkuPreSellPrice":0,"limitedFlag":0,"newItemFlag":true,"showPicUrl":"https://yanxuan-item.nosdn.127.net/d691b12d383ea93c2108a383e2b1d3cc.png","itemTagList":[{"itemId":3988892,"tagId":0,"freshmanExclusive":false,"name":"新品","subType":0,"forbidJump":false,"type":1}],"primarySkuPreSellStatus":0,"pieceNum":0,"extra":{"resource":{"materialType":"商品id","materialId":"54640059","itemId":"3988892","materialContentFrom":1,"materialName":"不要把病菌刷到嘴里，紫外线牙刷消毒收纳架","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":6,"itemIdList":["3988892"],"crmUserGroupId":"0","taskId":"54646763"},"modelType":1},"id":3988892,"sellVolume":687,"isCouponConflict":true,"colorNum":0,"primaryPicUrl":"https://yanxuan-item.nosdn.127.net/d691b12d383ea93c2108a383e2b1d3cc.png","displaySkuId":300199920,"pieceUnitDesc":"件","resourcesId":0,"discountFlag":false,"name":"不要把病菌刷到嘴里，紫外线牙刷消毒收纳架","productPlace":"","couponPrice":0,"cutFlag":false,"retailPrice":298,"primary":true,"status":2},{"goodCmtCount":0,"couponConflict":true,"scenePicUrl":"https://yanxuan-item.nosdn.127.net/d421db66d7dd061ededcc2bc430780e4.jpg","listPicUrl":"https://yanxuan-item.nosdn.127.net/5b8a31f4fa0045defafbd54c60f7346c.png","tagId":0,"simpleDesc":"泰国进口，绵密香醇","primarySkuPreSellPrice":0,"limitedFlag":204,"newItemFlag":false,"showPicUrl":"https://yanxuan-item.nosdn.127.net/190ef99484d669354838b4f37e0dd336.png","itemTagList":[{"itemId":3986150,"tagId":128129527,"freshmanExclusive":false,"name":"特价","subType":204,"forbidJump":false,"type":2}],"primarySkuPreSellStatus":0,"pieceNum":0,"extra":{"resource":{"materialType":"商品id","materialId":"54639236","itemId":"3986150","materialContentFrom":1,"materialName":"冰封住的绵密香甜，泰国金枕榴莲冻肉 300克","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":7,"itemIdList":["3986150"],"crmUserGroupId":"0","taskId":"54646764"},"modelType":1},"id":3986150,"sellVolume":7901,"isCouponConflict":true,"colorNum":0,"primaryPicUrl":"https://yanxuan-item.nosdn.127.net/5b8a31f4fa0045defafbd54c60f7346c.png","displaySkuId":300185954,"pieceUnitDesc":"件","resourcesId":0,"discountFlag":false,"name":"冰封住的绵密香甜，泰国金枕榴莲冻肉 300克","productPlace":"泰国","counterPrice":68,"couponPrice":0,"cutFlag":false,"retailPrice":63,"primary":true,"status":2}],"freshmanFlag":true,"flashSaleModule":{"activityPrice":199,"primaryPicUrl":"https://yanxuan-item.nosdn.127.net/a5486fc786b49e02cb3fc65686ba89f6.png","nextStartTime":1581904800000,"itemList":[{"itemId":1625008,"picUrl":"https://yanxuan-item.nosdn.127.net/a5486fc786b49e02cb3fc65686ba89f6.png","activityPrice":199,"originPrice":259,"showPicUrl":"https://yanxuan-item.nosdn.127.net/c89c4c86c6cb31805bd537d8c772a231.png"},{"itemId":3529053,"picUrl":"https://yanxuan-item.nosdn.127.net/7d147d6c9f1707f0e0f9b3d825d69775.png","activityPrice":599,"originPrice":799,"showPicUrl":"https://yanxuan-item.nosdn.127.net/bc869ed5218e472655526a89224a6517.png"},{"itemId":1116033,"picUrl":"https://yanxuan-item.nosdn.127.net/d96e57a0fad3675e2f88890e64b8cbd9.png","activityPrice":1189,"originPrice":1399,"showPicUrl":"https://yanxuan-item.nosdn.127.net/91a264d84fed57f97c48dc107370e941.png"},{"itemId":1009013,"picUrl":"https://yanxuan-item.nosdn.127.net/3bbb65a733f290ca6adf5e7772dd761d.png","activityPrice":79,"originPrice":99,"showPicUrl":"https://yanxuan-item.nosdn.127.net/3b7a448ea9a148b76e399b699d78f6c5.png"},{"itemId":3416001,"picUrl":"https://yanxuan-item.nosdn.127.net/9df8cd5635ef6cbe7bbaa008de70caf5.png","activityPrice":55.9,"originPrice":69,"showPicUrl":"https://yanxuan-item.nosdn.127.net/899d91ae4b28e9bb42d617aa6691276d.png"},{"itemId":1683007,"picUrl":"https://yanxuan-item.nosdn.127.net/6b642811e46781dea284df964dd0a68b.png","activityPrice":239,"originPrice":299,"showPicUrl":"https://yanxuan-item.nosdn.127.net/1f93923086cbb7d63be958c920289f05.png"}],"remainTime":1178252,"showFlash":true,"flashSaleScreenId":115102115},"focusList":[{"picUrl":"https://yanxuan.nosdn.127.net/a18ab9d5f61b74b67732a928e8a5ad0f.jpg","expireTime":0,"extra":{"materialContentFrom":1,"materialName":"防疫活动-主会场v2-2.4-2.24","rcmdSort":false,"taskType":1,"itemFrom":0,"resourcesId":1,"materialType":"广告banner","crmUserGroupId":"0","materialId":"54639872","taskId":"54647271"},"name":"防疫活动-主会场v2-2.4-2.24","onlineTime":0,"id":54639872,"originSchemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html","targetUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html"},{"picUrl":"https://yanxuan.nosdn.127.net/b61633b348f010c7284837c1d7fc9cdd.jpg","expireTime":0,"extra":{"materialContentFrom":1,"materialName":"（智能合图）食品-24节气春季活动-2.17-2.22","rcmdSort":false,"taskType":1,"itemFrom":0,"resourcesId":2,"materialType":"广告banner","crmUserGroupId":"0","materialId":"54640120","taskId":"54647349"},"name":"（智能合图）食品-24节气春季活动-2.17-2.22","onlineTime":0,"id":54640120,"originSchemeUrl":"https://act.you.163.com/act/pub/aBDdgGR7skrV.html","targetUrl":"https://act.you.163.com/act/pub/aBDdgGR7skrV.html"},{"picUrl":"https://yanxuan.nosdn.127.net/fb5a9555c539bca5af2a4721923365a4.jpg","expireTime":0,"extra":{"materialContentFrom":1,"materialName":"食品-吃喝到家 强健抵抗力-2.11-2.24","rcmdSort":false,"taskType":1,"itemFrom":0,"resourcesId":3,"materialType":"广告banner","crmUserGroupId":"0","materialId":"54639858","taskId":"54647354"},"name":"食品-吃喝到家 强健抵抗力-2.11-2.24","onlineTime":0,"id":54639858,"originSchemeUrl":"https://act.you.163.com/act/pub/HW3LkZ184cR5.html","targetUrl":"https://act.you.163.com/act/pub/HW3LkZ184cR5.html"},{"picUrl":"https://yanxuan.nosdn.127.net/6b1ebd19470cea9a7b8e81a52485f414.jpg","expireTime":0,"extra":{"materialContentFrom":1,"materialName":"防疫活动-春运榜单-2.5-长期","rcmdSort":false,"taskType":1,"itemFrom":0,"resourcesId":4,"materialType":"广告banner","crmUserGroupId":"0","materialId":"54639594","taskId":"54647422"},"name":"防疫活动-春运榜单-2.5-长期","onlineTime":0,"id":54639594,"originSchemeUrl":"https://m.you.163.com/topic/v1/pub/ythX1hoqoUBs.html","targetUrl":"https://m.you.163.com/topic/v1/pub/ythX1hoqoUBs.html"},{"picUrl":"https://yanxuan.nosdn.127.net/b87939fc55cf938f3a32c2eadb14afc9.jpg","expireTime":0,"extra":{"materialContentFrom":1,"materialName":"防疫活动-居家v2-2.4-2.24","rcmdSort":false,"taskType":1,"itemFrom":0,"resourcesId":5,"materialType":"广告banner","crmUserGroupId":"0","materialId":"54639567","taskId":"54647274"},"name":"防疫活动-居家v2-2.4-2.24","onlineTime":0,"id":54639567,"originSchemeUrl":"https://act.you.163.com/act/pub/tKsjjWIXOli3.html","targetUrl":"https://act.you.163.com/act/pub/tKsjjWIXOli3.html"},{"picUrl":"https://yanxuan.nosdn.127.net/8c5af34810092b0cfe59d1020b28bcfe.jpg","expireTime":0,"extra":{"materialContentFrom":1,"materialName":"专题-防疫活动-高效清洁剂系列-2.6-长期","rcmdSort":false,"taskType":1,"itemFrom":0,"resourcesId":6,"materialType":"广告banner","crmUserGroupId":"0","materialId":"54639639","taskId":"54647275"},"name":"专题-防疫活动-高效清洁剂系列-2.6-长期","onlineTime":0,"id":54639639,"originSchemeUrl":"https://m.you.163.com/featuredSeries/detail?id=1000071","targetUrl":"https://m.you.163.com/featuredSeries/detail?id=1000071"},{"picUrl":"https://yanxuan.nosdn.127.net/810f6d9c5a04bb6eadbe20259784c16f.jpg","expireTime":0,"extra":{"materialContentFrom":1,"materialName":"专题-养生茶选购指南-2.14-2.29","rcmdSort":false,"taskType":1,"itemFrom":0,"resourcesId":7,"materialType":"广告banner","crmUserGroupId":"0","materialId":"54640089","taskId":"54647276"},"name":"专题-养生茶选购指南-2.14-2.29","onlineTime":0,"id":54640089,"originSchemeUrl":"https://act.you.163.com/act/pub/0ld8l37apcST.html","targetUrl":"https://act.you.163.com/act/pub/0ld8l37apcST.html"},{"picUrl":"https://yanxuan.nosdn.127.net/1d7c3ba8e117391e9377c2d0f4780e5b.jpg","expireTime":0,"extra":{"materialContentFrom":1,"materialName":"一个人住的好生活-长期","rcmdSort":false,"taskType":1,"itemFrom":0,"resourcesId":8,"materialType":"广告banner","crmUserGroupId":"0","materialId":"54639753","taskId":"54647350"},"name":"一个人住的好生活-长期","onlineTime":0,"id":54639753,"originSchemeUrl":"https://m.you.163.com/topic/v1/pub/OZIAh5mKTwac.html","targetUrl":"https://m.you.163.com/topic/v1/pub/OZIAh5mKTwac.html"}],"sceneLightShoppingGuideModule":[{"styleItem":{"backgroundUrl":"https://yanxuan.nosdn.127.net/b143c18172b5433310ff1f2adf281792.png","descColor":"7f7f7f","itemFrom":3,"picUrlList":["https://yanxuan-item.nosdn.127.net/5e818e36e0cfd0bb474c57f27e76b46d.png","https://yanxuan-item.nosdn.127.net/445689c4faa55f8186c500e68bff73d6.png"],"titleColor":"333333","extra":{"materialContentFrom":1,"materialName":"专题 断货补单王-new","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":1,"materialType":"场景轻导购","crmUserGroupId":"0","materialId":"46963134","taskId":"54644161"},"itemPicBeanList":[{"itemId":1006014,"picUrl":"https://yanxuan-item.nosdn.127.net/b097972db0ed9d5b47fbed0e2dbd1d99.png"},{"itemId":1009024,"picUrl":"https://yanxuan-item.nosdn.127.net/5e818e36e0cfd0bb474c57f27e76b46d.png"},{"itemId":1021020,"picUrl":"https://yanxuan-item.nosdn.127.net/445689c4faa55f8186c500e68bff73d6.png"},{"itemId":1023003,"picUrl":"https://yanxuan-item.nosdn.127.net/38d4d231bfa58be9998fd2feba15e908.png"},{"itemId":1085019,"picUrl":"https://yanxuan-item.nosdn.127.net/c27abf14fa51f922122d9c81d7e68bd8.png"},{"itemId":1108008,"picUrl":"https://yanxuan-item.nosdn.127.net/0fecbab07b9a3522015958ba8f31e27a.png"},{"itemId":1109013,"picUrl":"https://yanxuan-item.nosdn.127.net/3b7bbecb7acfe2e56a515ccebc060e77.png"},{"itemId":1109034,"picUrl":"https://yanxuan-item.nosdn.127.net/ccf82ca5058794d1fc27a8db204dec17.png"},{"itemId":1110003,"picUrl":"https://yanxuan-item.nosdn.127.net/9a33f08a3b0f5c06fdf4c586d51b2f7c.png"},{"itemId":1115009,"picUrl":"https://yanxuan-item.nosdn.127.net/6df81c2f8582dbc597acadf8f1089a6a.png"},{"itemId":1115059,"picUrl":"https://yanxuan-item.nosdn.127.net/cb80f9a76a8b4fbbedde4379ecad4b1e.png"},{"itemId":1116033,"picUrl":"https://yanxuan-item.nosdn.127.net/91a264d84fed57f97c48dc107370e941.png"},{"itemId":1127003,"picUrl":"https://yanxuan-item.nosdn.127.net/84454f5de65796c78a5ef9f3d6b7d843.png"},{"itemId":1127007,"picUrl":"https://yanxuan-item.nosdn.127.net/ecef155d279e1a485b4f31f87daa3698.png"},{"itemId":1130056,"picUrl":"https://yanxuan-item.nosdn.127.net/89d86a4e463115e366daf841b9bcff46.png"},{"itemId":1135047,"picUrl":"https://yanxuan-item.nosdn.127.net/eddaeb4852b8a4732102eab839641c95.png"},{"itemId":1145021,"picUrl":"https://yanxuan-item.nosdn.127.net/9929e5ba245313a3db4a80ea7504f61d.png"},{"itemId":1149000,"picUrl":"https://yanxuan-item.nosdn.127.net/16b4d581afc5a9cd36e8adc8ed6ceb4f.png"},{"itemId":1154003,"picUrl":"https://yanxuan-item.nosdn.127.net/7a0e064c1fd99b5eb16608bca9b7aa0d.png"},{"itemId":1193014,"picUrl":"https://yanxuan-item.nosdn.127.net/bf56acb6a6fa46a44f17c25e70645501.png"},{"itemId":1197009,"picUrl":"https://yanxuan-item.nosdn.127.net/451ee6d21410297df3b2ed923f45d07d.png"},{"itemId":1221001,"picUrl":"https://yanxuan-item.nosdn.127.net/8f4265e206020ecfbbe34c2a2d230fb2.png"},{"itemId":1292003,"picUrl":"https://yanxuan-item.nosdn.127.net/1d85a516aadbeb11978f325f205820b9.png"},{"itemId":1298009,"picUrl":"https://yanxuan-item.nosdn.127.net/024f82132c69893cef7f6db17d7ca8f1.png"},{"itemId":1305017,"picUrl":"https://yanxuan-item.nosdn.127.net/659500940eba07cf9b9940e996d4bc66.png"},{"itemId":1306026,"picUrl":"https://yanxuan-item.nosdn.127.net/63967eb40b0af505f1fd066442952bab.png"},{"itemId":1306027,"picUrl":"https://yanxuan-item.nosdn.127.net/271eb0b3d94e80579afdeb614cc240ad.png"},{"itemId":1318002,"picUrl":"https://yanxuan-item.nosdn.127.net/644a27b8e168b8fe8e43ccaad934b24e.png"},{"itemId":1365002,"picUrl":"https://yanxuan-item.nosdn.127.net/50d83c848125577c2bcc1f60c16280ac.png"},{"itemId":1369013,"picUrl":"https://yanxuan-item.nosdn.127.net/91210d925dd625e0c2a81e54890bf345.png"},{"itemId":1389000,"picUrl":"https://yanxuan-item.nosdn.127.net/64c3915f7edb71c10dbfbd18441f271c.png"},{"itemId":1398016,"picUrl":"https://yanxuan-item.nosdn.127.net/9d581d4ec02cf86ff2a05cf81868f159.png"},{"itemId":1401006,"picUrl":"https://yanxuan-item.nosdn.127.net/5e702b909a7d0cf391bfa8d3fce03c92.png"},{"itemId":1417023,"picUrl":"https://yanxuan-item.nosdn.127.net/6f8849cd376ea181f977f0ae40f309eb.png"},{"itemId":1429006,"picUrl":"https://yanxuan-item.nosdn.127.net/88632d540cae0e1c05f0134d3c76905d.png"},{"itemId":1435022,"picUrl":"https://yanxuan-item.nosdn.127.net/7b5815dba28684d89601e0643e2a1b56.png"},{"itemId":1450007,"picUrl":"https://yanxuan-item.nosdn.127.net/dcabfb063d4d0f84688a49941d5deb11.png"},{"itemId":1458000,"picUrl":"https://yanxuan-item.nosdn.127.net/e290e08fca0e9d2cf9605272a2b07aa6.png"},{"itemId":1460022,"picUrl":"https://yanxuan-item.nosdn.127.net/26ff24df419c0b051c4e46574403c7ad.png"},{"itemId":1462040,"picUrl":"https://yanxuan-item.nosdn.127.net/e4c7e5a4ccb531e0ad6b066df0429813.png"},{"itemId":1468014,"picUrl":"https://yanxuan-item.nosdn.127.net/8ff83d4079c2dbf64db5ef984fbbaa2b.png"},{"itemId":1476005,"picUrl":"https://yanxuan-item.nosdn.127.net/c10eb9001206096698f2451f3c383c7b.png"},{"itemId":1487026,"picUrl":"https://yanxuan-item.nosdn.127.net/2b43ce0ad0b9e95b264b023cb60a4353.png"},{"itemId":1497001,"picUrl":"https://yanxuan-item.nosdn.127.net/7c850ef50fc408c4eab4d7abdb920da3.png"},{"itemId":1498025,"picUrl":"https://yanxuan-item.nosdn.127.net/23e2ba8b86ecdc9a46ec9df99d00e86d.png"},{"itemId":1505027,"picUrl":"https://yanxuan-item.nosdn.127.net/17aeee124855d7e7eb24b19579e230e5.png"},{"itemId":1505029,"picUrl":"https://yanxuan-item.nosdn.127.net/ea9af61f4504871f72c4b9ef38ca4799.png"},{"itemId":1506045,"picUrl":"https://yanxuan-item.nosdn.127.net/1e18863d306689a49ca0370a269ba0db.png"},{"itemId":1512034,"picUrl":"https://yanxuan-item.nosdn.127.net/4501a4154cf56c90d555701b5b435947.png"},{"itemId":1516008,"picUrl":"https://yanxuan-item.nosdn.127.net/6b172c71a23491d31db63b97a39f1f53.png"},{"itemId":1535010,"picUrl":"https://yanxuan-item.nosdn.127.net/59eb7e52ab114c894a8179bc2991122b.png"},{"itemId":1535011,"picUrl":"https://yanxuan-item.nosdn.127.net/e37656ecad9a2494f456e222fe7800a2.png"},{"itemId":1545016,"picUrl":"https://yanxuan-item.nosdn.127.net/6cdb3da46a4b95b36dea89d6d47d3bd9.png"},{"itemId":1553041,"picUrl":"https://yanxuan-item.nosdn.127.net/11d98dbe3f5b1099b479dfb8dacdf89d.png"},{"itemId":1572026,"picUrl":"https://yanxuan-item.nosdn.127.net/83f18fba460c27b4785cc65f19385a34.png"},{"itemId":1589012,"picUrl":"https://yanxuan-item.nosdn.127.net/08ba712ea8e3074922c9046601218fc3.png"},{"itemId":1601000,"picUrl":"https://yanxuan-item.nosdn.127.net/7bb60cd94cb436726b8db296fda698fc.png"},{"itemId":1604016,"picUrl":"https://yanxuan-item.nosdn.127.net/74662d24f6d217b520178c5a6d031457.png"},{"itemId":1606002,"picUrl":"https://yanxuan-item.nosdn.127.net/f444ac11115a8249a92dc95dccad6e07.png"},{"itemId":1620018,"picUrl":"https://yanxuan-item.nosdn.127.net/00bd304b98650d5fe73b68635771ea4d.png"},{"itemId":1621018,"picUrl":"https://yanxuan-item.nosdn.127.net/b051b5aa933cde8d952905becd2046d8.png"},{"itemId":1621025,"picUrl":"https://yanxuan-item.nosdn.127.net/b74d5c3b31398f145b30bf761d72affc.png"},{"itemId":1622005,"picUrl":"https://yanxuan-item.nosdn.127.net/cc9556998b8b3047bc18ba8f23c86ed3.png"},{"itemId":1623004,"picUrl":"https://yanxuan-item.nosdn.127.net/47a68d94263be9494482d55caed9bed8.png"},{"itemId":1624001,"picUrl":"https://yanxuan-item.nosdn.127.net/51348ec7731f5ed5c4bb9e0bed88717c.png"},{"itemId":1625008,"picUrl":"https://yanxuan-item.nosdn.127.net/c89c4c86c6cb31805bd537d8c772a231.png"},{"itemId":1629001,"picUrl":"https://yanxuan-item.nosdn.127.net/f95b39abadbcb55953abd2cff2e0c001.png"},{"itemId":1630007,"picUrl":"https://yanxuan-item.nosdn.127.net/86989f8cb0ece3d5ebf903b988abae79.png"},{"itemId":1636017,"picUrl":"https://yanxuan-item.nosdn.127.net/4d0c383d52e675f7c5d9aad6b8799699.png"},{"itemId":1669011,"picUrl":"https://yanxuan-item.nosdn.127.net/b70e5e1786a175c574514c293bd88971.png"},{"itemId":1672038,"picUrl":"https://yanxuan-item.nosdn.127.net/79fb28d0a101f704d2fa3665273dbc1a.png"},{"itemId":1674003,"picUrl":"https://yanxuan-item.nosdn.127.net/e30375922143f7fad7465fb56bc5acd6.png"},{"itemId":1686032,"picUrl":"https://yanxuan-item.nosdn.127.net/52c5108883fa57ca1707d22c7ed41aa7.png"},{"itemId":1690003,"picUrl":"https://yanxuan-item.nosdn.127.net/a9d6de39ab17ab82d5424205dafc4136.png"},{"itemId":3381014,"picUrl":"https://yanxuan-item.nosdn.127.net/ed85b7028d4620bdcd46db6405b445b4.png"},{"itemId":3398008,"picUrl":"https://yanxuan-item.nosdn.127.net/dfc5f3de3aeaf0b4616c644b23df35a8.png"},{"itemId":3407065,"picUrl":"https://yanxuan-item.nosdn.127.net/8710b394afc12ff039fac08dfb9333bb.png"},{"itemId":3408014,"picUrl":"https://yanxuan-item.nosdn.127.net/0434f5cb29b2c6c6ade2f1c0487ae97c.png"},{"itemId":3413004,"picUrl":"https://yanxuan-item.nosdn.127.net/30fe9253a061b5c4c7c389b7caf24a67.png"},{"itemId":3440070,"picUrl":"https://yanxuan-item.nosdn.127.net/2445e4d9070508d170ade17135e6cacc.png"},{"itemId":3447007,"picUrl":"https://yanxuan-item.nosdn.127.net/b74cd5601ba0e3b205e694943e978c5f.png"},{"itemId":3455001,"picUrl":"https://yanxuan-item.nosdn.127.net/d82be6b363e282825bf858696ce40ee3.png"},{"itemId":3478023,"picUrl":"https://yanxuan-item.nosdn.127.net/08f6e74986069813ab7dab4c2491cf96.png"},{"itemId":3526027,"picUrl":"https://yanxuan-item.nosdn.127.net/b9cda216c597fd2297432a893d3da371.png"},{"itemId":3534014,"picUrl":"https://yanxuan-item.nosdn.127.net/75ce66f46c287cc512749f9e8328f0b3.png"},{"itemId":3802025,"picUrl":"https://yanxuan-item.nosdn.127.net/f961b628a67e5a95150b962a48963b6d.png"}],"originSchemeUrl":"https://m.you.163.com/cms-op/wap/17.html","title":"断货补单王","targetUrl":"https://m.you.163.com/cms-op/wap/17.html","desc":"紧急补仓疯抢中"}},{"styleItem":{"backgroundUrl":"https://yanxuan.nosdn.127.net/f874dbb9da6101748d015d972a44d78e.png","descColor":"7f7f7f","itemFrom":3,"picUrlList":["https://yanxuan-item.nosdn.127.net/1eecf74b769af3ed4c7817aeb5d6bb2b.png","https://yanxuan-item.nosdn.127.net/be4d030d4b4a8a4bf096714ec5b2a4aa.png"],"titleColor":"333333","extra":{"materialContentFrom":1,"materialName":"专题 回购榜new-文案","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":2,"materialType":"场景轻导购","crmUserGroupId":"0","materialId":"46564203","taskId":"54644162"},"itemPicBeanList":[{"itemId":1006058,"picUrl":"https://yanxuan-item.nosdn.127.net/1eecf74b769af3ed4c7817aeb5d6bb2b.png"},{"itemId":1021020,"picUrl":"https://yanxuan-item.nosdn.127.net/445689c4faa55f8186c500e68bff73d6.png"},{"itemId":1023000,"picUrl":"https://yanxuan-item.nosdn.127.net/be4d030d4b4a8a4bf096714ec5b2a4aa.png"},{"itemId":1023014,"picUrl":"https://yanxuan-item.nosdn.127.net/056e0e74a683d7e0011bd583d0084b7c.png"},{"itemId":1031002,"picUrl":"https://yanxuan-item.nosdn.127.net/42cb1e188fac9347eabdb8cfc8c27f74.png"},{"itemId":1046005,"picUrl":"https://yanxuan-item.nosdn.127.net/8a8eeefd81555eec03a673abbc24615a.png"},{"itemId":1055027,"picUrl":"https://yanxuan-item.nosdn.127.net/6db2949655ada5b2148f5f667e10172d.png"},{"itemId":1056000,"picUrl":"https://yanxuan-item.nosdn.127.net/7be46223373b04fc2f42e0bd2add4d61.png"},{"itemId":1056006,"picUrl":"https://yanxuan-item.nosdn.127.net/f608f7868d43c5ac67fc03189b07c589.png"},{"itemId":1056013,"picUrl":"https://yanxuan-item.nosdn.127.net/4f10a45de3d6818dbd75e9bfb119cac1.png"},{"itemId":1057033,"picUrl":"https://yanxuan-item.nosdn.127.net/2a6c649e26ddd566b3ea8c38cab20155.png"},{"itemId":1060007,"picUrl":"https://yanxuan-item.nosdn.127.net/79ffc02578c43ae1dc10782b9a98c225.png"},{"itemId":1062033,"picUrl":"https://yanxuan-item.nosdn.127.net/569ab2c87df93c56de39b8c890463242.png"},{"itemId":1076004,"picUrl":"https://yanxuan-item.nosdn.127.net/39e2e51fabe9256a3bba0fab776d5e33.png"},{"itemId":1077003,"picUrl":"https://yanxuan-item.nosdn.127.net/a10ed5c19533c9e1e2abf1d8cb843c24.png"},{"itemId":1085007,"picUrl":"https://yanxuan-item.nosdn.127.net/05eed5e90b2d6002600dddd4dd66260d.png"},{"itemId":1092026,"picUrl":"https://yanxuan-item.nosdn.127.net/58fdbceab428754d9b8e8b3019d84c4e.png"},{"itemId":1097000,"picUrl":"https://yanxuan-item.nosdn.127.net/6e05a3a46a46a34e7fa5b86c122a0787.png"},{"itemId":1108028,"picUrl":"https://yanxuan-item.nosdn.127.net/38779b7e649b2e02f2a689bff17cbc42.png"},{"itemId":1109013,"picUrl":"https://yanxuan-item.nosdn.127.net/3b7bbecb7acfe2e56a515ccebc060e77.png"},{"itemId":1113001,"picUrl":"https://yanxuan-item.nosdn.127.net/431a09a43914483f4d70aeda8ecb8a59.png"},{"itemId":1114010,"picUrl":"https://yanxuan-item.nosdn.127.net/58b7b4a5277dddbfd9b99b07f38b6c20.png"},{"itemId":1115009,"picUrl":"https://yanxuan-item.nosdn.127.net/6df81c2f8582dbc597acadf8f1089a6a.png"},{"itemId":1116034,"picUrl":"https://yanxuan-item.nosdn.127.net/cfd2ab8d2ea2188ff422c5c91c1d920c.png"},{"itemId":1124015,"picUrl":"https://yanxuan-item.nosdn.127.net/3f9a412e160d7e864442ce28f42d7e08.png"},{"itemId":1127007,"picUrl":"https://yanxuan-item.nosdn.127.net/ecef155d279e1a485b4f31f87daa3698.png"},{"itemId":1129016,"picUrl":"https://yanxuan-item.nosdn.127.net/3f06df1af8138410617e9b9aa05c3330.png"},{"itemId":1134051,"picUrl":"https://yanxuan-item.nosdn.127.net/0c807260926eb396d65e8d697d923bbf.png"},{"itemId":1134066,"picUrl":"https://yanxuan-item.nosdn.127.net/1b8e4a484e128c28a050cd2bc0c64396.png"},{"itemId":1135047,"picUrl":"https://yanxuan-item.nosdn.127.net/eddaeb4852b8a4732102eab839641c95.png"},{"itemId":1137006,"picUrl":"https://yanxuan-item.nosdn.127.net/af7fe534423a1d316e49bf84986a01c2.png"},{"itemId":1142056,"picUrl":"https://yanxuan-item.nosdn.127.net/af034280b9feb9795d01052496eef8d7.png"},{"itemId":1146006,"picUrl":"https://yanxuan-item.nosdn.127.net/6763c33e5242040e7e678630b4e6eba5.png"},{"itemId":1146007,"picUrl":"https://yanxuan-item.nosdn.127.net/0188adf6cdc4c1159fe647fa5092cb0f.png"},{"itemId":1149005,"picUrl":"https://yanxuan-item.nosdn.127.net/8427b14107deadbc140e95367ae38d5e.png"},{"itemId":1156005,"picUrl":"https://yanxuan-item.nosdn.127.net/d3fa30a9d0152e3223ce8a945e5a20d7.png"},{"itemId":1156119,"picUrl":"https://yanxuan-item.nosdn.127.net/600a367b9e1ea02cbbdddbc528610155.png"},{"itemId":1164006,"picUrl":"https://yanxuan-item.nosdn.127.net/e9de2a3b586c3cbed7fd621d7810d2f4.png"},{"itemId":1165015,"picUrl":"https://yanxuan-item.nosdn.127.net/17c3596d257753108d1d471b8ea4d385.png"},{"itemId":1165060,"picUrl":"https://yanxuan-item.nosdn.127.net/1d4c2ef77a2bb131239904b450d13972.png"},{"itemId":1189010,"picUrl":"https://yanxuan-item.nosdn.127.net/327fcfaa9ad513279fba3ac896ea4336.png"},{"itemId":1197009,"picUrl":"https://yanxuan-item.nosdn.127.net/451ee6d21410297df3b2ed923f45d07d.png"},{"itemId":1199020,"picUrl":"https://yanxuan-item.nosdn.127.net/e40487bb477b7392456f8f876d51ba58.png"},{"itemId":1199024,"picUrl":"https://yanxuan-item.nosdn.127.net/f6020d78fddf899a2622e4f4502ae967.png"},{"itemId":1225000,"picUrl":"https://yanxuan-item.nosdn.127.net/a730a83e9599459d80096a0dec8c500e.png"},{"itemId":1242000,"picUrl":"https://yanxuan-item.nosdn.127.net/c118cd431a41c3942bd34f9aa4ca80cc.png"},{"itemId":1253002,"picUrl":"https://yanxuan-item.nosdn.127.net/b49de3cf17c7dc92746f994b2296fd05.png"},{"itemId":1292003,"picUrl":"https://yanxuan-item.nosdn.127.net/1d85a516aadbeb11978f325f205820b9.png"},{"itemId":1306019,"picUrl":"https://yanxuan-item.nosdn.127.net/74eb39b9cd945dd0a336a3ce0f196fbc.png"},{"itemId":1314016,"picUrl":"https://yanxuan-item.nosdn.127.net/c73e4aa55503b7900209aa454be55dbf.png"},{"itemId":1318002,"picUrl":"https://yanxuan-item.nosdn.127.net/644a27b8e168b8fe8e43ccaad934b24e.png"},{"itemId":1321000,"picUrl":"https://yanxuan-item.nosdn.127.net/39e5df244905c79abf947fb4a534699d.png"},{"itemId":1323007,"picUrl":"https://yanxuan-item.nosdn.127.net/588d3261656320815632763a70925527.png"},{"itemId":1325028,"picUrl":"https://yanxuan-item.nosdn.127.net/e7f4dec7ff46ee289621e24cc78bc8df.png"},{"itemId":1356013,"picUrl":"https://yanxuan-item.nosdn.127.net/a57c294dbf1ef6c476703ae5a57b6b4b.png"},{"itemId":1358009,"picUrl":"https://yanxuan-item.nosdn.127.net/e5dac755e5d501f67e992d88fa401ce8.png"},{"itemId":1369012,"picUrl":"https://yanxuan-item.nosdn.127.net/516f9a53f493673fa6da347cd2bf93a7.png"},{"itemId":1391001,"picUrl":"https://yanxuan-item.nosdn.127.net/08ed8b0e068a3ff2a0aae8c427db1858.png"},{"itemId":1397006,"picUrl":"https://yanxuan-item.nosdn.127.net/65da8671e33bf88c98c2acdd694b156d.png"},{"itemId":1398011,"picUrl":"https://yanxuan-item.nosdn.127.net/84455b9ed53b6f29d3463d05fa6bf907.png"},{"itemId":1398015,"picUrl":"https://yanxuan-item.nosdn.127.net/1985e340c80c8b8b92555368faadbd89.png"},{"itemId":1435022,"picUrl":"https://yanxuan-item.nosdn.127.net/7b5815dba28684d89601e0643e2a1b56.png"},{"itemId":1469019,"picUrl":"https://yanxuan-item.nosdn.127.net/0040559ca37f3a088d2edd247d71f721.png"},{"itemId":1490004,"picUrl":"https://yanxuan-item.nosdn.127.net/664f2823ff24deab4ddbac4257e74c50.png"},{"itemId":1503004,"picUrl":"https://yanxuan-item.nosdn.127.net/c449cda7439ae40e1c0e16f2a701619a.png"},{"itemId":1506021,"picUrl":"https://yanxuan-item.nosdn.127.net/98f00e8b15f30c11e3e64f1da7fba591.png"},{"itemId":1506032,"picUrl":"https://yanxuan-item.nosdn.127.net/4808526f99e3e912a645dd2e4c5a20d0.png"},{"itemId":1512027,"picUrl":"https://yanxuan-item.nosdn.127.net/d3f4d9b6df8ea22c43f637469363abcf.png"},{"itemId":1513025,"picUrl":"https://yanxuan-item.nosdn.127.net/6fc85a398808d3247d1ffcb4810298bb.png"},{"itemId":1513031,"picUrl":"https://yanxuan-item.nosdn.127.net/9b3447a8a2716c284859a72b9b03b53d.png"},{"itemId":1527004,"picUrl":"https://yanxuan-item.nosdn.127.net/ded687f676cc7a8a858cc00bc8c5119a.png"},{"itemId":1552007,"picUrl":"https://yanxuan-item.nosdn.127.net/36f83fc61bab85ae138638f479f42fa3.png"},{"itemId":1561001,"picUrl":"https://yanxuan-item.nosdn.127.net/0064e22029d052276c2f8e49b1f3973d.png"},{"itemId":1564054,"picUrl":"https://yanxuan-item.nosdn.127.net/951f0223f005fb0d5d85cffba86622d6.png"},{"itemId":1572013,"picUrl":"https://yanxuan-item.nosdn.127.net/7e4db021bc68c9af8eddecdb1aa96c36.png"},{"itemId":1605001,"picUrl":"https://yanxuan-item.nosdn.127.net/b89e1647728d4ad29180ce52a6ebbedb.png"},{"itemId":1624017,"picUrl":"https://yanxuan-item.nosdn.127.net/b6dd9b0d4c403d38c208019f207a69e3.png"},{"itemId":1656012,"picUrl":"https://yanxuan-item.nosdn.127.net/f08f80a81ecef8418b2434f083c7129d.png"},{"itemId":1666060,"picUrl":"https://yanxuan-item.nosdn.127.net/355e0781cabbdfa084bf947aabceacf0.png"},{"itemId":1672002,"picUrl":"https://yanxuan-item.nosdn.127.net/59e8fa6fa2ffec391fae8d99e9c9aeee.png"},{"itemId":1673009,"picUrl":"https://yanxuan-item.nosdn.127.net/6b396a24be431d003b00316495b98a52.png"},{"itemId":3394032,"picUrl":"https://yanxuan-item.nosdn.127.net/951ecc96ffd33ddd680257c48d64a484.png"},{"itemId":3395000,"picUrl":"https://yanxuan-item.nosdn.127.net/3680159bab0ac5fc0c404640a6593b93.png"},{"itemId":3402020,"picUrl":"https://yanxuan-item.nosdn.127.net/2c0147161faaa160cf10b6770f1e290d.png"},{"itemId":3408049,"picUrl":"https://yanxuan-item.nosdn.127.net/03faa79c841e439c9aeb645977f4f8f7.png"},{"itemId":3408050,"picUrl":"https://yanxuan-item.nosdn.127.net/5a0d395159cf7f51d48c45599b96df3f.png"},{"itemId":3432036,"picUrl":"https://yanxuan-item.nosdn.127.net/4a89b652c30fbfc6b40adfe08d996aa3.png"},{"itemId":3447007,"picUrl":"https://yanxuan-item.nosdn.127.net/b74cd5601ba0e3b205e694943e978c5f.png"},{"itemId":3455001,"picUrl":"https://yanxuan-item.nosdn.127.net/d82be6b363e282825bf858696ce40ee3.png"},{"itemId":3469054,"picUrl":"https://yanxuan-item.nosdn.127.net/591ce4c819434a8c4365d06b5ca6e75e.png"},{"itemId":3481270,"picUrl":"https://yanxuan-item.nosdn.127.net/00e55362f57545ed4efdb32d83fe389f.png"}],"originSchemeUrl":"https://m.you.163.com/topic/v1/pub/GpCIMFZBO2.html","title":"无限回购榜单","targetUrl":"https://m.you.163.com/topic/v1/pub/GpCIMFZBO2.html","desc":"买了又买的超值好物"}},{"styleItem":{"backgroundUrl":"https://yanxuan.nosdn.127.net/e9cf9142f68e0fd944b07940ce9d8ec7.png","descColor":"7f7f7f","itemFrom":3,"picUrlList":["https://yanxuan-item.nosdn.127.net/3321ee2d70b1e062422b40e4cb2cc74b.png","https://yanxuan-item.nosdn.127.net/b2065eab67acc5923a8ec71167a35f6a.png"],"titleColor":"333333","extra":{"materialContentFrom":1,"materialName":"必买好物-2月篇","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"无分组","resourcesId":3,"materialType":"场景轻导购","crmUserGroupId":"0","materialId":"54639337","taskId":"54646221"},"itemPicBeanList":[{"itemId":1009024,"picUrl":"https://yanxuan-item.nosdn.127.net/5e818e36e0cfd0bb474c57f27e76b46d.png"},{"itemId":1027017,"picUrl":"https://yanxuan-item.nosdn.127.net/3321ee2d70b1e062422b40e4cb2cc74b.png"},{"itemId":1037001,"picUrl":"https://yanxuan-item.nosdn.127.net/b2065eab67acc5923a8ec71167a35f6a.png"},{"itemId":1075011,"picUrl":"https://yanxuan-item.nosdn.127.net/c2e290dda5250cb83de7bfce5dfb1b32.png"},{"itemId":1097000,"picUrl":"https://yanxuan-item.nosdn.127.net/6e05a3a46a46a34e7fa5b86c122a0787.png"},{"itemId":1109013,"picUrl":"https://yanxuan-item.nosdn.127.net/3b7bbecb7acfe2e56a515ccebc060e77.png"},{"itemId":1116033,"picUrl":"https://yanxuan-item.nosdn.127.net/91a264d84fed57f97c48dc107370e941.png"},{"itemId":1129016,"picUrl":"https://yanxuan-item.nosdn.127.net/3f06df1af8138410617e9b9aa05c3330.png"},{"itemId":1164007,"picUrl":"https://yanxuan-item.nosdn.127.net/7d4bacc5e3f4ed6c302db032cd953204.png"},{"itemId":1173006,"picUrl":"https://yanxuan-item.nosdn.127.net/ea8f5714ef50441d01930f4638eb98e1.png"},{"itemId":1197009,"picUrl":"https://yanxuan-item.nosdn.127.net/451ee6d21410297df3b2ed923f45d07d.png"},{"itemId":1241013,"picUrl":"https://yanxuan-item.nosdn.127.net/ff3cfd89ce1664eb70701f4f273ee562.png"},{"itemId":1245014,"picUrl":"https://yanxuan-item.nosdn.127.net/068b1375219cec84915cebcb8488f693.png"},{"itemId":1275000,"picUrl":"https://yanxuan-item.nosdn.127.net/c6c31c7160d2e6f7e367b74b23fd5c64.png"},{"itemId":1283015,"picUrl":"https://yanxuan-item.nosdn.127.net/467d1114d8bfb3208eda60c47619838a.png"},{"itemId":1325030,"picUrl":"https://yanxuan-item.nosdn.127.net/7f77125f98386cfd48938a5f43b30af0.png"},{"itemId":1382009,"picUrl":"https://yanxuan-item.nosdn.127.net/2f8347e13a8d7174704b87a8a05918d3.png"},{"itemId":1397017,"picUrl":"https://yanxuan-item.nosdn.127.net/de1812569b00c3cd600589b160893db4.png"},{"itemId":1419007,"picUrl":"https://yanxuan-item.nosdn.127.net/ee6eb8203527dbe5a749b9f5f3c6fe27.png"},{"itemId":1435010,"picUrl":"https://yanxuan-item.nosdn.127.net/3a1e52236c16b06d2c433e1ab82cc788.png"},{"itemId":1435017,"picUrl":"https://yanxuan-item.nosdn.127.net/bc0df62fde0d585cb6d001299152328c.png"},{"itemId":1447057,"picUrl":"https://yanxuan-item.nosdn.127.net/09fefff18127bd81742707a4adb56968.png"},{"itemId":1475015,"picUrl":"https://yanxuan-item.nosdn.127.net/793d9e467b2f64348722151a362d4673.png"},{"itemId":1487008,"picUrl":"https://yanxuan-item.nosdn.127.net/57820c78a765022243576b344927fdbb.png"},{"itemId":1487013,"picUrl":"https://yanxuan-item.nosdn.127.net/0542500ca5edef888ad0d0461392853b.png"},{"itemId":1494003,"picUrl":"https://yanxuan-item.nosdn.127.net/0ac21674d619c4558d99c0f380fd5b71.png"},{"itemId":1498025,"picUrl":"https://yanxuan-item.nosdn.127.net/23e2ba8b86ecdc9a46ec9df99d00e86d.png"},{"itemId":1501008,"picUrl":"https://yanxuan-item.nosdn.127.net/fbae3a43b448d2e6e6671936ba665b99.png"},{"itemId":1506015,"picUrl":"https://yanxuan-item.nosdn.127.net/d372755e9371b65f8638a372cac0d177.png"},{"itemId":1512033,"picUrl":"https://yanxuan-item.nosdn.127.net/1dcae085a33838163c69ced60e48a9e8.png"},{"itemId":1516008,"picUrl":"https://yanxuan-item.nosdn.127.net/6b172c71a23491d31db63b97a39f1f53.png"},{"itemId":1549000,"picUrl":"https://yanxuan-item.nosdn.127.net/abe76ae78cdd8ac1a1a82878a03d1deb.png"},{"itemId":1555000,"picUrl":"https://yanxuan-item.nosdn.127.net/57103d892fa09deae9ef9e56c301f14a.png"},{"itemId":1574001,"picUrl":"https://yanxuan-item.nosdn.127.net/ca28789b69f41959f8a7aaf341e42bde.png"},{"itemId":1604004,"picUrl":"https://yanxuan-item.nosdn.127.net/8bbed559f8d497919b929404b8c55110.png"},{"itemId":1625008,"picUrl":"https://yanxuan-item.nosdn.127.net/c89c4c86c6cb31805bd537d8c772a231.png"},{"itemId":1635010,"picUrl":"https://yanxuan-item.nosdn.127.net/c417a2c9ea84671a959d886ad482629d.png"},{"itemId":1635019,"picUrl":"https://yanxuan-item.nosdn.127.net/28dd5050489b6c926ab5e3aee6f9b915.png"},{"itemId":1637002,"picUrl":"https://yanxuan-item.nosdn.127.net/f5b1cba9a449797089d43cfe6939933d.png"},{"itemId":1652009,"picUrl":"https://yanxuan-item.nosdn.127.net/df3b083f7c42a6453fec121db61d0297.png"},{"itemId":1657020,"picUrl":"https://yanxuan-item.nosdn.127.net/bf92d8a1eb0e55d41fd29a71dea1e56e.png"},{"itemId":1657028,"picUrl":"https://yanxuan-item.nosdn.127.net/b92c06b09b0446c8635e8d4db6c502d8.png"},{"itemId":1658025,"picUrl":"https://yanxuan-item.nosdn.127.net/3efe2debeec4d9013ff56e5d69e934e3.png"},{"itemId":1663002,"picUrl":"https://yanxuan-item.nosdn.127.net/b050aa1beaad0960bc0b579848dcc4a9.png"},{"itemId":1675046,"picUrl":"https://yanxuan-item.nosdn.127.net/7835dc10763c48ad53a9830b196de01e.png"},{"itemId":1677004,"picUrl":"https://yanxuan-item.nosdn.127.net/6dace61cf151dae53bf5079297ee38bb.png"},{"itemId":1683016,"picUrl":"https://yanxuan-item.nosdn.127.net/81b2b58106f17dfeee60aba8aabd8a85.png"},{"itemId":1690003,"picUrl":"https://yanxuan-item.nosdn.127.net/a9d6de39ab17ab82d5424205dafc4136.png"},{"itemId":3383008,"picUrl":"https://yanxuan-item.nosdn.127.net/eb5aaec3178da93222aeca4b7fcaf757.png"},{"itemId":3397008,"picUrl":"https://yanxuan-item.nosdn.127.net/892430d8b919681ba3e715a670105bc5.png"},{"itemId":3408015,"picUrl":"https://yanxuan-item.nosdn.127.net/f5c935419855b5b5c8ee021cf2197313.png"},{"itemId":3412043,"picUrl":"https://yanxuan-item.nosdn.127.net/a840c425859a599c0a439067b6ad3ec7.png"},{"itemId":3412045,"picUrl":"https://yanxuan-item.nosdn.127.net/dfcb8036f2cbd7b94f9a6119ddfadb51.png"},{"itemId":3416001,"picUrl":"https://yanxuan-item.nosdn.127.net/899d91ae4b28e9bb42d617aa6691276d.png"},{"itemId":3425014,"picUrl":"https://yanxuan-item.nosdn.127.net/ebf4447ec2851db4cc5617d792658a63.png"},{"itemId":3427014,"picUrl":"https://yanxuan-item.nosdn.127.net/cc234b2950c0bfa28b10daa6fd09f3ac.png"},{"itemId":3438006,"picUrl":"https://yanxuan-item.nosdn.127.net/78a1f661665eb3e9257a947d4cd8ac83.png"},{"itemId":3440224,"picUrl":"https://yanxuan-item.nosdn.127.net/863cd7ac1ebb25ea95f6b716123d5e8b.png"},{"itemId":3464069,"picUrl":"https://yanxuan-item.nosdn.127.net/d129e72169eee8b6c47e30504cd34442.png"},{"itemId":3465028,"picUrl":"https://yanxuan-item.nosdn.127.net/77c3456827d3aaec3cea785680831bb8.png"},{"itemId":3465073,"picUrl":"https://yanxuan-item.nosdn.127.net/5328548b08399e3347cc1d9679d9943f.png"},{"itemId":3469061,"picUrl":"https://yanxuan-item.nosdn.127.net/d5c982eae5e21fbd2397df9b17408c76.png"},{"itemId":3481037,"picUrl":"https://yanxuan-item.nosdn.127.net/e952473fbb0d3a27b20185e68dc6bdf5.png"},{"itemId":3481038,"picUrl":"https://yanxuan-item.nosdn.127.net/1df97688e72a2368aa46a3642939bc1e.png"},{"itemId":3482078,"picUrl":"https://yanxuan-item.nosdn.127.net/3ba85e0b142d0c14332670ed246ec04a.png"},{"itemId":3491114,"picUrl":"https://yanxuan-item.nosdn.127.net/3eca7b34cd80ce4128c98233e3809ece.png"},{"itemId":3498011,"picUrl":"https://yanxuan-item.nosdn.127.net/84334e0d0a33897bb8f5fee654fa0cee.jpg"},{"itemId":3499009,"picUrl":"https://yanxuan-item.nosdn.127.net/58290418f47df80146a7a462ab231b07.png"},{"itemId":3506034,"picUrl":"https://yanxuan-item.nosdn.127.net/71e2c597d7c02912c9fe635cdc2a9c0d.png"},{"itemId":3507203,"picUrl":"https://yanxuan-item.nosdn.127.net/60ebd2ecc9a4fca5b746e6753631e9d5.png"},{"itemId":3507205,"picUrl":"https://yanxuan-item.nosdn.127.net/f3f18a4fe9e7905cd7c9ff28e42ff0c2.png"},{"itemId":3510086,"picUrl":"https://yanxuan-item.nosdn.127.net/e3a108207eb1c518d84b5f24ff6627a3.png"},{"itemId":3510125,"picUrl":"https://yanxuan-item.nosdn.127.net/cf7e3528a9aef4dbcb0796c357699994.png"},{"itemId":3522076,"picUrl":"https://yanxuan-item.nosdn.127.net/a7082a3e10618bff612181bf8d204282.png"},{"itemId":3527154,"picUrl":"https://yanxuan-item.nosdn.127.net/02dd07dbee4575a71afa30fd680a6ec7.png"},{"itemId":3532013,"picUrl":"https://yanxuan-item.nosdn.127.net/e3ae33519b9b62248619ec270934a05c.png"},{"itemId":3550216,"picUrl":"https://yanxuan-item.nosdn.127.net/192a35ff83f0575f797765f5395bf03b.png"},{"itemId":3550317,"picUrl":"https://yanxuan-item.nosdn.127.net/598e04918a3e617e59d58ecab8b60e91.png"},{"itemId":3550346,"picUrl":"https://yanxuan-item.nosdn.127.net/56b9ab8ed17e90bd436a48f874bc4f4b.png"},{"itemId":3553004,"picUrl":"https://yanxuan-item.nosdn.127.net/5d89a6f902e09a90d75db57c39c1b817.png"},{"itemId":3804035,"picUrl":"https://yanxuan-item.nosdn.127.net/28099c9166d4987f3fb595509f6a8897.png"},{"itemId":3804060,"picUrl":"https://yanxuan-item.nosdn.127.net/ab9070b9b1a8b126838fd9b5fe0b6958.png"},{"itemId":3811005,"picUrl":"https://yanxuan-item.nosdn.127.net/580a4e84e1bc630f101a3ee01b71d8c2.png"},{"itemId":3811006,"picUrl":"https://yanxuan-item.nosdn.127.net/10a65a661aeb27006186f57ace454da4.png"},{"itemId":3814094,"picUrl":"https://yanxuan-item.nosdn.127.net/6fd807743e8e25472aca8b6b0b8f3039.png"},{"itemId":3815023,"picUrl":"https://yanxuan-item.nosdn.127.net/1cfcd48aeff9c9789f3eb39a6e3ae773.png"},{"itemId":3817012,"picUrl":"https://yanxuan-item.nosdn.127.net/3f3e946c23aaddf5b9e2c259af03571a.png"},{"itemId":3823002,"picUrl":"https://yanxuan-item.nosdn.127.net/910eba5eb892cb555e1d21d6a5a00c5b.png"},{"itemId":3823005,"picUrl":"https://yanxuan-item.nosdn.127.net/be3010770b6075951c7d7253a3e75b69.png"},{"itemId":3826011,"picUrl":"https://yanxuan-item.nosdn.127.net/901be61b95ed8dfc89947125cbdc603b.png"},{"itemId":3828011,"picUrl":"https://yanxuan-item.nosdn.127.net/aabbab9a31151e49c199937a3d0a0cbd.png"},{"itemId":3829113,"picUrl":"https://yanxuan-item.nosdn.127.net/0056e02c30468162c011487b1236272f.png"},{"itemId":3830010,"picUrl":"https://yanxuan-item.nosdn.127.net/aeccb8ca393435861d87e3978c158e02.png"},{"itemId":3835007,"picUrl":"https://yanxuan-item.nosdn.127.net/eea064c1198b70f1b80b86c4fc579141.png"},{"itemId":3837006,"picUrl":"https://yanxuan-item.nosdn.127.net/f66c8252524832d211e9a9c1caa5f86c.png"},{"itemId":3838014,"picUrl":"https://yanxuan-item.nosdn.127.net/d6a3ff3894437578b137ccbd6be32132.png"},{"itemId":3841036,"picUrl":"https://yanxuan-item.nosdn.127.net/588cbd22ee48928b914acbb0ba91cede.png"},{"itemId":3844039,"picUrl":"https://yanxuan-item.nosdn.127.net/acd948c07ab0ed93e5e53bb3edd55731.png"},{"itemId":3853004,"picUrl":"https://yanxuan-item.nosdn.127.net/3e24ed5f8b9d2f0599367df67a40a5f2.png"},{"itemId":3854022,"picUrl":"https://yanxuan-item.nosdn.127.net/061f5b8a5a0c03d1165deed64ca2db19.png"},{"itemId":3855009,"picUrl":"https://yanxuan-item.nosdn.127.net/0558cf6c29e030f072210755f1ad7db7.png"},{"itemId":3865005,"picUrl":"https://yanxuan-item.nosdn.127.net/074874864fcfe6b25e280ac2c45fe51e.png"},{"itemId":3876017,"picUrl":"https://yanxuan-item.nosdn.127.net/70a1f0ca1a4486284c98f3da2c7d1e36.png"},{"itemId":3876019,"picUrl":"https://yanxuan-item.nosdn.127.net/ddc1a90a6224cca5ba67c568ca8fdb49.png"},{"itemId":3876026,"picUrl":"https://yanxuan-item.nosdn.127.net/fccad0de2abbc2cea599df022ce78fa7.png"},{"itemId":3883028,"picUrl":"https://yanxuan-item.nosdn.127.net/93fcef7402e40ec6d763068ac4180b99.png"},{"itemId":3884006,"picUrl":"https://yanxuan-item.nosdn.127.net/1e1887a1524e74e41a5b3d06befa33bb.png"},{"itemId":3986043,"picUrl":"https://yanxuan-item.nosdn.127.net/ae01357ec23e170d0d0988192c964225.png"},{"itemId":3986044,"picUrl":"https://yanxuan-item.nosdn.127.net/7047b2fb3a7e6e61d3d7e050e534516e.png"},{"itemId":3986130,"picUrl":"https://yanxuan-item.nosdn.127.net/3cebf5b10d11683e59f39056582f3822.png"},{"itemId":3986569,"picUrl":"https://yanxuan-item.nosdn.127.net/a44f4c7eface3314c6e901f478474d55.png"},{"itemId":3986591,"picUrl":"https://yanxuan-item.nosdn.127.net/800ac1231416df2d77cf5da015f67473.png"},{"itemId":3986612,"picUrl":"https://yanxuan-item.nosdn.127.net/06a2aabda57f8233b872dc3aba21c783.png"},{"itemId":3986727,"picUrl":"https://yanxuan-item.nosdn.127.net/866b7cd99ac4c5c555819c5de38ed8f0.png"},{"itemId":3987388,"picUrl":"https://yanxuan-item.nosdn.127.net/c97ed9ccfdf8441a8a6f54727ea149b8.png"},{"itemId":3987554,"picUrl":"https://yanxuan-item.nosdn.127.net/c64630a92d1cb74bf24c443ae1a2acd6.png"},{"itemId":3987797,"picUrl":"https://yanxuan-item.nosdn.127.net/fb569ac82cff11d5aac9cddd163b50d5.png"}],"originSchemeUrl":"http://you.163.com/topic/v1/pub/DAZ7vL3eAdT8.html","title":"应季尖货","targetUrl":"http://you.163.com/topic/v1/pub/DAZ7vL3eAdT8.html","desc":"2月拔草清单"}},{"styleItem":{"backgroundUrl":"https://yanxuan.nosdn.127.net/42396d871da5f7636c29e5dfb33105ed.png","descColor":"7f7f7f","itemFrom":2,"picUrlList":["https://yanxuan-item.nosdn.127.net/24dd7f6f16154871f09e86766cc92a94.png","https://yanxuan-item.nosdn.127.net/3ddebc9df09f6b10b9b301d1edf2c303.png"],"titleColor":"333333","extra":{"materialContentFrom":1,"materialName":"员工精选-2.17","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"无分组","resourcesId":4,"materialType":"场景轻导购","crmUserGroupId":"0","materialId":"54639986","taskId":"54647179"},"itemPicBeanList":[{"itemId":1333015,"picUrl":"https://yanxuan-item.nosdn.127.net/24dd7f6f16154871f09e86766cc92a94.png"},{"itemId":3844033,"picUrl":"https://yanxuan-item.nosdn.127.net/3ddebc9df09f6b10b9b301d1edf2c303.png"}],"originSchemeUrl":"https://m.you.163.com/topic/v1/pub/MZee3MWrbs.html","title":"网易员工精选","targetUrl":"https://m.you.163.com/topic/v1/pub/MZee3MWrbs.html","desc":"停课不停学 词典笔直降70 "}}],"kingKongModule":{"norColor":"ff000000","selectedColor":"ffffffff","background":"https://yanxuan.nosdn.127.net/fe0bd37a552434cc0d27c1889ff3e1fe.png","kingKongList":[{"schemeUrl":"https://m.you.163.com/item/newItem","picUrl":"https://yanxuan.nosdn.127.net/c6fd8835a6400b7da7a016ad85506b69.png","text":"新品首发","textColor":"333333"},{"schemeUrl":"https://m.you.163.com/item/list?categoryId=1005000&style=pd","picUrl":"https://yanxuan.nosdn.127.net/fede8b110c502ec5799702d5ec824792.png","text":"居家生活","textColor":"333333"},{"schemeUrl":"https://m.you.163.com/item/list?categoryId=1010000&style=pd","picUrl":"https://yanxuan.nosdn.127.net/896a3beac514ae8f40aafe028e5fec56.png","text":"服饰鞋包","textColor":"333333"},{"schemeUrl":"https://m.you.163.com/item/list?categoryId=1005002&style=pd","picUrl":"https://yanxuan.nosdn.127.net/37520d1204a0c55474021b43dac2a69e.png","text":"美食酒水","textColor":"333333"},{"schemeUrl":"https://m.you.163.com/item/list?categoryId=1013001&style=pd","picUrl":"https://yanxuan.nosdn.127.net/6c3bd9d885c818b1f73e497335a68b47.png","text":"个护清洁","textColor":"333333"},{"schemeUrl":"https://m.you.163.com/item/list?categoryId=1011000&style=pd","picUrl":"https://yanxuan.nosdn.127.net/559d2a240ec20b096590a902217009ff.png","text":"母婴亲子","textColor":"333333"},{"schemeUrl":"https://m.you.163.com/item/list?categoryId=109243029&style=pd","picUrl":"https://yanxuan.nosdn.127.net/5c088559ebcc3f0ffcda663f04dfbeb2.png","text":"运动旅行","textColor":"333333"},{"schemeUrl":"https://m.you.163.com/item/list?categoryId=1043000&style=pd","picUrl":"https://yanxuan.nosdn.127.net/fbca8e1f2948f0c09fc7672c2c125384.png","text":"数码家电","textColor":"333333"},{"schemeUrl":"https://m.you.163.com/item/list?categoryId=1019000&style=pd","picUrl":"https://yanxuan.nosdn.127.net/f7281169d4e82d5d8d52aa1fec83fe01.png","text":"全球特色","textColor":"333333"},{"schemeUrl":"https://act.you.163.com/act/pub/OuB7EL0tpQ3Z.html","picUrl":"https://yanxuan.nosdn.127.net/12e8efd15b9b210ab156a7ee9b340548.gif","text":"好货抄底","textColor":"333333"}]},"indexActivityModule":[{"backgroundUrl":"","picUrl":"https://yanxuan-item.nosdn.127.net/f961b628a67e5a95150b962a48963b6d.png","activityPrice":"¥69","subTitle":"今日特价","originPrice":"¥99","tag":"","title":"福利社","targetUrl":"https://m.you.163.com/saleCenter/index","showPicUrl":"https://yanxuan-item.nosdn.127.net/f961b628a67e5a95150b962a48963b6d.png"},{"tag":"1元起包邮","subTitle":"","title":"新人拼团","targetUrl":"https://m.you.163.com/pin/item/list"}]};
+
+/***/ }),
+
+/***/ 3:
 /*!***********************************!*\
   !*** (webpack)/buildin/global.js ***!
   \***********************************/
@@ -7610,7 +9398,800 @@ module.exports = g;
 
 
 /***/ }),
-/* 4 */
+
+/***/ 34:
+/*!**********************************************************!*\
+  !*** ./node_modules/@babel/runtime/regenerator/index.js ***!
+  \**********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(/*! regenerator-runtime */ 35);
+
+
+/***/ }),
+
+/***/ 35:
+/*!************************************************************!*\
+  !*** ./node_modules/regenerator-runtime/runtime-module.js ***!
+  \************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+/**
+ * Copyright (c) 2014-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+// This method of obtaining a reference to the global object needs to be
+// kept identical to the way it is obtained in runtime.js
+var g = (function() {
+  return this || (typeof self === "object" && self);
+})() || Function("return this")();
+
+// Use `getOwnPropertyNames` because not all browsers support calling
+// `hasOwnProperty` on the global `self` object in a worker. See #183.
+var hadRuntime = g.regeneratorRuntime &&
+  Object.getOwnPropertyNames(g).indexOf("regeneratorRuntime") >= 0;
+
+// Save the old regeneratorRuntime in case it needs to be restored later.
+var oldRuntime = hadRuntime && g.regeneratorRuntime;
+
+// Force reevalutation of runtime.js.
+g.regeneratorRuntime = undefined;
+
+module.exports = __webpack_require__(/*! ./runtime */ 36);
+
+if (hadRuntime) {
+  // Restore the original runtime.
+  g.regeneratorRuntime = oldRuntime;
+} else {
+  // Remove the global property added by runtime.js.
+  try {
+    delete g.regeneratorRuntime;
+  } catch(e) {
+    g.regeneratorRuntime = undefined;
+  }
+}
+
+
+/***/ }),
+
+/***/ 36:
+/*!*****************************************************!*\
+  !*** ./node_modules/regenerator-runtime/runtime.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * Copyright (c) 2014-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+!(function(global) {
+  "use strict";
+
+  var Op = Object.prototype;
+  var hasOwn = Op.hasOwnProperty;
+  var undefined; // More compressible than void 0.
+  var $Symbol = typeof Symbol === "function" ? Symbol : {};
+  var iteratorSymbol = $Symbol.iterator || "@@iterator";
+  var asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator";
+  var toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
+
+  var inModule = typeof module === "object";
+  var runtime = global.regeneratorRuntime;
+  if (runtime) {
+    if (inModule) {
+      // If regeneratorRuntime is defined globally and we're in a module,
+      // make the exports object identical to regeneratorRuntime.
+      module.exports = runtime;
+    }
+    // Don't bother evaluating the rest of this file if the runtime was
+    // already defined globally.
+    return;
+  }
+
+  // Define the runtime globally (as expected by generated code) as either
+  // module.exports (if we're in a module) or a new, empty object.
+  runtime = global.regeneratorRuntime = inModule ? module.exports : {};
+
+  function wrap(innerFn, outerFn, self, tryLocsList) {
+    // If outerFn provided and outerFn.prototype is a Generator, then outerFn.prototype instanceof Generator.
+    var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator;
+    var generator = Object.create(protoGenerator.prototype);
+    var context = new Context(tryLocsList || []);
+
+    // The ._invoke method unifies the implementations of the .next,
+    // .throw, and .return methods.
+    generator._invoke = makeInvokeMethod(innerFn, self, context);
+
+    return generator;
+  }
+  runtime.wrap = wrap;
+
+  // Try/catch helper to minimize deoptimizations. Returns a completion
+  // record like context.tryEntries[i].completion. This interface could
+  // have been (and was previously) designed to take a closure to be
+  // invoked without arguments, but in all the cases we care about we
+  // already have an existing method we want to call, so there's no need
+  // to create a new function object. We can even get away with assuming
+  // the method takes exactly one argument, since that happens to be true
+  // in every case, so we don't have to touch the arguments object. The
+  // only additional allocation required is the completion record, which
+  // has a stable shape and so hopefully should be cheap to allocate.
+  function tryCatch(fn, obj, arg) {
+    try {
+      return { type: "normal", arg: fn.call(obj, arg) };
+    } catch (err) {
+      return { type: "throw", arg: err };
+    }
+  }
+
+  var GenStateSuspendedStart = "suspendedStart";
+  var GenStateSuspendedYield = "suspendedYield";
+  var GenStateExecuting = "executing";
+  var GenStateCompleted = "completed";
+
+  // Returning this object from the innerFn has the same effect as
+  // breaking out of the dispatch switch statement.
+  var ContinueSentinel = {};
+
+  // Dummy constructor functions that we use as the .constructor and
+  // .constructor.prototype properties for functions that return Generator
+  // objects. For full spec compliance, you may wish to configure your
+  // minifier not to mangle the names of these two functions.
+  function Generator() {}
+  function GeneratorFunction() {}
+  function GeneratorFunctionPrototype() {}
+
+  // This is a polyfill for %IteratorPrototype% for environments that
+  // don't natively support it.
+  var IteratorPrototype = {};
+  IteratorPrototype[iteratorSymbol] = function () {
+    return this;
+  };
+
+  var getProto = Object.getPrototypeOf;
+  var NativeIteratorPrototype = getProto && getProto(getProto(values([])));
+  if (NativeIteratorPrototype &&
+      NativeIteratorPrototype !== Op &&
+      hasOwn.call(NativeIteratorPrototype, iteratorSymbol)) {
+    // This environment has a native %IteratorPrototype%; use it instead
+    // of the polyfill.
+    IteratorPrototype = NativeIteratorPrototype;
+  }
+
+  var Gp = GeneratorFunctionPrototype.prototype =
+    Generator.prototype = Object.create(IteratorPrototype);
+  GeneratorFunction.prototype = Gp.constructor = GeneratorFunctionPrototype;
+  GeneratorFunctionPrototype.constructor = GeneratorFunction;
+  GeneratorFunctionPrototype[toStringTagSymbol] =
+    GeneratorFunction.displayName = "GeneratorFunction";
+
+  // Helper for defining the .next, .throw, and .return methods of the
+  // Iterator interface in terms of a single ._invoke method.
+  function defineIteratorMethods(prototype) {
+    ["next", "throw", "return"].forEach(function(method) {
+      prototype[method] = function(arg) {
+        return this._invoke(method, arg);
+      };
+    });
+  }
+
+  runtime.isGeneratorFunction = function(genFun) {
+    var ctor = typeof genFun === "function" && genFun.constructor;
+    return ctor
+      ? ctor === GeneratorFunction ||
+        // For the native GeneratorFunction constructor, the best we can
+        // do is to check its .name property.
+        (ctor.displayName || ctor.name) === "GeneratorFunction"
+      : false;
+  };
+
+  runtime.mark = function(genFun) {
+    if (Object.setPrototypeOf) {
+      Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
+    } else {
+      genFun.__proto__ = GeneratorFunctionPrototype;
+      if (!(toStringTagSymbol in genFun)) {
+        genFun[toStringTagSymbol] = "GeneratorFunction";
+      }
+    }
+    genFun.prototype = Object.create(Gp);
+    return genFun;
+  };
+
+  // Within the body of any async function, `await x` is transformed to
+  // `yield regeneratorRuntime.awrap(x)`, so that the runtime can test
+  // `hasOwn.call(value, "__await")` to determine if the yielded value is
+  // meant to be awaited.
+  runtime.awrap = function(arg) {
+    return { __await: arg };
+  };
+
+  function AsyncIterator(generator) {
+    function invoke(method, arg, resolve, reject) {
+      var record = tryCatch(generator[method], generator, arg);
+      if (record.type === "throw") {
+        reject(record.arg);
+      } else {
+        var result = record.arg;
+        var value = result.value;
+        if (value &&
+            typeof value === "object" &&
+            hasOwn.call(value, "__await")) {
+          return Promise.resolve(value.__await).then(function(value) {
+            invoke("next", value, resolve, reject);
+          }, function(err) {
+            invoke("throw", err, resolve, reject);
+          });
+        }
+
+        return Promise.resolve(value).then(function(unwrapped) {
+          // When a yielded Promise is resolved, its final value becomes
+          // the .value of the Promise<{value,done}> result for the
+          // current iteration.
+          result.value = unwrapped;
+          resolve(result);
+        }, function(error) {
+          // If a rejected Promise was yielded, throw the rejection back
+          // into the async generator function so it can be handled there.
+          return invoke("throw", error, resolve, reject);
+        });
+      }
+    }
+
+    var previousPromise;
+
+    function enqueue(method, arg) {
+      function callInvokeWithMethodAndArg() {
+        return new Promise(function(resolve, reject) {
+          invoke(method, arg, resolve, reject);
+        });
+      }
+
+      return previousPromise =
+        // If enqueue has been called before, then we want to wait until
+        // all previous Promises have been resolved before calling invoke,
+        // so that results are always delivered in the correct order. If
+        // enqueue has not been called before, then it is important to
+        // call invoke immediately, without waiting on a callback to fire,
+        // so that the async generator function has the opportunity to do
+        // any necessary setup in a predictable way. This predictability
+        // is why the Promise constructor synchronously invokes its
+        // executor callback, and why async functions synchronously
+        // execute code before the first await. Since we implement simple
+        // async functions in terms of async generators, it is especially
+        // important to get this right, even though it requires care.
+        previousPromise ? previousPromise.then(
+          callInvokeWithMethodAndArg,
+          // Avoid propagating failures to Promises returned by later
+          // invocations of the iterator.
+          callInvokeWithMethodAndArg
+        ) : callInvokeWithMethodAndArg();
+    }
+
+    // Define the unified helper method that is used to implement .next,
+    // .throw, and .return (see defineIteratorMethods).
+    this._invoke = enqueue;
+  }
+
+  defineIteratorMethods(AsyncIterator.prototype);
+  AsyncIterator.prototype[asyncIteratorSymbol] = function () {
+    return this;
+  };
+  runtime.AsyncIterator = AsyncIterator;
+
+  // Note that simple async functions are implemented on top of
+  // AsyncIterator objects; they just return a Promise for the value of
+  // the final result produced by the iterator.
+  runtime.async = function(innerFn, outerFn, self, tryLocsList) {
+    var iter = new AsyncIterator(
+      wrap(innerFn, outerFn, self, tryLocsList)
+    );
+
+    return runtime.isGeneratorFunction(outerFn)
+      ? iter // If outerFn is a generator, return the full iterator.
+      : iter.next().then(function(result) {
+          return result.done ? result.value : iter.next();
+        });
+  };
+
+  function makeInvokeMethod(innerFn, self, context) {
+    var state = GenStateSuspendedStart;
+
+    return function invoke(method, arg) {
+      if (state === GenStateExecuting) {
+        throw new Error("Generator is already running");
+      }
+
+      if (state === GenStateCompleted) {
+        if (method === "throw") {
+          throw arg;
+        }
+
+        // Be forgiving, per 25.3.3.3.3 of the spec:
+        // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-generatorresume
+        return doneResult();
+      }
+
+      context.method = method;
+      context.arg = arg;
+
+      while (true) {
+        var delegate = context.delegate;
+        if (delegate) {
+          var delegateResult = maybeInvokeDelegate(delegate, context);
+          if (delegateResult) {
+            if (delegateResult === ContinueSentinel) continue;
+            return delegateResult;
+          }
+        }
+
+        if (context.method === "next") {
+          // Setting context._sent for legacy support of Babel's
+          // function.sent implementation.
+          context.sent = context._sent = context.arg;
+
+        } else if (context.method === "throw") {
+          if (state === GenStateSuspendedStart) {
+            state = GenStateCompleted;
+            throw context.arg;
+          }
+
+          context.dispatchException(context.arg);
+
+        } else if (context.method === "return") {
+          context.abrupt("return", context.arg);
+        }
+
+        state = GenStateExecuting;
+
+        var record = tryCatch(innerFn, self, context);
+        if (record.type === "normal") {
+          // If an exception is thrown from innerFn, we leave state ===
+          // GenStateExecuting and loop back for another invocation.
+          state = context.done
+            ? GenStateCompleted
+            : GenStateSuspendedYield;
+
+          if (record.arg === ContinueSentinel) {
+            continue;
+          }
+
+          return {
+            value: record.arg,
+            done: context.done
+          };
+
+        } else if (record.type === "throw") {
+          state = GenStateCompleted;
+          // Dispatch the exception by looping back around to the
+          // context.dispatchException(context.arg) call above.
+          context.method = "throw";
+          context.arg = record.arg;
+        }
+      }
+    };
+  }
+
+  // Call delegate.iterator[context.method](context.arg) and handle the
+  // result, either by returning a { value, done } result from the
+  // delegate iterator, or by modifying context.method and context.arg,
+  // setting context.delegate to null, and returning the ContinueSentinel.
+  function maybeInvokeDelegate(delegate, context) {
+    var method = delegate.iterator[context.method];
+    if (method === undefined) {
+      // A .throw or .return when the delegate iterator has no .throw
+      // method always terminates the yield* loop.
+      context.delegate = null;
+
+      if (context.method === "throw") {
+        if (delegate.iterator.return) {
+          // If the delegate iterator has a return method, give it a
+          // chance to clean up.
+          context.method = "return";
+          context.arg = undefined;
+          maybeInvokeDelegate(delegate, context);
+
+          if (context.method === "throw") {
+            // If maybeInvokeDelegate(context) changed context.method from
+            // "return" to "throw", let that override the TypeError below.
+            return ContinueSentinel;
+          }
+        }
+
+        context.method = "throw";
+        context.arg = new TypeError(
+          "The iterator does not provide a 'throw' method");
+      }
+
+      return ContinueSentinel;
+    }
+
+    var record = tryCatch(method, delegate.iterator, context.arg);
+
+    if (record.type === "throw") {
+      context.method = "throw";
+      context.arg = record.arg;
+      context.delegate = null;
+      return ContinueSentinel;
+    }
+
+    var info = record.arg;
+
+    if (! info) {
+      context.method = "throw";
+      context.arg = new TypeError("iterator result is not an object");
+      context.delegate = null;
+      return ContinueSentinel;
+    }
+
+    if (info.done) {
+      // Assign the result of the finished delegate to the temporary
+      // variable specified by delegate.resultName (see delegateYield).
+      context[delegate.resultName] = info.value;
+
+      // Resume execution at the desired location (see delegateYield).
+      context.next = delegate.nextLoc;
+
+      // If context.method was "throw" but the delegate handled the
+      // exception, let the outer generator proceed normally. If
+      // context.method was "next", forget context.arg since it has been
+      // "consumed" by the delegate iterator. If context.method was
+      // "return", allow the original .return call to continue in the
+      // outer generator.
+      if (context.method !== "return") {
+        context.method = "next";
+        context.arg = undefined;
+      }
+
+    } else {
+      // Re-yield the result returned by the delegate method.
+      return info;
+    }
+
+    // The delegate iterator is finished, so forget it and continue with
+    // the outer generator.
+    context.delegate = null;
+    return ContinueSentinel;
+  }
+
+  // Define Generator.prototype.{next,throw,return} in terms of the
+  // unified ._invoke helper method.
+  defineIteratorMethods(Gp);
+
+  Gp[toStringTagSymbol] = "Generator";
+
+  // A Generator should always return itself as the iterator object when the
+  // @@iterator function is called on it. Some browsers' implementations of the
+  // iterator prototype chain incorrectly implement this, causing the Generator
+  // object to not be returned from this call. This ensures that doesn't happen.
+  // See https://github.com/facebook/regenerator/issues/274 for more details.
+  Gp[iteratorSymbol] = function() {
+    return this;
+  };
+
+  Gp.toString = function() {
+    return "[object Generator]";
+  };
+
+  function pushTryEntry(locs) {
+    var entry = { tryLoc: locs[0] };
+
+    if (1 in locs) {
+      entry.catchLoc = locs[1];
+    }
+
+    if (2 in locs) {
+      entry.finallyLoc = locs[2];
+      entry.afterLoc = locs[3];
+    }
+
+    this.tryEntries.push(entry);
+  }
+
+  function resetTryEntry(entry) {
+    var record = entry.completion || {};
+    record.type = "normal";
+    delete record.arg;
+    entry.completion = record;
+  }
+
+  function Context(tryLocsList) {
+    // The root entry object (effectively a try statement without a catch
+    // or a finally block) gives us a place to store values thrown from
+    // locations where there is no enclosing try statement.
+    this.tryEntries = [{ tryLoc: "root" }];
+    tryLocsList.forEach(pushTryEntry, this);
+    this.reset(true);
+  }
+
+  runtime.keys = function(object) {
+    var keys = [];
+    for (var key in object) {
+      keys.push(key);
+    }
+    keys.reverse();
+
+    // Rather than returning an object with a next method, we keep
+    // things simple and return the next function itself.
+    return function next() {
+      while (keys.length) {
+        var key = keys.pop();
+        if (key in object) {
+          next.value = key;
+          next.done = false;
+          return next;
+        }
+      }
+
+      // To avoid creating an additional object, we just hang the .value
+      // and .done properties off the next function object itself. This
+      // also ensures that the minifier will not anonymize the function.
+      next.done = true;
+      return next;
+    };
+  };
+
+  function values(iterable) {
+    if (iterable) {
+      var iteratorMethod = iterable[iteratorSymbol];
+      if (iteratorMethod) {
+        return iteratorMethod.call(iterable);
+      }
+
+      if (typeof iterable.next === "function") {
+        return iterable;
+      }
+
+      if (!isNaN(iterable.length)) {
+        var i = -1, next = function next() {
+          while (++i < iterable.length) {
+            if (hasOwn.call(iterable, i)) {
+              next.value = iterable[i];
+              next.done = false;
+              return next;
+            }
+          }
+
+          next.value = undefined;
+          next.done = true;
+
+          return next;
+        };
+
+        return next.next = next;
+      }
+    }
+
+    // Return an iterator with no values.
+    return { next: doneResult };
+  }
+  runtime.values = values;
+
+  function doneResult() {
+    return { value: undefined, done: true };
+  }
+
+  Context.prototype = {
+    constructor: Context,
+
+    reset: function(skipTempReset) {
+      this.prev = 0;
+      this.next = 0;
+      // Resetting context._sent for legacy support of Babel's
+      // function.sent implementation.
+      this.sent = this._sent = undefined;
+      this.done = false;
+      this.delegate = null;
+
+      this.method = "next";
+      this.arg = undefined;
+
+      this.tryEntries.forEach(resetTryEntry);
+
+      if (!skipTempReset) {
+        for (var name in this) {
+          // Not sure about the optimal order of these conditions:
+          if (name.charAt(0) === "t" &&
+              hasOwn.call(this, name) &&
+              !isNaN(+name.slice(1))) {
+            this[name] = undefined;
+          }
+        }
+      }
+    },
+
+    stop: function() {
+      this.done = true;
+
+      var rootEntry = this.tryEntries[0];
+      var rootRecord = rootEntry.completion;
+      if (rootRecord.type === "throw") {
+        throw rootRecord.arg;
+      }
+
+      return this.rval;
+    },
+
+    dispatchException: function(exception) {
+      if (this.done) {
+        throw exception;
+      }
+
+      var context = this;
+      function handle(loc, caught) {
+        record.type = "throw";
+        record.arg = exception;
+        context.next = loc;
+
+        if (caught) {
+          // If the dispatched exception was caught by a catch block,
+          // then let that catch block handle the exception normally.
+          context.method = "next";
+          context.arg = undefined;
+        }
+
+        return !! caught;
+      }
+
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        var record = entry.completion;
+
+        if (entry.tryLoc === "root") {
+          // Exception thrown outside of any try block that could handle
+          // it, so set the completion value of the entire function to
+          // throw the exception.
+          return handle("end");
+        }
+
+        if (entry.tryLoc <= this.prev) {
+          var hasCatch = hasOwn.call(entry, "catchLoc");
+          var hasFinally = hasOwn.call(entry, "finallyLoc");
+
+          if (hasCatch && hasFinally) {
+            if (this.prev < entry.catchLoc) {
+              return handle(entry.catchLoc, true);
+            } else if (this.prev < entry.finallyLoc) {
+              return handle(entry.finallyLoc);
+            }
+
+          } else if (hasCatch) {
+            if (this.prev < entry.catchLoc) {
+              return handle(entry.catchLoc, true);
+            }
+
+          } else if (hasFinally) {
+            if (this.prev < entry.finallyLoc) {
+              return handle(entry.finallyLoc);
+            }
+
+          } else {
+            throw new Error("try statement without catch or finally");
+          }
+        }
+      }
+    },
+
+    abrupt: function(type, arg) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.tryLoc <= this.prev &&
+            hasOwn.call(entry, "finallyLoc") &&
+            this.prev < entry.finallyLoc) {
+          var finallyEntry = entry;
+          break;
+        }
+      }
+
+      if (finallyEntry &&
+          (type === "break" ||
+           type === "continue") &&
+          finallyEntry.tryLoc <= arg &&
+          arg <= finallyEntry.finallyLoc) {
+        // Ignore the finally entry if control is not jumping to a
+        // location outside the try/catch block.
+        finallyEntry = null;
+      }
+
+      var record = finallyEntry ? finallyEntry.completion : {};
+      record.type = type;
+      record.arg = arg;
+
+      if (finallyEntry) {
+        this.method = "next";
+        this.next = finallyEntry.finallyLoc;
+        return ContinueSentinel;
+      }
+
+      return this.complete(record);
+    },
+
+    complete: function(record, afterLoc) {
+      if (record.type === "throw") {
+        throw record.arg;
+      }
+
+      if (record.type === "break" ||
+          record.type === "continue") {
+        this.next = record.arg;
+      } else if (record.type === "return") {
+        this.rval = this.arg = record.arg;
+        this.method = "return";
+        this.next = "end";
+      } else if (record.type === "normal" && afterLoc) {
+        this.next = afterLoc;
+      }
+
+      return ContinueSentinel;
+    },
+
+    finish: function(finallyLoc) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.finallyLoc === finallyLoc) {
+          this.complete(entry.completion, entry.afterLoc);
+          resetTryEntry(entry);
+          return ContinueSentinel;
+        }
+      }
+    },
+
+    "catch": function(tryLoc) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.tryLoc === tryLoc) {
+          var record = entry.completion;
+          if (record.type === "throw") {
+            var thrown = record.arg;
+            resetTryEntry(entry);
+          }
+          return thrown;
+        }
+      }
+
+      // The context.catch method must only be called with a location
+      // argument that corresponds to a known catch block.
+      throw new Error("illegal catch attempt");
+    },
+
+    delegateYield: function(iterable, resultName, nextLoc) {
+      this.delegate = {
+        iterator: values(iterable),
+        resultName: resultName,
+        nextLoc: nextLoc
+      };
+
+      if (this.method === "next") {
+        // Deliberately forget the last sent value so that we don't
+        // accidentally pass it on to the delegate.
+        this.arg = undefined;
+      }
+
+      return ContinueSentinel;
+    }
+  };
+})(
+  // In sloppy mode, unbound `this` refers to the global object, fallback to
+  // Function constructor if we're in global strict mode. That is sadly a form
+  // of indirect eval which violates Content Security Policy.
+  (function() {
+    return this || (typeof self === "object" && self);
+  })() || Function("return this")()
+);
+
+
+/***/ }),
+
+/***/ 4:
 /*!************************************************************************!*\
   !*** C:/Users/Apple/Desktop/study/13-网易严选/project_app_wyyx/pages.json ***!
   \************************************************************************/
@@ -7621,7 +10202,8 @@ module.exports = g;
 
 
 /***/ }),
-/* 5 */
+
+/***/ 5:
 /*!*******************************************************!*\
   !*** ./node_modules/@dcloudio/uni-stat/dist/index.js ***!
   \*******************************************************/
@@ -8507,7 +11089,8 @@ main();
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 
 /***/ }),
-/* 6 */
+
+/***/ 6:
 /*!******************************************************!*\
   !*** ./node_modules/@dcloudio/uni-stat/package.json ***!
   \******************************************************/
@@ -8517,7 +11100,8 @@ main();
 module.exports = {"_from":"@dcloudio/uni-stat@alpha","_id":"@dcloudio/uni-stat@2.0.0-alpha-25720200116005","_inBundle":false,"_integrity":"sha512-RZFw3WAaS/CZTzzv9JPaWvmoNitojD/06vPdHSzlqZi8GbuE222lFuyochEjrGkG8rPPrWHAnwfoPBuQVtkfdg==","_location":"/@dcloudio/uni-stat","_phantomChildren":{},"_requested":{"type":"tag","registry":true,"raw":"@dcloudio/uni-stat@alpha","name":"@dcloudio/uni-stat","escapedName":"@dcloudio%2funi-stat","scope":"@dcloudio","rawSpec":"alpha","saveSpec":null,"fetchSpec":"alpha"},"_requiredBy":["#USER","/","/@dcloudio/vue-cli-plugin-uni"],"_resolved":"https://registry.npmjs.org/@dcloudio/uni-stat/-/uni-stat-2.0.0-alpha-25720200116005.tgz","_shasum":"08bb17aba91c84a981f33d74153aa3dd07b578ad","_spec":"@dcloudio/uni-stat@alpha","_where":"/Users/guoshengqiang/Documents/dcloud-plugins/alpha/uniapp-cli","author":"","bugs":{"url":"https://github.com/dcloudio/uni-app/issues"},"bundleDependencies":false,"deprecated":false,"description":"","devDependencies":{"@babel/core":"^7.5.5","@babel/preset-env":"^7.5.5","eslint":"^6.1.0","rollup":"^1.19.3","rollup-plugin-babel":"^4.3.3","rollup-plugin-clear":"^2.0.7","rollup-plugin-commonjs":"^10.0.2","rollup-plugin-copy":"^3.1.0","rollup-plugin-eslint":"^7.0.0","rollup-plugin-json":"^4.0.0","rollup-plugin-node-resolve":"^5.2.0","rollup-plugin-replace":"^2.2.0","rollup-plugin-uglify":"^6.0.2"},"files":["dist","package.json","LICENSE"],"gitHead":"a129bde60de35f7ef497f43d5a45b4556231995c","homepage":"https://github.com/dcloudio/uni-app#readme","license":"Apache-2.0","main":"dist/index.js","name":"@dcloudio/uni-stat","repository":{"type":"git","url":"git+https://github.com/dcloudio/uni-app.git","directory":"packages/uni-stat"},"scripts":{"build":"NODE_ENV=production rollup -c rollup.config.js","dev":"NODE_ENV=development rollup -w -c rollup.config.js"},"version":"2.0.0-alpha-25720200116005"};
 
 /***/ }),
-/* 7 */
+
+/***/ 7:
 /*!*****************************************************************************************!*\
   !*** C:/Users/Apple/Desktop/study/13-网易严选/project_app_wyyx/pages.json?{"type":"style"} ***!
   \*****************************************************************************************/
@@ -8528,7 +11112,8 @@ module.exports = {"_from":"@dcloudio/uni-stat@alpha","_id":"@dcloudio/uni-stat@2
 Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default = { "pages": { "pages/index/index": { "navigationBarTitleText": "网易严选" }, "pages/product/product": { "navigationBarTitleText": "详情展示" }, "pages/set/set": { "navigationBarTitleText": "设置" }, "pages/userinfo/userinfo": { "navigationBarTitleText": "修改资料" }, "pages/cart/cart": { "navigationBarTitleText": "购物车" }, "pages/public/login": { "navigationBarTitleText": "", "navigationStyle": "custom" }, "pages/user/user": { "navigationBarTitleText": "我的", "navigationStyle": "custom" }, "pages/detail/detail": { "navigationBarTitleText": "" }, "pages/order/order": { "navigationBarTitleText": "我的订单" }, "pages/money/money": {}, "pages/order/createOrder": { "navigationBarTitleText": "创建订单" }, "pages/address/address": { "navigationBarTitleText": "收货地址" }, "pages/address/addressManage": { "navigationBarTitleText": "" }, "pages/money/pay": { "navigationBarTitleText": "支付" }, "pages/money/paySuccess": { "navigationBarTitleText": "支付成功" }, "pages/notice/notice": { "navigationBarTitleText": "通知" }, "pages/category/category": { "navigationBarTitleText": "分类" }, "pages/product/list": { "enablePullDownRefresh": true, "navigationBarTitleText": "商品列表" }, "pages/buy/buy": { "navigationBarTitleText": "值得买" } }, "globalStyle": { "navigationBarTextStyle": "black", "navigationBarTitleText": "网易严选", "navigationBarBackgroundColor": "#55aa7f", "backgroundColor": "#f8f8f8" } };exports.default = _default;
 
 /***/ }),
-/* 8 */
+
+/***/ 8:
 /*!****************************************************************************************!*\
   !*** C:/Users/Apple/Desktop/study/13-网易严选/project_app_wyyx/pages.json?{"type":"stat"} ***!
   \****************************************************************************************/
@@ -8539,7 +11124,8 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default = { "appid": "" };exports.default = _default;
 
 /***/ }),
-/* 9 */
+
+/***/ 9:
 /*!****************************************************************************!*\
   !*** C:/Users/Apple/Desktop/study/13-网易严选/project_app_wyyx/store/index.js ***!
   \****************************************************************************/
@@ -8584,2573 +11170,7 @@ var store = new _vuex.default.Store({
 store;exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 
-/***/ }),
-/* 10 */
-/*!********************************************!*\
-  !*** ./node_modules/vuex/dist/vuex.esm.js ***!
-  \********************************************/
-/*! exports provided: Store, install, mapState, mapMutations, mapGetters, mapActions, createNamespacedHelpers, default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Store", function() { return Store; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "install", function() { return install; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mapState", function() { return mapState; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mapMutations", function() { return mapMutations; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mapGetters", function() { return mapGetters; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mapActions", function() { return mapActions; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createNamespacedHelpers", function() { return createNamespacedHelpers; });
-/**
- * vuex v3.0.1
- * (c) 2017 Evan You
- * @license MIT
- */
-var applyMixin = function (Vue) {
-  var version = Number(Vue.version.split('.')[0]);
-
-  if (version >= 2) {
-    Vue.mixin({ beforeCreate: vuexInit });
-  } else {
-    // override init and inject vuex init procedure
-    // for 1.x backwards compatibility.
-    var _init = Vue.prototype._init;
-    Vue.prototype._init = function (options) {
-      if ( options === void 0 ) options = {};
-
-      options.init = options.init
-        ? [vuexInit].concat(options.init)
-        : vuexInit;
-      _init.call(this, options);
-    };
-  }
-
-  /**
-   * Vuex init hook, injected into each instances init hooks list.
-   */
-
-  function vuexInit () {
-    var options = this.$options;
-    // store injection
-    if (options.store) {
-      this.$store = typeof options.store === 'function'
-        ? options.store()
-        : options.store;
-    } else if (options.parent && options.parent.$store) {
-      this.$store = options.parent.$store;
-    }
-  }
-};
-
-var devtoolHook =
-  typeof window !== 'undefined' &&
-  window.__VUE_DEVTOOLS_GLOBAL_HOOK__;
-
-function devtoolPlugin (store) {
-  if (!devtoolHook) { return }
-
-  store._devtoolHook = devtoolHook;
-
-  devtoolHook.emit('vuex:init', store);
-
-  devtoolHook.on('vuex:travel-to-state', function (targetState) {
-    store.replaceState(targetState);
-  });
-
-  store.subscribe(function (mutation, state) {
-    devtoolHook.emit('vuex:mutation', mutation, state);
-  });
-}
-
-/**
- * Get the first item that pass the test
- * by second argument function
- *
- * @param {Array} list
- * @param {Function} f
- * @return {*}
- */
-/**
- * Deep copy the given object considering circular structure.
- * This function caches all nested objects and its copies.
- * If it detects circular structure, use cached copy to avoid infinite loop.
- *
- * @param {*} obj
- * @param {Array<Object>} cache
- * @return {*}
- */
-
-
-/**
- * forEach for object
- */
-function forEachValue (obj, fn) {
-  Object.keys(obj).forEach(function (key) { return fn(obj[key], key); });
-}
-
-function isObject (obj) {
-  return obj !== null && typeof obj === 'object'
-}
-
-function isPromise (val) {
-  return val && typeof val.then === 'function'
-}
-
-function assert (condition, msg) {
-  if (!condition) { throw new Error(("[vuex] " + msg)) }
-}
-
-var Module = function Module (rawModule, runtime) {
-  this.runtime = runtime;
-  this._children = Object.create(null);
-  this._rawModule = rawModule;
-  var rawState = rawModule.state;
-  this.state = (typeof rawState === 'function' ? rawState() : rawState) || {};
-};
-
-var prototypeAccessors$1 = { namespaced: { configurable: true } };
-
-prototypeAccessors$1.namespaced.get = function () {
-  return !!this._rawModule.namespaced
-};
-
-Module.prototype.addChild = function addChild (key, module) {
-  this._children[key] = module;
-};
-
-Module.prototype.removeChild = function removeChild (key) {
-  delete this._children[key];
-};
-
-Module.prototype.getChild = function getChild (key) {
-  return this._children[key]
-};
-
-Module.prototype.update = function update (rawModule) {
-  this._rawModule.namespaced = rawModule.namespaced;
-  if (rawModule.actions) {
-    this._rawModule.actions = rawModule.actions;
-  }
-  if (rawModule.mutations) {
-    this._rawModule.mutations = rawModule.mutations;
-  }
-  if (rawModule.getters) {
-    this._rawModule.getters = rawModule.getters;
-  }
-};
-
-Module.prototype.forEachChild = function forEachChild (fn) {
-  forEachValue(this._children, fn);
-};
-
-Module.prototype.forEachGetter = function forEachGetter (fn) {
-  if (this._rawModule.getters) {
-    forEachValue(this._rawModule.getters, fn);
-  }
-};
-
-Module.prototype.forEachAction = function forEachAction (fn) {
-  if (this._rawModule.actions) {
-    forEachValue(this._rawModule.actions, fn);
-  }
-};
-
-Module.prototype.forEachMutation = function forEachMutation (fn) {
-  if (this._rawModule.mutations) {
-    forEachValue(this._rawModule.mutations, fn);
-  }
-};
-
-Object.defineProperties( Module.prototype, prototypeAccessors$1 );
-
-var ModuleCollection = function ModuleCollection (rawRootModule) {
-  // register root module (Vuex.Store options)
-  this.register([], rawRootModule, false);
-};
-
-ModuleCollection.prototype.get = function get (path) {
-  return path.reduce(function (module, key) {
-    return module.getChild(key)
-  }, this.root)
-};
-
-ModuleCollection.prototype.getNamespace = function getNamespace (path) {
-  var module = this.root;
-  return path.reduce(function (namespace, key) {
-    module = module.getChild(key);
-    return namespace + (module.namespaced ? key + '/' : '')
-  }, '')
-};
-
-ModuleCollection.prototype.update = function update$1 (rawRootModule) {
-  update([], this.root, rawRootModule);
-};
-
-ModuleCollection.prototype.register = function register (path, rawModule, runtime) {
-    var this$1 = this;
-    if ( runtime === void 0 ) runtime = true;
-
-  if (true) {
-    assertRawModule(path, rawModule);
-  }
-
-  var newModule = new Module(rawModule, runtime);
-  if (path.length === 0) {
-    this.root = newModule;
-  } else {
-    var parent = this.get(path.slice(0, -1));
-    parent.addChild(path[path.length - 1], newModule);
-  }
-
-  // register nested modules
-  if (rawModule.modules) {
-    forEachValue(rawModule.modules, function (rawChildModule, key) {
-      this$1.register(path.concat(key), rawChildModule, runtime);
-    });
-  }
-};
-
-ModuleCollection.prototype.unregister = function unregister (path) {
-  var parent = this.get(path.slice(0, -1));
-  var key = path[path.length - 1];
-  if (!parent.getChild(key).runtime) { return }
-
-  parent.removeChild(key);
-};
-
-function update (path, targetModule, newModule) {
-  if (true) {
-    assertRawModule(path, newModule);
-  }
-
-  // update target module
-  targetModule.update(newModule);
-
-  // update nested modules
-  if (newModule.modules) {
-    for (var key in newModule.modules) {
-      if (!targetModule.getChild(key)) {
-        if (true) {
-          console.warn(
-            "[vuex] trying to add a new module '" + key + "' on hot reloading, " +
-            'manual reload is needed'
-          );
-        }
-        return
-      }
-      update(
-        path.concat(key),
-        targetModule.getChild(key),
-        newModule.modules[key]
-      );
-    }
-  }
-}
-
-var functionAssert = {
-  assert: function (value) { return typeof value === 'function'; },
-  expected: 'function'
-};
-
-var objectAssert = {
-  assert: function (value) { return typeof value === 'function' ||
-    (typeof value === 'object' && typeof value.handler === 'function'); },
-  expected: 'function or object with "handler" function'
-};
-
-var assertTypes = {
-  getters: functionAssert,
-  mutations: functionAssert,
-  actions: objectAssert
-};
-
-function assertRawModule (path, rawModule) {
-  Object.keys(assertTypes).forEach(function (key) {
-    if (!rawModule[key]) { return }
-
-    var assertOptions = assertTypes[key];
-
-    forEachValue(rawModule[key], function (value, type) {
-      assert(
-        assertOptions.assert(value),
-        makeAssertionMessage(path, key, type, value, assertOptions.expected)
-      );
-    });
-  });
-}
-
-function makeAssertionMessage (path, key, type, value, expected) {
-  var buf = key + " should be " + expected + " but \"" + key + "." + type + "\"";
-  if (path.length > 0) {
-    buf += " in module \"" + (path.join('.')) + "\"";
-  }
-  buf += " is " + (JSON.stringify(value)) + ".";
-  return buf
-}
-
-var Vue; // bind on install
-
-var Store = function Store (options) {
-  var this$1 = this;
-  if ( options === void 0 ) options = {};
-
-  // Auto install if it is not done yet and `window` has `Vue`.
-  // To allow users to avoid auto-installation in some cases,
-  // this code should be placed here. See #731
-  if (!Vue && typeof window !== 'undefined' && window.Vue) {
-    install(window.Vue);
-  }
-
-  if (true) {
-    assert(Vue, "must call Vue.use(Vuex) before creating a store instance.");
-    assert(typeof Promise !== 'undefined', "vuex requires a Promise polyfill in this browser.");
-    assert(this instanceof Store, "Store must be called with the new operator.");
-  }
-
-  var plugins = options.plugins; if ( plugins === void 0 ) plugins = [];
-  var strict = options.strict; if ( strict === void 0 ) strict = false;
-
-  var state = options.state; if ( state === void 0 ) state = {};
-  if (typeof state === 'function') {
-    state = state() || {};
-  }
-
-  // store internal state
-  this._committing = false;
-  this._actions = Object.create(null);
-  this._actionSubscribers = [];
-  this._mutations = Object.create(null);
-  this._wrappedGetters = Object.create(null);
-  this._modules = new ModuleCollection(options);
-  this._modulesNamespaceMap = Object.create(null);
-  this._subscribers = [];
-  this._watcherVM = new Vue();
-
-  // bind commit and dispatch to self
-  var store = this;
-  var ref = this;
-  var dispatch = ref.dispatch;
-  var commit = ref.commit;
-  this.dispatch = function boundDispatch (type, payload) {
-    return dispatch.call(store, type, payload)
-  };
-  this.commit = function boundCommit (type, payload, options) {
-    return commit.call(store, type, payload, options)
-  };
-
-  // strict mode
-  this.strict = strict;
-
-  // init root module.
-  // this also recursively registers all sub-modules
-  // and collects all module getters inside this._wrappedGetters
-  installModule(this, state, [], this._modules.root);
-
-  // initialize the store vm, which is responsible for the reactivity
-  // (also registers _wrappedGetters as computed properties)
-  resetStoreVM(this, state);
-
-  // apply plugins
-  plugins.forEach(function (plugin) { return plugin(this$1); });
-
-  if (Vue.config.devtools) {
-    devtoolPlugin(this);
-  }
-};
-
-var prototypeAccessors = { state: { configurable: true } };
-
-prototypeAccessors.state.get = function () {
-  return this._vm._data.$$state
-};
-
-prototypeAccessors.state.set = function (v) {
-  if (true) {
-    assert(false, "Use store.replaceState() to explicit replace store state.");
-  }
-};
-
-Store.prototype.commit = function commit (_type, _payload, _options) {
-    var this$1 = this;
-
-  // check object-style commit
-  var ref = unifyObjectStyle(_type, _payload, _options);
-    var type = ref.type;
-    var payload = ref.payload;
-    var options = ref.options;
-
-  var mutation = { type: type, payload: payload };
-  var entry = this._mutations[type];
-  if (!entry) {
-    if (true) {
-      console.error(("[vuex] unknown mutation type: " + type));
-    }
-    return
-  }
-  this._withCommit(function () {
-    entry.forEach(function commitIterator (handler) {
-      handler(payload);
-    });
-  });
-  this._subscribers.forEach(function (sub) { return sub(mutation, this$1.state); });
-
-  if (
-     true &&
-    options && options.silent
-  ) {
-    console.warn(
-      "[vuex] mutation type: " + type + ". Silent option has been removed. " +
-      'Use the filter functionality in the vue-devtools'
-    );
-  }
-};
-
-Store.prototype.dispatch = function dispatch (_type, _payload) {
-    var this$1 = this;
-
-  // check object-style dispatch
-  var ref = unifyObjectStyle(_type, _payload);
-    var type = ref.type;
-    var payload = ref.payload;
-
-  var action = { type: type, payload: payload };
-  var entry = this._actions[type];
-  if (!entry) {
-    if (true) {
-      console.error(("[vuex] unknown action type: " + type));
-    }
-    return
-  }
-
-  this._actionSubscribers.forEach(function (sub) { return sub(action, this$1.state); });
-
-  return entry.length > 1
-    ? Promise.all(entry.map(function (handler) { return handler(payload); }))
-    : entry[0](payload)
-};
-
-Store.prototype.subscribe = function subscribe (fn) {
-  return genericSubscribe(fn, this._subscribers)
-};
-
-Store.prototype.subscribeAction = function subscribeAction (fn) {
-  return genericSubscribe(fn, this._actionSubscribers)
-};
-
-Store.prototype.watch = function watch (getter, cb, options) {
-    var this$1 = this;
-
-  if (true) {
-    assert(typeof getter === 'function', "store.watch only accepts a function.");
-  }
-  return this._watcherVM.$watch(function () { return getter(this$1.state, this$1.getters); }, cb, options)
-};
-
-Store.prototype.replaceState = function replaceState (state) {
-    var this$1 = this;
-
-  this._withCommit(function () {
-    this$1._vm._data.$$state = state;
-  });
-};
-
-Store.prototype.registerModule = function registerModule (path, rawModule, options) {
-    if ( options === void 0 ) options = {};
-
-  if (typeof path === 'string') { path = [path]; }
-
-  if (true) {
-    assert(Array.isArray(path), "module path must be a string or an Array.");
-    assert(path.length > 0, 'cannot register the root module by using registerModule.');
-  }
-
-  this._modules.register(path, rawModule);
-  installModule(this, this.state, path, this._modules.get(path), options.preserveState);
-  // reset store to update getters...
-  resetStoreVM(this, this.state);
-};
-
-Store.prototype.unregisterModule = function unregisterModule (path) {
-    var this$1 = this;
-
-  if (typeof path === 'string') { path = [path]; }
-
-  if (true) {
-    assert(Array.isArray(path), "module path must be a string or an Array.");
-  }
-
-  this._modules.unregister(path);
-  this._withCommit(function () {
-    var parentState = getNestedState(this$1.state, path.slice(0, -1));
-    Vue.delete(parentState, path[path.length - 1]);
-  });
-  resetStore(this);
-};
-
-Store.prototype.hotUpdate = function hotUpdate (newOptions) {
-  this._modules.update(newOptions);
-  resetStore(this, true);
-};
-
-Store.prototype._withCommit = function _withCommit (fn) {
-  var committing = this._committing;
-  this._committing = true;
-  fn();
-  this._committing = committing;
-};
-
-Object.defineProperties( Store.prototype, prototypeAccessors );
-
-function genericSubscribe (fn, subs) {
-  if (subs.indexOf(fn) < 0) {
-    subs.push(fn);
-  }
-  return function () {
-    var i = subs.indexOf(fn);
-    if (i > -1) {
-      subs.splice(i, 1);
-    }
-  }
-}
-
-function resetStore (store, hot) {
-  store._actions = Object.create(null);
-  store._mutations = Object.create(null);
-  store._wrappedGetters = Object.create(null);
-  store._modulesNamespaceMap = Object.create(null);
-  var state = store.state;
-  // init all modules
-  installModule(store, state, [], store._modules.root, true);
-  // reset vm
-  resetStoreVM(store, state, hot);
-}
-
-function resetStoreVM (store, state, hot) {
-  var oldVm = store._vm;
-
-  // bind store public getters
-  store.getters = {};
-  var wrappedGetters = store._wrappedGetters;
-  var computed = {};
-  forEachValue(wrappedGetters, function (fn, key) {
-    // use computed to leverage its lazy-caching mechanism
-    computed[key] = function () { return fn(store); };
-    Object.defineProperty(store.getters, key, {
-      get: function () { return store._vm[key]; },
-      enumerable: true // for local getters
-    });
-  });
-
-  // use a Vue instance to store the state tree
-  // suppress warnings just in case the user has added
-  // some funky global mixins
-  var silent = Vue.config.silent;
-  Vue.config.silent = true;
-  store._vm = new Vue({
-    data: {
-      $$state: state
-    },
-    computed: computed
-  });
-  Vue.config.silent = silent;
-
-  // enable strict mode for new vm
-  if (store.strict) {
-    enableStrictMode(store);
-  }
-
-  if (oldVm) {
-    if (hot) {
-      // dispatch changes in all subscribed watchers
-      // to force getter re-evaluation for hot reloading.
-      store._withCommit(function () {
-        oldVm._data.$$state = null;
-      });
-    }
-    Vue.nextTick(function () { return oldVm.$destroy(); });
-  }
-}
-
-function installModule (store, rootState, path, module, hot) {
-  var isRoot = !path.length;
-  var namespace = store._modules.getNamespace(path);
-
-  // register in namespace map
-  if (module.namespaced) {
-    store._modulesNamespaceMap[namespace] = module;
-  }
-
-  // set state
-  if (!isRoot && !hot) {
-    var parentState = getNestedState(rootState, path.slice(0, -1));
-    var moduleName = path[path.length - 1];
-    store._withCommit(function () {
-      Vue.set(parentState, moduleName, module.state);
-    });
-  }
-
-  var local = module.context = makeLocalContext(store, namespace, path);
-
-  module.forEachMutation(function (mutation, key) {
-    var namespacedType = namespace + key;
-    registerMutation(store, namespacedType, mutation, local);
-  });
-
-  module.forEachAction(function (action, key) {
-    var type = action.root ? key : namespace + key;
-    var handler = action.handler || action;
-    registerAction(store, type, handler, local);
-  });
-
-  module.forEachGetter(function (getter, key) {
-    var namespacedType = namespace + key;
-    registerGetter(store, namespacedType, getter, local);
-  });
-
-  module.forEachChild(function (child, key) {
-    installModule(store, rootState, path.concat(key), child, hot);
-  });
-}
-
-/**
- * make localized dispatch, commit, getters and state
- * if there is no namespace, just use root ones
- */
-function makeLocalContext (store, namespace, path) {
-  var noNamespace = namespace === '';
-
-  var local = {
-    dispatch: noNamespace ? store.dispatch : function (_type, _payload, _options) {
-      var args = unifyObjectStyle(_type, _payload, _options);
-      var payload = args.payload;
-      var options = args.options;
-      var type = args.type;
-
-      if (!options || !options.root) {
-        type = namespace + type;
-        if ( true && !store._actions[type]) {
-          console.error(("[vuex] unknown local action type: " + (args.type) + ", global type: " + type));
-          return
-        }
-      }
-
-      return store.dispatch(type, payload)
-    },
-
-    commit: noNamespace ? store.commit : function (_type, _payload, _options) {
-      var args = unifyObjectStyle(_type, _payload, _options);
-      var payload = args.payload;
-      var options = args.options;
-      var type = args.type;
-
-      if (!options || !options.root) {
-        type = namespace + type;
-        if ( true && !store._mutations[type]) {
-          console.error(("[vuex] unknown local mutation type: " + (args.type) + ", global type: " + type));
-          return
-        }
-      }
-
-      store.commit(type, payload, options);
-    }
-  };
-
-  // getters and state object must be gotten lazily
-  // because they will be changed by vm update
-  Object.defineProperties(local, {
-    getters: {
-      get: noNamespace
-        ? function () { return store.getters; }
-        : function () { return makeLocalGetters(store, namespace); }
-    },
-    state: {
-      get: function () { return getNestedState(store.state, path); }
-    }
-  });
-
-  return local
-}
-
-function makeLocalGetters (store, namespace) {
-  var gettersProxy = {};
-
-  var splitPos = namespace.length;
-  Object.keys(store.getters).forEach(function (type) {
-    // skip if the target getter is not match this namespace
-    if (type.slice(0, splitPos) !== namespace) { return }
-
-    // extract local getter type
-    var localType = type.slice(splitPos);
-
-    // Add a port to the getters proxy.
-    // Define as getter property because
-    // we do not want to evaluate the getters in this time.
-    Object.defineProperty(gettersProxy, localType, {
-      get: function () { return store.getters[type]; },
-      enumerable: true
-    });
-  });
-
-  return gettersProxy
-}
-
-function registerMutation (store, type, handler, local) {
-  var entry = store._mutations[type] || (store._mutations[type] = []);
-  entry.push(function wrappedMutationHandler (payload) {
-    handler.call(store, local.state, payload);
-  });
-}
-
-function registerAction (store, type, handler, local) {
-  var entry = store._actions[type] || (store._actions[type] = []);
-  entry.push(function wrappedActionHandler (payload, cb) {
-    var res = handler.call(store, {
-      dispatch: local.dispatch,
-      commit: local.commit,
-      getters: local.getters,
-      state: local.state,
-      rootGetters: store.getters,
-      rootState: store.state
-    }, payload, cb);
-    if (!isPromise(res)) {
-      res = Promise.resolve(res);
-    }
-    if (store._devtoolHook) {
-      return res.catch(function (err) {
-        store._devtoolHook.emit('vuex:error', err);
-        throw err
-      })
-    } else {
-      return res
-    }
-  });
-}
-
-function registerGetter (store, type, rawGetter, local) {
-  if (store._wrappedGetters[type]) {
-    if (true) {
-      console.error(("[vuex] duplicate getter key: " + type));
-    }
-    return
-  }
-  store._wrappedGetters[type] = function wrappedGetter (store) {
-    return rawGetter(
-      local.state, // local state
-      local.getters, // local getters
-      store.state, // root state
-      store.getters // root getters
-    )
-  };
-}
-
-function enableStrictMode (store) {
-  store._vm.$watch(function () { return this._data.$$state }, function () {
-    if (true) {
-      assert(store._committing, "Do not mutate vuex store state outside mutation handlers.");
-    }
-  }, { deep: true, sync: true });
-}
-
-function getNestedState (state, path) {
-  return path.length
-    ? path.reduce(function (state, key) { return state[key]; }, state)
-    : state
-}
-
-function unifyObjectStyle (type, payload, options) {
-  if (isObject(type) && type.type) {
-    options = payload;
-    payload = type;
-    type = type.type;
-  }
-
-  if (true) {
-    assert(typeof type === 'string', ("Expects string as the type, but found " + (typeof type) + "."));
-  }
-
-  return { type: type, payload: payload, options: options }
-}
-
-function install (_Vue) {
-  if (Vue && _Vue === Vue) {
-    if (true) {
-      console.error(
-        '[vuex] already installed. Vue.use(Vuex) should be called only once.'
-      );
-    }
-    return
-  }
-  Vue = _Vue;
-  applyMixin(Vue);
-}
-
-var mapState = normalizeNamespace(function (namespace, states) {
-  var res = {};
-  normalizeMap(states).forEach(function (ref) {
-    var key = ref.key;
-    var val = ref.val;
-
-    res[key] = function mappedState () {
-      var state = this.$store.state;
-      var getters = this.$store.getters;
-      if (namespace) {
-        var module = getModuleByNamespace(this.$store, 'mapState', namespace);
-        if (!module) {
-          return
-        }
-        state = module.context.state;
-        getters = module.context.getters;
-      }
-      return typeof val === 'function'
-        ? val.call(this, state, getters)
-        : state[val]
-    };
-    // mark vuex getter for devtools
-    res[key].vuex = true;
-  });
-  return res
-});
-
-var mapMutations = normalizeNamespace(function (namespace, mutations) {
-  var res = {};
-  normalizeMap(mutations).forEach(function (ref) {
-    var key = ref.key;
-    var val = ref.val;
-
-    res[key] = function mappedMutation () {
-      var args = [], len = arguments.length;
-      while ( len-- ) args[ len ] = arguments[ len ];
-
-      var commit = this.$store.commit;
-      if (namespace) {
-        var module = getModuleByNamespace(this.$store, 'mapMutations', namespace);
-        if (!module) {
-          return
-        }
-        commit = module.context.commit;
-      }
-      return typeof val === 'function'
-        ? val.apply(this, [commit].concat(args))
-        : commit.apply(this.$store, [val].concat(args))
-    };
-  });
-  return res
-});
-
-var mapGetters = normalizeNamespace(function (namespace, getters) {
-  var res = {};
-  normalizeMap(getters).forEach(function (ref) {
-    var key = ref.key;
-    var val = ref.val;
-
-    val = namespace + val;
-    res[key] = function mappedGetter () {
-      if (namespace && !getModuleByNamespace(this.$store, 'mapGetters', namespace)) {
-        return
-      }
-      if ( true && !(val in this.$store.getters)) {
-        console.error(("[vuex] unknown getter: " + val));
-        return
-      }
-      return this.$store.getters[val]
-    };
-    // mark vuex getter for devtools
-    res[key].vuex = true;
-  });
-  return res
-});
-
-var mapActions = normalizeNamespace(function (namespace, actions) {
-  var res = {};
-  normalizeMap(actions).forEach(function (ref) {
-    var key = ref.key;
-    var val = ref.val;
-
-    res[key] = function mappedAction () {
-      var args = [], len = arguments.length;
-      while ( len-- ) args[ len ] = arguments[ len ];
-
-      var dispatch = this.$store.dispatch;
-      if (namespace) {
-        var module = getModuleByNamespace(this.$store, 'mapActions', namespace);
-        if (!module) {
-          return
-        }
-        dispatch = module.context.dispatch;
-      }
-      return typeof val === 'function'
-        ? val.apply(this, [dispatch].concat(args))
-        : dispatch.apply(this.$store, [val].concat(args))
-    };
-  });
-  return res
-});
-
-var createNamespacedHelpers = function (namespace) { return ({
-  mapState: mapState.bind(null, namespace),
-  mapGetters: mapGetters.bind(null, namespace),
-  mapMutations: mapMutations.bind(null, namespace),
-  mapActions: mapActions.bind(null, namespace)
-}); };
-
-function normalizeMap (map) {
-  return Array.isArray(map)
-    ? map.map(function (key) { return ({ key: key, val: key }); })
-    : Object.keys(map).map(function (key) { return ({ key: key, val: map[key] }); })
-}
-
-function normalizeNamespace (fn) {
-  return function (namespace, map) {
-    if (typeof namespace !== 'string') {
-      map = namespace;
-      namespace = '';
-    } else if (namespace.charAt(namespace.length - 1) !== '/') {
-      namespace += '/';
-    }
-    return fn(namespace, map)
-  }
-}
-
-function getModuleByNamespace (store, helper, namespace) {
-  var module = store._modulesNamespaceMap[namespace];
-  if ( true && !module) {
-    console.error(("[vuex] module namespace not found in " + helper + "(): " + namespace));
-  }
-  return module
-}
-
-var index_esm = {
-  Store: Store,
-  install: install,
-  version: '3.0.1',
-  mapState: mapState,
-  mapMutations: mapMutations,
-  mapGetters: mapGetters,
-  mapActions: mapActions,
-  createNamespacedHelpers: createNamespacedHelpers
-};
-
-
-/* harmony default export */ __webpack_exports__["default"] = (index_esm);
-
-
-/***/ }),
-/* 11 */,
-/* 12 */,
-/* 13 */,
-/* 14 */,
-/* 15 */,
-/* 16 */
-/*!**********************************************************************************************************!*\
-  !*** ./node_modules/@dcloudio/vue-cli-plugin-uni/packages/vue-loader/lib/runtime/componentNormalizer.js ***!
-  \**********************************************************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return normalizeComponent; });
-/* globals __VUE_SSR_CONTEXT__ */
-
-// IMPORTANT: Do NOT use ES2015 features in this file (except for modules).
-// This module is a runtime utility for cleaner component module output and will
-// be included in the final webpack user bundle.
-
-function normalizeComponent (
-  scriptExports,
-  render,
-  staticRenderFns,
-  functionalTemplate,
-  injectStyles,
-  scopeId,
-  moduleIdentifier, /* server only */
-  shadowMode, /* vue-cli only */
-  components, // fixed by xxxxxx auto components
-  renderjs // fixed by xxxxxx renderjs
-) {
-  // Vue.extend constructor export interop
-  var options = typeof scriptExports === 'function'
-    ? scriptExports.options
-    : scriptExports
-
-  // fixed by xxxxxx auto components
-  if (components) {
-    options.components = Object.assign(components, options.components || {})
-  }
-  // fixed by xxxxxx renderjs
-  if (renderjs) {
-    (renderjs.beforeCreate || (renderjs.beforeCreate = [])).unshift(function() {
-      this[renderjs.__module] = this
-    });
-    (options.mixins || (options.mixins = [])).push(renderjs)
-  }
-
-  // render functions
-  if (render) {
-    options.render = render
-    options.staticRenderFns = staticRenderFns
-    options._compiled = true
-  }
-
-  // functional template
-  if (functionalTemplate) {
-    options.functional = true
-  }
-
-  // scopedId
-  if (scopeId) {
-    options._scopeId = 'data-v-' + scopeId
-  }
-
-  var hook
-  if (moduleIdentifier) { // server build
-    hook = function (context) {
-      // 2.3 injection
-      context =
-        context || // cached call
-        (this.$vnode && this.$vnode.ssrContext) || // stateful
-        (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext) // functional
-      // 2.2 with runInNewContext: true
-      if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
-        context = __VUE_SSR_CONTEXT__
-      }
-      // inject component styles
-      if (injectStyles) {
-        injectStyles.call(this, context)
-      }
-      // register component module identifier for async chunk inferrence
-      if (context && context._registeredComponents) {
-        context._registeredComponents.add(moduleIdentifier)
-      }
-    }
-    // used by ssr in case component is cached and beforeCreate
-    // never gets called
-    options._ssrRegister = hook
-  } else if (injectStyles) {
-    hook = shadowMode
-      ? function () { injectStyles.call(this, this.$root.$options.shadowRoot) }
-      : injectStyles
-  }
-
-  if (hook) {
-    if (options.functional) {
-      // for template-only hot-reload because in that case the render fn doesn't
-      // go through the normalizer
-      options._injectStyles = hook
-      // register for functioal component in vue file
-      var originalRender = options.render
-      options.render = function renderWithStyleInjection (h, context) {
-        hook.call(context)
-        return originalRender(h, context)
-      }
-    } else {
-      // inject component registration as beforeCreate hook
-      var existing = options.beforeCreate
-      options.beforeCreate = existing
-        ? [].concat(existing, hook)
-        : [hook]
-    }
-  }
-
-  return {
-    exports: scriptExports,
-    options: options
-  }
-}
-
-
-/***/ }),
-/* 17 */
-/*!*********************************************************************!*\
-  !*** C:/Users/Apple/Desktop/study/13-网易严选/project_app_wyyx/Json.js ***!
-  \*********************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0; /* 用户 */
-var userInfo = {
-  status: 1,
-  data: {
-    id: 1,
-    mobile: 18888888888,
-    nickname: 'Leo yo',
-    portrait: 'http://img.61ef.cn/news/201409/28/2014092805595807.jpg' },
-
-  msg: '提示'
-
-  /* 首页轮播图 */ };
-var carouselList = [{
-  src: "/static/temp/banner3.jpg",
-  background: "rgb(203, 87, 60)" },
-
-{
-  src: "/static/temp/banner2.jpg",
-  background: "rgb(205, 215, 218)" },
-
-{
-  src: "/static/temp/banner4.jpg",
-  background: "rgb(183, 73, 69)" }];
-
-
-/* 商品列表 */
-var goodsList = [{
-  image: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553187020783&di=bac9dd78b36fd984502d404d231011c0&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201609%2F26%2F20160926173213_s5adi.jpeg",
-  image2: "http://pic.rmb.bdstatic.com/819a044daa66718c2c40a48c1ba971e6.jpeg",
-  image3: "http://img001.hc360.cn/y5/M00/1B/45/wKhQUVYFE0uEZ7zVAAAAAMj3H1w418.jpg",
-  title: "古黛妃 短袖t恤女夏装2019新款韩版宽松",
-  price: 179,
-  sales: 61 },
-
-{
-  image: "https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=4031878334,2682695508&fm=11&gp=0.jpg",
-  image2: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554013048&di=a3dc9fd1406dd7bad7fbb97b5489ec04&imgtype=jpg&er=1&src=http%3A%2F%2Fimg009.hc360.cn%2Fhb%2FnKo44ac2656F831c684507E3Da0E3a26841.jpg",
-  image3: "http://img.zcool.cn/community/017a4e58b4eab6a801219c77084373.jpg",
-  title: "潘歌针织连衣裙",
-  price: 78,
-  sales: 16 },
-
-{
-  image: "https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg",
-  image2: "http://m.360buyimg.com/n12/jfs/t247/42/1078640382/162559/3628a0b/53f5ad09N0dd79894.jpg%21q70.jpg",
-  image3: "http://ikids.61kids.com.cn/upload/2018-12-29/1546070626796114.jpg",
-  title: "巧谷2019春夏季新品新款女装",
-  price: 108.8,
-  sales: 5 },
-{
-  image: "https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=756705744,3505936868&fm=11&gp=0.jpg",
-  image2: "http://images.jaadee.com/images/201702/goods_img/30150_d85aed83521.jpg",
-  image3: "http://img13.360buyimg.com/popWaterMark/jfs/t865/120/206320620/138889/dcc94caa/550acedcN613e2a9d.jpg",
-  title: "私萱连衣裙",
-  price: 265,
-  sales: 88 },
-{
-  image: "https://img13.360buyimg.com/n8/jfs/t1/30343/20/1029/481370/5c449438Ecb46a15b/2b2adccb6dc742fd.jpg",
-  image2: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553418265666&di=d4a7f7eb0ae3c859edeb921641ee1c3a&imgtype=0&src=http%3A%2F%2Fimg003.hc360.cn%2Fy3%2FM02%2FF8%2F9F%2FwKhQh1TuSkGELIlQAAAAAPuLl4M987.jpg",
-  image3: "http://img.ef43.com.cn/product/2016/8/05100204b0c.jpg",
-  title: "娇诗茹 ulzzang原宿风学生潮韩版春夏短",
-  price: 422,
-  sales: 137 },
-{
-  image: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553187020783&di=bac9dd78b36fd984502d404d231011c0&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201609%2F26%2F20160926173213_s5adi.jpeg",
-  image2: "http://image5.suning.cn/uimg/b2c/newcatentries/0070158827-000000000622091973_2_800x800.jpg",
-  image3: "http://img.61ef.cn/news/201903/20/2019032009251784.jpg",
-  title: "古黛妃 短袖t恤女夏装2019新款韩版宽松",
-  price: 179,
-  sales: 95 }];
-
-
-
-/* 购物车 */
-var cartList = [{
-  id: 1,
-  image: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553005139&di=3368549edf9eee769a9bcb3fbbed2504&imgtype=jpg&er=1&src=http%3A%2F%2Fimg002.hc360.cn%2Fy3%2FM01%2F5F%2FDB%2FwKhQh1T7iceEGRdWAAAAADQvqk8733.jpg',
-  attr_val: '春装款 L',
-  stock: 15,
-  title: 'OVBE 长袖风衣',
-  price: 278.00,
-  number: 1 },
-
-{
-  id: 3,
-  image: 'https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=2319343996,1107396922&fm=26&gp=0.jpg',
-  attr_val: '激光导航 扫拖一体',
-  stock: 3,
-  title: '科沃斯 Ecovacs 扫地机器人',
-  price: 1348.00,
-  number: 5 },
-
-{
-  id: 4,
-  image: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=2668268226,1765897385&fm=26&gp=0.jpg',
-  attr_val: 'XL',
-  stock: 55,
-  title: '朵绒菲小西装',
-  price: 175.88,
-  number: 1 },
-
-{
-  id: 5,
-  image: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1552410549432&di=06dd3758053fb6d6362516f30a42d055&imgtype=0&src=http%3A%2F%2Fimgcache.mysodao.com%2Fimg3%2FM0A%2F67%2F42%2FCgAPD1vNSsHNm-TnAAEy61txQb4543_400x400x2.JPG',
-  attr_val: '520 #粉红色',
-  stock: 15,
-  title: '迪奥（Dior）烈艳唇膏',
-  price: 1089.00,
-  number: 1 },
-
-{
-  id: 6,
-  image: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1031875829,2994442603&fm=26&gp=0.jpg',
-  attr_val: '樱花味润手霜 30ml',
-  stock: 15,
-  title: "欧舒丹（L'OCCITANE）乳木果",
-  price: 128,
-  number: 1 },
-
-{
-  id: 7,
-  image: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553007107&di=390915aa8a022cf0b03c03340881b0e7&imgtype=jpg&er=1&src=http%3A%2F%2Fimg13.360buyimg.com%2Fn0%2Fjfs%2Ft646%2F285%2F736444951%2F480473%2Faa701c97%2F548176feN10c9ed7b.jpg',
-  attr_val: '特级 12个',
-  stock: 7,
-  title: '新疆阿克苏苹果 特级',
-  price: 58.8,
-  number: 10 },
-
-{
-  id: 8,
-  image: 'https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=2319343996,1107396922&fm=26&gp=0.jpg',
-  attr_val: '激光导航 扫拖一体',
-  stock: 15,
-  title: '科沃斯 Ecovacs 扫地机器人',
-  price: 1348.00,
-  number: 1 },
-
-{
-  id: 9,
-  image: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=2668268226,1765897385&fm=26&gp=0.jpg',
-  attr_val: 'XL',
-  stock: 55,
-  title: '朵绒菲小西装',
-  price: 175.88,
-  number: 1 },
-
-{
-  id: 10,
-  image: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1552410549432&di=06dd3758053fb6d6362516f30a42d055&imgtype=0&src=http%3A%2F%2Fimgcache.mysodao.com%2Fimg3%2FM0A%2F67%2F42%2FCgAPD1vNSsHNm-TnAAEy61txQb4543_400x400x2.JPG',
-  attr_val: '520 #粉红色',
-  stock: 15,
-  title: '迪奥（Dior）烈艳唇膏',
-  price: 1089.00,
-  number: 1 },
-
-{
-  id: 11,
-  image: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1031875829,2994442603&fm=26&gp=0.jpg',
-  attr_val: '樱花味润手霜 30ml',
-  stock: 15,
-  title: "欧舒丹（L'OCCITANE）乳木果",
-  price: 128,
-  number: 1 },
-
-{
-  id: 12,
-  image: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553007107&di=390915aa8a022cf0b03c03340881b0e7&imgtype=jpg&er=1&src=http%3A%2F%2Fimg13.360buyimg.com%2Fn0%2Fjfs%2Ft646%2F285%2F736444951%2F480473%2Faa701c97%2F548176feN10c9ed7b.jpg',
-  attr_val: '特级 12个',
-  stock: 7,
-  title: '新疆阿克苏苹果 特级',
-  price: 58.8,
-  number: 10 },
-
-{
-  id: 13,
-  image: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1552405266625&di=a703f2b2cdb0fe7f3f05f62dd91307ab&imgtype=0&src=http%3A%2F%2Fwww.78.cn%2Fzixun%2Fnews%2Fupload%2F20190214%2F1550114706486250.jpg',
-  attr_val: '春装款/m',
-  stock: 15,
-  title: '女装2019春秋新款',
-  price: 420.00,
-  number: 1 }];
-
-
-//详情展示页面
-var detailData = {
-  title: '纯种金毛幼犬活体有血统证书',
-  title2: '拆家小能手 你值得拥有',
-  favorite: true,
-  imgList: [{
-    src: 'http://img0.imgtn.bdimg.com/it/u=2396068252,4277062836&fm=26&gp=0.jpg' },
-
-  {
-    src: 'http://img.pconline.com.cn/images/upload/upc/tx/itbbs/1309/06/c4/25310541_1378426131583.jpg' },
-
-  {
-    src: 'http://img.pconline.com.cn/images/upload/upc/tx/photoblog/1610/26/c4/28926240_1477451226577_mthumb.jpg' },
-
-  {
-    src: 'http://picture.ik123.com/uploads/allimg/190219/12-1Z219105139.jpg' }],
-
-
-  episodeList: [
-  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24],
-
-  guessList: [{
-    src: 'http://img.52z.com/upload/news/image/20180530/20180530081619_31029.jpg',
-    title: '猫眼指甲油',
-    title2: '独树一帜的免照灯猫眼指甲' },
-
-  {
-    src: 'http://m.china-7.net/uploads/14778449362891.jpg',
-    title: '创意屋',
-    title2: '创意屋形上下双层高低床' },
-
-  {
-    src: 'http://www.k73.com/up/allimg/130415/22-130415093527.jpg',
-    title: 'MissCandy 指甲油',
-    title2: '十分适合喜欢素净的妹纸，尽显淡雅的气质' },
-
-  {
-    src: 'http://img0.imgtn.bdimg.com/it/u=2108933440,2194129200&fm=214&gp=0.jpg	',
-    title: 'RMK 2017星空海蓝唇釉',
-    title2: '唇釉质地，上唇后很滋润。少女也会心动的蓝色，透明液体形状。' }],
-
-
-  evaList: [{
-    src: 'http://gss0.baidu.com/-fo3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/77c6a7efce1b9d1663174705fbdeb48f8d546486.jpg',
-    nickname: 'Ranth Allngal',
-    time: '09-20 12:54',
-    zan: '54',
-    content: '评论不要太苛刻，不管什么产品都会有瑕疵，客服也说了可以退货并且商家承担运费，我觉得至少态度就可以给五星。' },
-
-  {
-    src: 'http://img0.imgtn.bdimg.com/it/u=2396068252,4277062836&fm=26&gp=0.jpg',
-    nickname: 'Ranth Allngal',
-    time: '09-20 12:54',
-    zan: '54',
-    content: '楼上说的好有道理。' }] };
-
-
-
-var shareList = [{
-  type: 1,
-  icon: '/static/temp/share_wechat.png',
-  text: '微信好友' },
-
-{
-  type: 2,
-  icon: '/static/temp/share_moment.png',
-  text: '朋友圈' },
-
-{
-  type: 3,
-  icon: '/static/temp/share_qq.png',
-  text: 'QQ好友' },
-
-{
-  type: 4,
-  icon: '/static/temp/share_qqzone.png',
-  text: 'QQ空间' }];
-
-
-var lazyLoadList = [{
-  src: 'http://img0.imgtn.bdimg.com/it/u=2396068252,4277062836&fm=26&gp=0.jpg' },
-
-{
-  src: 'http://img.pconline.com.cn/images/upload/upc/tx/itbbs/1309/06/c4/25310541_1378426131583.jpg' },
-
-{
-  src: 'http://img.pconline.com.cn/images/upload/upc/tx/photoblog/1610/26/c4/28926240_1477451226577_mthumb.jpg' },
-
-{
-  src: 'http://picture.ik123.com/uploads/allimg/190219/12-1Z219105139.jpg' },
-
-{
-  src: 'http://img5.imgtn.bdimg.com/it/u=2904900134,438461613&fm=26&gp=0.jpg' },
-
-{
-  src: 'http://img1.imgtn.bdimg.com/it/u=1690475408,2565370337&fm=26&gp=0.jpg' },
-
-{
-  src: 'http://img.99114.com/group1/M00/7F/99/wKgGS1kVrPGAe5LmAAU2KrJmb3Q923_600_600.jpg' },
-
-{
-  src: 'http://img4.imgtn.bdimg.com/it/u=261047209,372231813&fm=26&gp=0.jpg' },
-
-{
-  src: 'http://i2.17173cdn.com/i7mz64/YWxqaGBf/tu17173com/20150107/eMyVMObjlbcvDEv.jpg' },
-
-{
-  src: 'http://img008.hc360.cn/m4/M02/E7/87/wKhQ6FSrfU6EfUoyAAAAAITAfyc280.jpg' },
-
-{
-  src: 'http://pic1.win4000.com/wallpaper/d/5991569950166.jpg' },
-
-{
-  src: 'http://gss0.baidu.com/9fo3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/6f061d950a7b0208f9fe945e60d9f2d3572cc85e.jpg' },
-
-{
-  src: 'http://pic41.nipic.com/20140429/18169759_125841756000_2.jpg' },
-
-{
-  src: 'http://www.k73.com/up/allimg/130415/22-130415093527.jpg' },
-
-{
-  src: 'http://img.52z.com/upload/news/image/20180530/20180530081619_31029.jpg' },
-
-{
-  src: 'http://b-ssl.duitang.com/uploads/item/201410/02/20141002111638_tXAzU.jpeg' },
-
-{
-  src: 'http://img2.ph.126.net/C4JW6f57QWSB21-8jh2UGQ==/1762596304262286698.jpg' },
-
-{
-  src: 'http://att.bbs.duowan.com/forum/201405/17/190257nzcvkkdg6w2e8226.jpg' },
-
-{
-  src: 'http://attach.bbs.miui.com/forum/201504/10/223644v3intigyvva0vgym.jpg' },
-
-{
-  src: 'http://pic1.win4000.com/mobile/3/57888a298d61d.jpg' }];
-
-
-
-var orderList = [{
-  time: '2019-04-06 11:37',
-  state: 1,
-  goodsList: [{
-    image: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553187020783&di=bac9dd78b36fd984502d404d231011c0&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201609%2F26%2F20160926173213_s5adi.jpeg' },
-
-  {
-    image: 'https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=4031878334,2682695508&fm=11&gp=0.jpg' },
-
-  {
-    image: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg' },
-
-  {
-    image: 'https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=4031878334,2682695508&fm=11&gp=0.jpg' },
-
-  {
-    image: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg' },
-
-  {
-    image: 'https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=4031878334,2682695508&fm=11&gp=0.jpg' },
-
-  {
-    image: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg' }] },
-
-
-
-{
-  time: '2019-04-06 11:37',
-  state: 9,
-  goodsList: [{
-    title: '古黛妃 短袖t恤女 春夏装2019新款韩版宽松',
-    price: 179.5,
-    image: 'https://img13.360buyimg.com/n8/jfs/t1/30343/20/1029/481370/5c449438Ecb46a15b/2b2adccb6dc742fd.jpg',
-    number: 1,
-    attr: '珊瑚粉 M' }] },
-
-
-{
-  time: '2019-04-06 11:37',
-  state: 1,
-  goodsList: [{
-    image: 'https://img.alicdn.com/imgextra/https://img.alicdn.com/imgextra/i2/2120460599/O1CN01LBPS4C1GINkwsOTXS_!!2120460599.jpg_430x430q90.jpg' },
-
-  {
-    image: 'https://img.alicdn.com/imgextra/i2/1069876356/TB2ocTQG4WYBuNjy1zkXXXGGpXa_!!1069876356.jpg_430x430q90.jpg' },
-
-  {
-    image: 'https://img.alicdn.com/imgextra/https://img.alicdn.com/imgextra/i4/2120460599/O1CN01YsmgwZ1GINkv38rkn_!!2120460599.jpg_430x430q90.jpg' }] },
-
-
-
-{
-  time: '2019-04-06 11:37',
-  state: 1,
-  goodsList: [{
-    title: '回力女鞋高帮帆布鞋女学生韩版鞋子女2019潮鞋女鞋新款春季板鞋女',
-    price: 69,
-    image: 'https://img.alicdn.com/imgextra/i3/2128794607/TB2gzzoc41YBuNjy1zcXXbNcXXa_!!2128794607.jpg_430x430q90.jpg',
-    number: 1,
-    attr: '白色-高帮 39' }] },
-
-
-{
-  time: '2019-04-06 11:37',
-  state: 1,
-  goodsList: [{
-    image: 'https://img.alicdn.com/imgextra/https://img.alicdn.com/imgextra/i4/3358098495/O1CN01dhYyid2Ccl5MWLDok_!!3358098495.jpg_430x430q90.jpg' },
-
-  {
-    image: 'https://img.alicdn.com/imgextra/https://img.alicdn.com/imgextra/i3/3358098495/O1CN01AWsnFA2Ccl5OzvqsL_!!3358098495.jpg_430x430q90.jpg' }] },
-
-
-
-{
-  time: '2019-04-06 11:37',
-  state: 1,
-  goodsList: [{
-    image: 'https://img.alicdn.com/imgextra/i4/3470687433/O1CN0124mMQOSERr18L1h_!!3470687433.jpg_430x430q90.jpg' },
-
-  {
-    image: 'https://img.alicdn.com/imgextra/i3/2888462616/O1CN01ERra5J1VCAbZaKI5n_!!0-item_pic.jpg_430x430q90.jpg' },
-
-  {
-    image: 'https://gd3.alicdn.com/imgextra/i3/819381730/O1CN01YV4mXj1OeNhQIhQlh_!!819381730.jpg_400x400.jpg' }] }];
-
-
-
-
-
-var cateList = [{
-  id: 1,
-  name: '手机数码' },
-
-{
-  id: 2,
-  name: '礼品鲜花' },
-
-{
-  id: 3,
-  name: '男装女装' },
-
-{
-  id: 4,
-  name: '母婴用品' },
-
-{
-  id: 5,
-  pid: 1,
-  name: '手机通讯' },
-
-{
-  id: 6,
-  pid: 1,
-  name: '运营商' },
-
-{
-  id: 8,
-  pid: 5,
-  name: '全面屏手机',
-  picture: '/static/temp/cate2.jpg' },
-
-{
-  id: 9,
-  pid: 5,
-  name: '游戏手机',
-  picture: '/static/temp/cate3.jpg' },
-
-{
-  id: 10,
-  pid: 5,
-  name: '老人机',
-  picture: '/static/temp/cate1.jpg' },
-
-{
-  id: 11,
-  pid: 5,
-  name: '拍照手机',
-  picture: '/static/temp/cate4.jpg' },
-
-{
-  id: 12,
-  pid: 5,
-  name: '女性手机',
-  picture: '/static/temp/cate5.jpg' },
-
-{
-  id: 14,
-  pid: 6,
-  name: '合约机',
-  picture: '/static/temp/cate1.jpg' },
-
-{
-  id: 15,
-  pid: 6,
-  name: '选好卡',
-  picture: '/static/temp/cate4.jpg' },
-
-{
-  id: 16,
-  pid: 6,
-  name: '办套餐',
-  picture: '/static/temp/cate5.jpg' },
-
-{
-  id: 17,
-  pid: 2,
-  name: '礼品' },
-
-{
-  id: 18,
-  pid: 2,
-  name: '鲜花' },
-
-{
-  id: 19,
-  pid: 17,
-  name: '公益摆件',
-  picture: '/static/temp/cate7.jpg' },
-
-{
-  id: 20,
-  pid: 17,
-  name: '创意礼品',
-  picture: '/static/temp/cate8.jpg' },
-
-{
-  id: 21,
-  pid: 18,
-  name: '鲜花',
-  picture: '/static/temp/cate9.jpg' },
-
-{
-  id: 22,
-  pid: 18,
-  name: '每周一花',
-  picture: '/static/temp/cate10.jpg' },
-
-{
-  id: 23,
-  pid: 18,
-  name: '卡通花束',
-  picture: '/static/temp/cate11.jpg' },
-
-{
-  id: 24,
-  pid: 18,
-  name: '永生花',
-  picture: '/static/temp/cate12.jpg' },
-
-{
-  id: 25,
-  pid: 3,
-  name: '男装' },
-
-{
-  id: 26,
-  pid: 3,
-  name: '女装' },
-
-{
-  id: 27,
-  pid: 25,
-  name: '男士T恤',
-  picture: '/static/temp/cate13.jpg' },
-
-{
-  id: 28,
-  pid: 25,
-  name: '男士外套',
-  picture: '/static/temp/cate14.jpg' },
-
-{
-  id: 29,
-  pid: 26,
-  name: '裙装',
-  picture: '/static/temp/cate15.jpg' },
-
-{
-  id: 30,
-  pid: 26,
-  name: 'T恤',
-  picture: '/static/temp/cate16.jpg' },
-
-{
-  id: 31,
-  pid: 26,
-  name: '上装',
-  picture: '/static/temp/cate15.jpg' },
-
-{
-  id: 32,
-  pid: 26,
-  name: '下装',
-  picture: '/static/temp/cate16.jpg' },
-
-{
-  id: 33,
-  pid: 4,
-  name: '奶粉' },
-
-{
-  id: 34,
-  pid: 4,
-  name: '营养辅食' },
-
-{
-  id: 35,
-  pid: 4,
-  name: '童装' },
-
-{
-  id: 39,
-  pid: 4,
-  name: '喂养用品' },
-
-{
-  id: 36,
-  pid: 33,
-  name: '有机奶粉',
-  picture: '/static/temp/cate17.jpg' },
-
-{
-  id: 37,
-  pid: 34,
-  name: '果泥/果汁',
-  picture: '/static/temp/cate18.jpg' },
-
-{
-  id: 39,
-  pid: 34,
-  name: '面条/粥',
-  picture: '/static/temp/cate20.jpg' },
-
-{
-  id: 42,
-  pid: 35,
-  name: '婴童衣橱',
-  picture: '/static/temp/cate19.jpg' },
-
-{
-  id: 43,
-  pid: 39,
-  name: '吸奶器',
-  picture: '/static/temp/cate21.jpg' },
-
-{
-  id: 44,
-  pid: 39,
-  name: '儿童餐具',
-  picture: '/static/temp/cate22.jpg' },
-
-{
-  id: 45,
-  pid: 39,
-  name: '牙胶安抚',
-  picture: '/static/temp/cate23.jpg' },
-
-{
-  id: 46,
-  pid: 39,
-  name: '围兜',
-  picture: '/static/temp/cate24.jpg' }];var _default =
-
-
-
-{
-  carouselList: carouselList,
-  cartList: cartList,
-  detailData: detailData,
-  lazyLoadList: lazyLoadList,
-  userInfo: userInfo,
-  shareList: shareList,
-  goodsList: goodsList,
-  orderList: orderList,
-  cateList: cateList };exports.default = _default;
-
-/***/ }),
-/* 18 */,
-/* 19 */,
-/* 20 */,
-/* 21 */,
-/* 22 */,
-/* 23 */,
-/* 24 */
-/*!***********************************************************************************************!*\
-  !*** C:/Users/Apple/Desktop/study/13-网易严选/project_app_wyyx/common/datas/indexCateModule.json ***!
-  \***********************************************************************************************/
-/*! exports provided: 0, 1, 2, 3, 4, 5, 6, 7, default */
-/***/ (function(module) {
-
-module.exports = [{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/c6a5af1034122a96a38fafd4b1ef2e7d.jpg?type=webp&imageView&quality=75&thumbnail=750x0","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"居家生活","id":1005000,"type":0,"subCateList":[{"categoryType":0,"showIndex":1,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1d89de114797fb9237314920695c564d.png","name":"秋冬好物","id":109243003,"frontDesc":"温暖秋冬","type":0,"subCateList":[],"frontName":"秋冬好物"},{"categoryType":0,"showIndex":2,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0fe3073506c10f604c4ed7e0ba65d1f4.png","name":"主题床品","id":109243004,"frontDesc":"设计点亮，品质当道","type":0,"subCateList":[],"frontName":"设计点亮，品质当道"},{"categoryType":0,"showIndex":3,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/02d3e51b8db87c331dc73bef9e217133.png","name":"北欧原木","id":109252033,"frontDesc":"经典北欧风，打造原木家","type":0,"subCateList":[],"frontName":"经典北欧风，打造原木家"},{"categoryType":0,"showIndex":4,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan-item.nosdn.127.net/4ccd6ee87a83918474e7e962b06d96fd.png","name":"餐厨爆款清单","id":109261015,"frontDesc":"烹饪享乐趣","type":0,"subCateList":[],"frontName":"烹饪享乐趣"},{"categoryType":0,"showIndex":6,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ed6400e5be573e1524cdef0b5c9e462d.png","bannerUrl":"","name":"床品件套","id":1008009,"frontDesc":"甄选品质，睡眠美学","type":0,"subCateList":[],"frontName":"甄选品质，睡眠美学"},{"categoryType":0,"showIndex":7,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/96d109867f08a14af62d2390b7787439.png","name":"被枕盖毯","id":109260008,"frontDesc":"陷进柔软，多样选择","type":0,"subCateList":[],"frontName":"陷进柔软，多样选择"},{"categoryType":0,"showIndex":8,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b91e14afc5a138df8dbc3236146d24e6.png","bannerUrl":"","name":"床垫床褥","id":1008008,"frontDesc":"安心托护，美梦时刻","type":0,"subCateList":[],"frontName":"安心托护，美梦时刻"},{"categoryType":0,"showIndex":9,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ef4a874893fb5e76504fb044c2f7cd49.png","name":"抱枕靠垫","id":109260009,"frontDesc":"装点美家，生活美学","type":0,"subCateList":[],"frontName":"装点美家，生活美学"},{"showIndex":10,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0e5da66d87fc9db4279322d59f9b3d5b.png","bannerUrl":"","frontDesc":"装点家的格调","type":0,"frontName":"装点家的格调","categoryType":0,"superCategoryId":1005000,"name":"家饰","iconUrl":"","id":1011004,"subCateList":[]},{"categoryType":0,"showIndex":11,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/d8f74a5d23c731084779b095e80fb3e3.png","bannerUrl":"","name":"居家布艺","id":1008002,"frontDesc":"趣意点缀，家中有格","type":0,"subCateList":[],"frontName":"趣意点缀，家中有格"},{"categoryType":0,"showIndex":12,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/aeecf63c24567c5a7a51b747a7dcf10a.png","name":"客餐厅家具","id":109243006,"frontDesc":"舒适经典，幸福宅家","type":0,"subCateList":[],"frontName":"舒适经典，幸福宅家"},{"categoryType":0,"showIndex":13,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/29a60124243be40301a571e09f8c935c.png","name":"卧室家具","id":109243007,"frontDesc":"天然选材，安心酣睡","type":0,"subCateList":[],"frontName":"天然选材，安心酣睡"},{"categoryType":0,"showIndex":14,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c35578aa38ec1c9e55aa74d9e77287a9.png","name":"办公书房家具","id":109243008,"frontDesc":"人体工学设计，健康办公","type":0,"subCateList":[],"frontName":"人体工学设计，健康办公"},{"categoryType":0,"showIndex":15,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/becde30fadf4ec335cd7ad8078798acf.png","name":"小件家具","id":109243009,"frontDesc":"实用至上，讲究质感","type":0,"subCateList":[],"frontName":"实用至上，讲究质感"},{"categoryType":0,"showIndex":16,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9bc4cae742e2b2709974ad074f897493.png","bannerUrl":"","name":"灯具","id":1008016,"frontDesc":"一盏灯，温暖一个家","type":0,"subCateList":[],"frontName":"一盏灯，温暖一个家"},{"categoryType":0,"showIndex":17,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f2e3e9df2cdb7e790e68356ac763cd58.png","name":"地毯窗帘","id":109261054,"frontDesc":"优质装点，柔软家居","type":0,"subCateList":[],"frontName":"优质装点，柔软家居"},{"categoryType":0,"showIndex":18,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ccf0ff26ca7bf8bbbc8683a740e28ae9.png","bannerUrl":"","name":"收纳","id":1008017,"frontDesc":"收纳神器大集结","type":0,"subCateList":[],"frontName":"收纳神器大集结"},{"categoryType":0,"showIndex":20,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/36d167a99e28b00dd08aa5e45fd33946.png","name":"晾晒除味","id":1092010,"frontDesc":"居家晾晒必备好物","type":0,"subCateList":[],"frontName":"居家晾晒必备好物"},{"categoryType":0,"showIndex":21,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f6eaa94e8920dd4290b9da7c545c8841.png","bannerUrl":"","name":"毛巾浴巾","id":1008001,"frontDesc":"亲肤柔棉，安心品质","type":0,"subCateList":[],"frontName":"亲肤柔棉，安心品质"},{"categoryType":0,"showIndex":22,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3e0c0c0f1d842ae66f4fbfd50a571ac1.png","name":"居家拖鞋","id":109243010,"frontDesc":"慵懒休闲时光，轻松惬意生活","type":0,"subCateList":[],"frontName":"慵懒休闲时光，轻松惬意生活"},{"categoryType":0,"showIndex":23,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3e60f0abe39d4cce0237edffad25c459.png","name":"家庭医疗","id":1092011,"frontDesc":"专业家庭医用好物","type":0,"subCateList":[],"frontName":"专业家庭医用好物"},{"categoryType":0,"showIndex":24,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/17cc6774b480037536a0f360bf207676.png","bannerUrl":"","name":"锅具","id":1005007,"frontDesc":"一口好锅，料理生活一日三餐","type":0,"subCateList":[],"frontName":"一口好锅，炖煮生活一日三餐"},{"categoryType":0,"showIndex":25,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1055eb85d2c5431c8f6623aed74bbbde.png","bannerUrl":"","name":"餐厨配件","id":1008012,"frontDesc":"下厨省力好帮手","type":0,"subCateList":[],"frontName":"下厨省力好帮手"},{"categoryType":0,"showIndex":26,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f17d41a51a2bb3a1b73f927959cd9ae2.png","bannerUrl":"","name":"刀剪砧板","id":1013005,"frontDesc":"传统工艺 源自中国刀城","type":0,"subCateList":[],"frontName":"传统工艺 源自中国刀城"},{"categoryType":0,"showIndex":27,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/338c77be5f292272e43869bcc52c8229.png","bannerUrl":"","name":"餐具","id":1005008,"frontDesc":"皇家道尔顿、日本KEYUCA制造商出品","type":0,"subCateList":[],"frontName":"餐桌上的舞蹈"},{"categoryType":0,"showIndex":28,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b24d4e3c402ecb4a95d7d6e8d77a93ba.png","bannerUrl":"","name":"水具杯壶","id":1007000,"frontDesc":"精工生产制作，匠人手艺","type":0,"subCateList":[],"frontName":"精工生产制作，匠人手艺"},{"categoryType":0,"showIndex":29,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/6395f0efc4c720dbc1bee012af23e56e.png","bannerUrl":"","name":"茶咖酒具","id":1005009,"frontDesc":"严选精巧器具，轻松冲调","type":0,"subCateList":[],"frontName":"严选精巧器具，轻松冲调"},{"categoryType":0,"showIndex":30,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/7d3612daccae482c1c9631992d4ffa44.png","name":"数码办公","id":109249013,"frontDesc":"职场数码办公用品","type":0,"subCateList":[],"frontName":"职场数码办公用品"},{"categoryType":0,"showIndex":31,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/41b1aa9754ea3d7cd29b2c753bdf3dd1.png","name":"办公家具","id":109248001,"frontDesc":"为健康办公生活加油","type":0,"subCateList":[],"frontName":"为健康办公生活加油"},{"categoryType":0,"showIndex":32,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2963d464664ffc426ed8dffd2f44ba16.png","name":"靠枕坐垫","id":109248002,"frontDesc":"让工位比被窝更舒适","type":0,"subCateList":[],"frontName":"让工位比被窝更舒适"},{"categoryType":0,"showIndex":33,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8bceb409edbc6415c91095a82d4d3edf.png","name":"宠物食品","id":1017000,"frontDesc":"用心选料，让爱宠健康成长","type":0,"subCateList":[],"frontName":"用心选料，让爱宠健康成长"},{"categoryType":0,"showIndex":34,"superCategoryId":1005000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0dc939d1cb0e437b56e392fbf859f768.png","name":"宠物用品","id":109248004,"frontDesc":"贴心设计，照顾爱宠舒适生活","type":0,"subCateList":[],"frontName":"贴心设计，照顾爱宠舒适生活"}]},{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/f247ad2cb1d02624e72248c91af4a4b2.jpg?type=webp&imageView&quality=75&thumbnail=750x0","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"服饰鞋包","id":1010000,"type":0,"subCateList":[{"categoryType":0,"showIndex":1,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e279c3e247614d47404d9d5d88b397c9.png","name":"热销爆款","id":109257004,"frontDesc":"人气好物放心购","type":0,"subCateList":[],"frontName":"人气好物放心购"},{"categoryType":0,"showIndex":2,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/d0a099cb4bfdb9afccf9470719b3611c.png","name":"好物上新","id":109243011,"frontDesc":"新品好物 一手掌握","type":0,"subCateList":[],"frontName":"新品好物 一手掌握"},{"categoryType":0,"showIndex":3,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1fc7bbf077f022659cb4eff564d382fa.png","name":"夏季新品","id":109243013,"frontDesc":"夏季热力爆品 抢先预览","type":0,"subCateList":[],"frontName":"夏季热力爆品 抢先预览"},{"categoryType":0,"showIndex":4,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/fa89d78c2c70477987ec09c56661dc31.png","name":"居家囤货","id":109243014,"frontDesc":"慵懒居家 一秒提升幸福感","type":0,"subCateList":[],"frontName":"慵懒居家 一秒提升幸福感"},{"categoryType":0,"showIndex":5,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f2ab8dca74661d5b7d36f80b14e50a5a.png","name":"抄底特惠","id":109259014,"frontDesc":"抄底特惠 低至5折","type":0,"subCateList":[],"frontName":"抄底特惠"},{"categoryType":0,"showIndex":6,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/10b0537e284e4eb89a9461e583d017db.png","name":"男式衬衫","id":1093008,"frontDesc":"经典百搭 精致设计","type":0,"subCateList":[],"frontName":"经典百搭 精致设计"},{"categoryType":0,"showIndex":7,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2c5a1f681831987ff3d4fb8e63f6d0d6.jpg","name":"男式针织衫/卫衣","id":109214004,"frontDesc":"简约调性 儒雅休闲自如切换","type":0,"subCateList":[],"frontName":"简约调性 儒雅休闲自如切换"},{"categoryType":0,"showIndex":8,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/35b564c2867fc5faed9403cec440bafe.png","name":"男式外套","id":1093012,"frontDesc":"自在潇洒穿着感","type":0,"subCateList":[],"frontName":"自在潇洒穿着感"},{"categoryType":0,"showIndex":9,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/690dee73a00b6922664f727b40a58a3b.png","name":"男式牛仔","id":1068003,"frontDesc":"颠覆牛仔认知 革新你的穿着体验","type":0,"subCateList":[],"frontName":"颠覆牛仔认知 革新你的穿着体验"},{"categoryType":0,"showIndex":10,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/270011056e5216e03d2d054683c2b337.png","name":"女式内衣","id":109272000,"frontDesc":"柔软呵护","type":0,"subCateList":[],"frontName":"柔软呵护"},{"categoryType":0,"showIndex":11,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/aba02a880a47a4a62cd85842ea6eadce.jpg","name":"男式裤装","id":1093009,"frontDesc":"高质感面料 休闲商务两适宜","type":0,"subCateList":[],"frontName":"高质感面料 休闲商务两适宜"},{"categoryType":0,"showIndex":12,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f917b00b07445c46a1df90ccaff2a8de.png","name":"男式T恤/POLO","id":109214000,"frontDesc":"内搭T恤 贴身自在","type":0,"subCateList":[],"frontName":"内搭T恤 贴身自在"},{"categoryType":0,"showIndex":13,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a729319b8b4d127b09402f65c96d421f.jpg","name":"女式针织衫/卫衣","id":109214003,"frontDesc":"体验温柔的质感","type":0,"subCateList":[],"frontName":"体验温柔的质感"},{"categoryType":0,"showIndex":14,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/7a6f1ba8da59a454e7c4a2b7b61ff26a.jpg","name":"女式衬衫","id":109214001,"frontDesc":"职场精致LOOK","type":0,"subCateList":[],"frontName":"职场精致LOOK"},{"categoryType":0,"showIndex":15,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3084ec837a9f38b053b81061cfcdae78.png","name":"女式外套","id":1093010,"frontDesc":"选对风格 只做自己","type":0,"subCateList":[],"frontName":"选对风格 只做自己"},{"categoryType":0,"showIndex":16,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/55ddb8143c911ee1881a6205572c718e.png","name":"女式裤装","id":1093007,"frontDesc":"轻松舒适 送给双腿的温柔力量","type":0,"subCateList":[],"frontName":"轻松舒适 送给双腿的温柔力量"},{"categoryType":0,"showIndex":17,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2f4686765e77abf8213f2b0e127045be.png","name":"女式牛仔","id":109214002,"frontDesc":"基础裤型的舒适之选","type":0,"subCateList":[],"frontName":"基础裤型的舒适之选"},{"categoryType":0,"showIndex":18,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/77ade36fe051e9800409dbfd3f7fa644.jpg","name":"女式T恤/POLO","id":1093006,"frontDesc":"精选材质 穿出质感","type":0,"subCateList":[],"frontName":"精选材质 穿出质感"},{"categoryType":0,"showIndex":19,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2b65c76b9aec77fe724b23199c79e718.png","name":"女式裙装","id":1037007,"frontDesc":"量身裁体的优雅","type":0,"subCateList":[],"frontName":"量身裁体的优雅"},{"categoryType":0,"showIndex":20,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e7fee5bb435eb5d5f094eb9f65df6c86.jpg","name":"男式家居服","id":1093004,"frontDesc":"舒适源自高品质","type":0,"subCateList":[],"frontName":"舒适源自高品质"},{"categoryType":0,"showIndex":21,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/603d7a8d9e2449aaec58ca191d0bea61.jpg","name":"女式家居服","id":1093005,"frontDesc":"享受宅家时光","type":0,"subCateList":[],"frontName":"享受宅家时光"},{"categoryType":0,"showIndex":22,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8207750f810aea25e43c423e6de7f943.png","bannerUrl":"","name":"男式内裤","id":1010002,"frontDesc":"透气舒爽 自由空间","type":0,"subCateList":[],"frontName":"透气舒爽 自由空间"},{"categoryType":0,"showIndex":23,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b330070087bb87cb7586bd4097aa5a65.png","bannerUrl":"","name":"女式内裤","id":1013006,"frontDesc":"温和安全 亲密呵护","type":0,"subCateList":[],"frontName":"温和安全 亲密呵护"},{"categoryType":0,"showIndex":24,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/59122ca632ba972f02d8621458da74c4.png","name":"女式文胸/套装","id":1093011,"frontDesc":"贴身关怀 少束缚","type":0,"subCateList":[],"frontName":"贴身关怀 少束缚"},{"categoryType":0,"showIndex":25,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/df3c77be2e897ad51fb5cfd2040b7b55.png","name":"男式内衣","id":1093013,"frontDesc":"绅士的第二肌肤","type":0,"subCateList":[],"frontName":"绅士的第二肌肤"},{"categoryType":0,"showIndex":26,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f850599cb9c99a523b0a88160da80eca.png","bannerUrl":"","name":"男袜","id":1008004,"frontDesc":"始于足下的品质生活","type":0,"subCateList":[],"frontName":"始于足下的品质生活"},{"categoryType":0,"showIndex":27,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e888bde27a75c01f67b20c8b3eb3cee3.png","name":"丝袜","id":1034000,"frontDesc":"犹如你腿部的第二层肌肤","type":0,"subCateList":[],"frontName":"犹如你腿部的第二层肌肤"},{"categoryType":0,"showIndex":28,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/27ba0c6e4898bffd723ea4272e6380db.png","bannerUrl":"","name":"女袜/连裤袜","id":109273001,"frontDesc":"始于足下的品质生活","type":0,"subCateList":[],"frontName":"始于足下的品质生活"},{"categoryType":0,"showIndex":29,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/5452d909f0caddc1b9a8311968e78a17.png","bannerUrl":"","name":"男鞋","id":1008003,"frontDesc":"匠心打造 轻潮舒适","type":0,"subCateList":[],"frontName":"匠心打造 轻潮舒适"},{"categoryType":0,"showIndex":30,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1a51bbdd24badf39d66b884ea71e665c.png","bannerUrl":"","name":"女鞋","id":1013000,"frontDesc":"优雅 如此舒适","type":0,"subCateList":[],"frontName":"优雅 如此舒适"},{"categoryType":0,"showIndex":31,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2885bf2a48a744cbf6c1aa4a9d0f907b.png","bannerUrl":"","name":"拖鞋","id":1008010,"frontDesc":"慵懒休闲时光 轻松惬意生活","type":0,"subCateList":[],"frontName":"慵懒休闲时光 轻松惬意生活"},{"showIndex":32,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/eedd6de98be2da9e63608b994035bf14.png","bannerUrl":"","frontDesc":"呵护双脚 驱散行走的压力","type":0,"frontName":"呵护双脚 驱散行走的压力","categoryType":0,"superCategoryId":1010000,"name":"鞋配","iconUrl":"","id":1044000,"subCateList":[]},{"categoryType":0,"showIndex":33,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/dbc1125c627b106de9b3d078b97292fb.png","name":"女士包袋","id":1056002,"frontDesc":"包里装着你的整个世界","type":0,"subCateList":[],"frontName":"包里装着你的整个世界"},{"categoryType":0,"showIndex":34,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e8b034f63aac15198f971503a6370947.png","name":"男士包袋","id":1056001,"frontDesc":"懂你的责任也更懂你","type":0,"subCateList":[],"frontName":"懂你的责任也更懂你"},{"categoryType":0,"showIndex":35,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a94a5d317d289f01a93ee093c3975121.png","name":"钱包及小皮件","id":1056003,"frontDesc":"握在手中的精致","type":0,"subCateList":[],"frontName":"握在手中的精致"},{"categoryType":0,"showIndex":36,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/638f6de1cfa9defef5468a952f4efcad.png","name":"行李箱","id":1037000,"frontDesc":"带着梦想即刻出发","type":0,"subCateList":[],"frontName":"带着梦想即刻出发"},{"showIndex":37,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/210c5f72a701ec888efa0c1d885d1de1.png","bannerUrl":"","frontDesc":"璀璨闪耀 品质甄选","type":0,"frontName":"璀璨闪耀 品质甄选","categoryType":0,"superCategoryId":1010000,"name":"奢华珠宝","iconUrl":"","id":1020008,"subCateList":[]},{"categoryType":0,"showIndex":38,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1eb26c281fa9b7b9e386cfd5ce1d67a7.png","name":"时尚饰品","id":109253000,"frontDesc":"精致灵动的小确幸","type":0,"subCateList":[],"frontName":"精致灵动的小确幸"},{"categoryType":0,"showIndex":39,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a83b12528629ec1f6d08e6344739fce7.png","bannerUrl":"","name":"围巾手套","id":1008007,"frontDesc":"冬日出街必备","type":0,"subCateList":[],"frontName":"冬日出街必备"},{"categoryType":0,"showIndex":40,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1d653f706fb834937a3d1c29e5725618.png","name":"眼镜墨镜","id":1036001,"frontDesc":"你和潮流之间就差一个我","type":0,"subCateList":[],"frontName":"你和潮流之间就差一个我"},{"categoryType":0,"showIndex":41,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/52d449042bc437f6179935624f0c1056.png","bannerUrl":"","name":"腰带腕表","id":1010004,"frontDesc":"匠心雕琢细节 细节彰显品位","type":0,"subCateList":[],"frontName":"匠心雕琢细节 细节彰显品位"},{"categoryType":0,"showIndex":42,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/dbee5f088438f7a1538454372788845d.png","name":"帽子发饰","id":109253001,"frontDesc":"时髦 从“头”开始","type":0,"subCateList":[],"frontName":"时髦 从“头”开始"},{"categoryType":0,"showIndex":43,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/01f06c74b0591a8da403199cf27dd875.png","name":"Yessing上装","id":109202000,"frontDesc":"运动生活两相宜","type":0,"subCateList":[],"frontName":"运动生活两相宜"},{"categoryType":0,"showIndex":44,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/6a68adf468654a26d916fcaf5a4ab5bd.png","name":"Yessing下装","id":109214006,"frontDesc":"时尚下装 元气满满","type":0,"subCateList":[],"frontName":"时尚下装 元气满满"},{"categoryType":0,"showIndex":45,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9fe3213589cf74af2ec8ec3ce5322ada.png","name":"女式上装","id":109255016,"frontDesc":"一步获取元气女神","type":0,"subCateList":[],"frontName":"一步获取元气女神"},{"categoryType":0,"showIndex":46,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/d0c83b8c8429de534a5945e2a6135a8a.png","name":"男式上装","id":109255014,"frontDesc":"运动休闲型男魅力","type":0,"subCateList":[],"frontName":"运动休闲型男魅力"},{"categoryType":0,"showIndex":47,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/353876f9db324dc0976ccef7bc834451.png","name":"女式下装","id":109255017,"frontDesc":"好穿易搭轻松减龄","type":0,"subCateList":[],"frontName":"好穿易搭轻松减龄"},{"categoryType":0,"showIndex":48,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/25a81eb6ab646d8a294f3a51d7dc231f.png","name":"男式下装","id":109255015,"frontDesc":"时尚生活有型有款","type":0,"subCateList":[],"frontName":"时尚生活有型有款"},{"categoryType":0,"showIndex":49,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8ebf546b13d24f2dc3c08521b592313f.png","name":"免烫系列","id":109263000,"frontDesc":"舒适免烫 时刻平整","type":0,"subCateList":[],"frontName":"舒适免烫 时刻平整"},{"categoryType":0,"showIndex":50,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a9db6faaa689c4dfcc37ef80d0552b1a.png","name":"棉麻系列","id":109263002,"frontDesc":"透气棉麻 清楚不羁","type":0,"subCateList":[],"frontName":"透气棉麻 清楚不羁"},{"categoryType":0,"showIndex":51,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/cc358f426cbe81d9e806c6b7c2fb64aa.png","name":"真丝系列","id":109263003,"frontDesc":"生活质感更考究","type":0,"subCateList":[],"frontName":"生活质感更考究"},{"categoryType":0,"showIndex":52,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/674af56699e3ccf525f4d65b7bab5446.png","name":"莫代尔系列","id":109263004,"frontDesc":"舒适不同凡响","type":0,"subCateList":[],"frontName":"舒适不同凡响"},{"categoryType":0,"showIndex":53,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9f7531cbaa489ec85a91a3a7dae92e21.png","name":"几何森林","id":109263005,"frontDesc":"绮梦穿梭 视觉世界","type":0,"subCateList":[],"frontName":"绮梦穿梭 视觉世界"},{"categoryType":0,"showIndex":54,"superCategoryId":1010000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f08b4c04de93a6896f4e02df44ab457b.png","name":"海洋环保","id":109269000,"frontDesc":"海洋垃圾再生面料 时尚又环保","type":0,"subCateList":[],"frontName":"海洋环保"}]},{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/b2595d342733647008a941ad3ba9914d.jpg?type=webp&imageView&quality=75&thumbnail=750x0","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"美食酒水","id":1005002,"type":0,"subCateList":[{"showIndex":1,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/85bf41ca68dc4fe79892344af5887e56.png","bannerUrl":"","frontDesc":"春节宅家囤美食，放假期间正常发货","type":0,"frontName":"春节宅家囤美食，放假期间正常发货","categoryType":0,"superCategoryId":1005002,"name":"宅家囤美食","iconUrl":"","id":109271000,"subCateList":[]},{"categoryType":0,"showIndex":2,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/eefce6cae6d9f89b309612f70a80c3e0.png","name":"居家保健","id":109273000,"frontDesc":"宅家吃好物，强身养生抵抗力棒","type":0,"subCateList":[],"frontName":"宅家吃好物，强身养生抵抗力棒"},{"categoryType":0,"showIndex":3,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/6282955a3db5db7c0ee06e9d560c165f.png","name":"上新美味","id":109253007,"frontDesc":"为你寻遍世间美味，让你品尝第一口好物","type":0,"subCateList":[],"frontName":"为你寻遍世间美味，让你品尝第一口好物"},{"categoryType":0,"showIndex":4,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/59fa0a9ddd1264dbc6f4cb8979357007.png","name":"大家都在买","id":109253008,"frontDesc":"网友购物车里的美食的TOP榜","type":0,"subCateList":[],"frontName":"网友购物车里的美食的TOP榜"},{"categoryType":0,"showIndex":5,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2e753a8f0977fd09a74ccea4f0c6192c.png","bannerUrl":"","name":"饼干糕点","id":1008015,"frontDesc":"无人工添加香精、防腐剂","type":0,"subCateList":[],"frontName":"四季糕点，用心烘焙"},{"categoryType":0,"showIndex":6,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/6941ede8541ceeb432e8da16e200152b.png","bannerUrl":"","name":"小食糖巧","id":1005011,"frontDesc":"原香鲜材，以小食之味，带来味蕾惊喜","type":0,"subCateList":[],"frontName":"原香鲜材，以小食之味，带来味蕾惊喜"},{"categoryType":0,"showIndex":7,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/18dc905db6c49fbf55b2709078875cdb.png","name":"肉类零食","id":1035003,"frontDesc":"真嗜肉者，都爱这一味，或麻辣鲜香、或五味俱全，都是佳肴美馔真滋味","type":0,"subCateList":[],"frontName":"真嗜肉者，都爱这一味，佳肴美馔真滋味"},{"categoryType":0,"showIndex":8,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/46b5256193d052612ecb9fb22d7f4b88.png","bannerUrl":"","name":"坚果炒货","id":1005010,"frontDesc":"精选原产地，美味加营养","type":0,"subCateList":[],"frontName":"精选原产地，美味加营养"},{"showIndex":9,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/dfc7d79ca21ee0f55428c8be218da5d3.png","bannerUrl":"","frontDesc":"品尝与收获到的是自然的味道","type":0,"frontName":"品尝与收获到的是自然的味道","categoryType":0,"superCategoryId":1005002,"name":"蜜饯果干","iconUrl":"","id":1027001,"subCateList":[]},{"categoryType":0,"showIndex":10,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8d4523c21259f514d378ad7431cd4a75.png","bannerUrl":"","name":"冲调饮品","id":1005013,"frontDesc":"以用料天然之美，尽享闲雅之意","type":0,"subCateList":[],"frontName":"以用料天然之美，尽享闲雅之意"},{"categoryType":0,"showIndex":11,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/edb41097ac4cc34ffd08d02f125c98e8.jpg","name":"传统茗茶","id":1027000,"frontDesc":"一品茶香，品茗即是观心，饮茶涤净尘虑","type":0,"subCateList":[],"frontName":"一品茶香，品茗即是观心，饮茶涤净尘虑"},{"showIndex":12,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/01a25fc0ec89278943d488eba3b959e1.jpg","bannerUrl":"","frontDesc":"人生圆满，不过赠好友一盒茶礼，品味畅谈","type":0,"frontName":"人生圆满，不过赠好友一盒茶礼，品味畅谈","categoryType":0,"superCategoryId":1005002,"name":"茗茶礼盒","iconUrl":"","id":109260000,"subCateList":[]},{"categoryType":0,"showIndex":13,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/bd65e6d2bd8985e55d38c06f173a6fb5.jpg","name":"茶包花茶","id":109206006,"frontDesc":"办公室必备茶包花茶","type":0,"subCateList":[],"frontName":"办公室必备茶包花茶"},{"categoryType":0,"showIndex":14,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0a66214a911887c854cb75e4112c07ed.png","name":"滋补食材","id":1054001,"frontDesc":"营养滋补，只为健康","type":0,"subCateList":[],"frontName":"营养滋补，只为健康"},{"categoryType":0,"showIndex":15,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/65fa4fbdbff206271c27179844e9297a.png","name":"保健品","id":109206016,"frontDesc":"保健佳品","type":0,"subCateList":[],"frontName":"保健佳品"},{"categoryType":0,"showIndex":16,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/25428a7b8047d4e35ab58367bf44d030.png","name":"乳品饮料","id":109206008,"frontDesc":"四季饮料，欢乐共享","type":0,"subCateList":[],"frontName":"四季饮料，欢乐共享"},{"categoryType":0,"showIndex":17,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e2ec593d7d5feae8a2f227892d08b081.png","name":"酒类","id":1053001,"frontDesc":"美酒佳酿，用心典藏","type":0,"subCateList":[],"frontName":"美酒佳酿，用心典藏"},{"categoryType":0,"showIndex":18,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e486923c1ffa14ad47672c6d495be8ed.png","name":"名酒馆","id":109264007,"frontDesc":"寻遍全球，甄选世界好酒","type":0,"subCateList":[],"frontName":"名酒馆"},{"categoryType":0,"showIndex":19,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/7ecc7eab5519a1bf49fd2b6f4ad433ec.png","name":"米面粮油","id":109206007,"frontDesc":"米面粮油，家庭必备","type":0,"subCateList":[],"frontName":"米面粮油，家庭必备"},{"categoryType":0,"showIndex":20,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/7154cb8de296a6d6acb16022d2725189.png","name":"方便食品","id":109201001,"frontDesc":"健康方便食品","type":0,"subCateList":[],"frontName":"健康方便食品"},{"categoryType":0,"showIndex":21,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4daf3eb8c49f473596bb15a71edc510f.png","bannerUrl":"","name":"南北干货","id":1005012,"frontDesc":"天时地利人和，寻找这个时节这个地点的味道","type":0,"subCateList":[],"frontName":"天时地利人和，寻找这个时节这个地点的味道"},{"categoryType":0,"showIndex":22,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/339889b1f38aba8b4a63c472e782d1ee.png","name":"调味酱菜","id":1036003,"frontDesc":"烹饪必备，美食调味","type":0,"subCateList":[],"frontName":"烹饪必备，美食调味"},{"categoryType":0,"showIndex":23,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e370d525c0bc5c35173fd72f2b598403.jpg","name":"水果蔬菜","id":109264008,"frontDesc":"应季果蔬，应有尽有","type":0,"subCateList":[],"frontName":"水果蔬菜"},{"categoryType":0,"showIndex":24,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/d3e0c79acff00d7b481e003816d5c105.png","name":"肉蛋海鲜","id":109206009,"frontDesc":"新鲜肉质，新鲜体验","type":0,"subCateList":[],"frontName":"肉蛋海鲜"},{"categoryType":0,"showIndex":25,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/075e800278eea9266f2d839f4c6cb5a2.png","name":"冷冻冷藏","id":109264009,"frontDesc":"冷冻美食，冷藏好味道","type":0,"subCateList":[],"frontName":"冷冻冷藏"},{"showIndex":26,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0a35aef69fd20761d113f4dc54f4ef2c.png","bannerUrl":"","frontDesc":"安全配送，新鲜直达","type":0,"frontName":"安全配送，新鲜直达","categoryType":0,"superCategoryId":1005002,"name":"网易黑猪","iconUrl":"","id":1008014,"subCateList":[]},{"categoryType":0,"showIndex":27,"superCategoryId":1005002,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ed9fda295d73fa8bbd0b9ea428329c1b.png","name":"全球美食","id":109206010,"frontDesc":"全球制造，环球美食","type":0,"subCateList":[],"frontName":"全球制造，环球美食"}]},{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/6b1ebd19470cea9a7b8e81a52485f414.jpg?type=webp&imageView&quality=75&thumbnail=750x0","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"个护清洁","id":1013001,"type":0,"subCateList":[{"categoryType":0,"showIndex":1,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0af70c043ee2418c63eb74135084b215.png","name":"爆款榜单","id":109256007,"frontDesc":"精选口碑尖货","type":0,"subCateList":[],"frontName":"精选口碑尖货"},{"categoryType":0,"showIndex":2,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ad777c7b8e1e53040bfe7e46a93f5950.png","name":"面部护理","id":1020001,"frontDesc":"温和无刺激的呵护","type":0,"subCateList":[],"frontName":"温和无刺激的呵护"},{"categoryType":0,"showIndex":3,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ffce24773c1b680572353d1d864da1e7.jpg","name":"新品尝鲜","id":109256008,"frontDesc":"新品速递，等你来试","type":0,"subCateList":[],"frontName":"新品速递，等你来试"},{"categoryType":0,"showIndex":4,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/52bca59c658299046c4df435c3abee1c.png","name":"基础护肤","id":109256010,"frontDesc":"高效补水，深层修护","type":0,"subCateList":[],"frontName":"高效补水，深层修护"},{"categoryType":0,"showIndex":5,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e3211f79704b02298656ec8c99b6a70d.png","name":"卸妆洁面","id":109256009,"frontDesc":"温和配方，养卸一体","type":0,"subCateList":[],"frontName":"温和配方，养卸一体"},{"categoryType":0,"showIndex":6,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/52068e062728c10f4d4da30fed9d3280.png","name":"护肤工具","id":109256011,"frontDesc":"智能美颜，匠心工艺","type":0,"subCateList":[],"frontName":"智能美颜，匠心工艺"},{"categoryType":0,"showIndex":7,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1ac9a9eee6be87a02faaea2e3abfec25.png","bannerUrl":"","name":"洗发护发","id":1013003,"frontDesc":"护发超有效小秘诀","type":0,"subCateList":[],"frontName":"呵护秀发，柔顺不同发质"},{"categoryType":0,"showIndex":8,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/cf842f27c11f1587ca55d20035c1caba.png","name":"身体护理","id":1037002,"frontDesc":"呵护肌肤，天然温和","type":0,"subCateList":[],"frontName":"呵护肌肤，天然温和"},{"categoryType":0,"showIndex":9,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/cef1d1b9f26a01037d705443e585d313.png","name":"口腔护理","id":1037003,"frontDesc":"健康口腔，品质生活","type":0,"subCateList":[],"frontName":"健康口腔，品质生活"},{"categoryType":0,"showIndex":10,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/13d7d7e9fa5f59227f8d5c4be153a957.png","name":"女性护理","id":109208003,"frontDesc":"品质之选，温柔呵护","type":0,"subCateList":[],"frontName":"品质之选，温柔呵护"},{"categoryType":0,"showIndex":11,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/5f91b77da79bb06f72973ecbb63c6a64.png","bannerUrl":"","name":"彩妆修容","id":1013002,"frontDesc":"为你的面容添色","type":0,"subCateList":[],"frontName":"为你的面容添色"},{"categoryType":0,"showIndex":12,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/fd2d0e6a87331d18ec67e77cd0f09c5b.png","name":"美妆工具","id":109243017,"frontDesc":"选对工具，精致妆容","type":0,"subCateList":[],"frontName":"选对工具，精致妆容"},{"categoryType":0,"showIndex":13,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e4c674c49a1a7da65fda7d50e2a32328.png","bannerUrl":"","name":"香水香氛","id":1013004,"frontDesc":"提炼纯净，清雅不腻","type":0,"subCateList":[],"frontName":"提炼纯净，清雅不腻"},{"categoryType":0,"showIndex":14,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/31856d567e5c2de30f2d06c03994148c.png","name":"个护电器","id":109248003,"frontDesc":"科技护理，创享精致生活","type":0,"subCateList":[],"frontName":"科技护理，创享精致生活"},{"categoryType":0,"showIndex":15,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8efe5dc20ae937faa0f8918678728f3d.png","name":"口腔护理电器","id":109254053,"frontDesc":"专业高效护理口腔","type":0,"subCateList":[],"frontName":"专业高效护理口腔"},{"categoryType":0,"showIndex":16,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/be5d2abe1db1b8efe84bb48250d2899c.png","name":"面部护理电器","id":109254054,"frontDesc":"让你变美的仪器们","type":0,"subCateList":[],"frontName":"让你变美的仪器们"},{"categoryType":0,"showIndex":17,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/539ea18e491d8e0c98152eed1d300f54.png","name":"头发护理电器","id":109254055,"frontDesc":"头发亮泽光彩，随心造型","type":0,"subCateList":[],"frontName":"头发亮泽光彩，随心造型"},{"categoryType":0,"showIndex":18,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/fb99d01e5fc25568f97b6cf93012b1d2.png","name":"身体护理电器","id":109254056,"frontDesc":"爱护身体，方寸间蕴出肌肤之美","type":0,"subCateList":[],"frontName":"爱护身体，方寸间蕴出肌肤之美"},{"categoryType":0,"showIndex":19,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/921337182aa5a4540ab0632c1fb6ad89.png","name":"纸品湿巾","id":1037001,"frontDesc":"和风设计，温和清洁","type":0,"subCateList":[],"frontName":"和风设计，温和清洁"},{"categoryType":0,"showIndex":20,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/869ab6b70b45716c9ffd35ed55669855.png","name":"纸品","id":109256012,"frontDesc":"和风设计，原生木浆","type":0,"subCateList":[],"frontName":"和风设计，原生木浆"},{"categoryType":0,"showIndex":21,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1275d57ba465ea26488f3be701295099.png","name":"湿巾","id":109256013,"frontDesc":"温和致净，亲密呵护","type":0,"subCateList":[],"frontName":"温和致净，亲密呵护"},{"categoryType":0,"showIndex":22,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e40f60a3fe682b3317f3672e374dca0b.png","name":"衣物护理","id":109243015,"frontDesc":"洁净衣物，守护全家","type":0,"subCateList":[],"frontName":"洁净衣物，守护全家"},{"categoryType":0,"showIndex":23,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/54f2e4f7a9cb17b61804d4d9a8982889.png","bannerUrl":"","name":"家庭清洁","id":1009000,"frontDesc":"天然材料，温和去除污垢","type":0,"subCateList":[],"frontName":"洁净才能带来清爽心情"},{"categoryType":0,"showIndex":24,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/45d436cc3d818ee3686b9ceb2a6a71e0.png","name":"餐厨清洁","id":109243016,"frontDesc":"高效清洁，省时省心","type":0,"subCateList":[],"frontName":"高效清洁，省时省心"},{"categoryType":0,"showIndex":25,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/44114978a0117bac622cdc3ffdc7b638.png","name":"毛巾浴巾","id":109261055,"frontDesc":"亲肤柔棉，安心品质","type":0,"subCateList":[],"frontName":"亲肤柔棉，安心品质"},{"categoryType":0,"showIndex":26,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/76d4335b8a97c7e2635f66e1b71e4ee1.png","name":"浴室用品","id":1020002,"frontDesc":"环保材料，耐用不发霉","type":0,"subCateList":[],"frontName":"小工具成就美好浴室"},{"categoryType":0,"showIndex":27,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c96383b484c677dacd0c696040a769b4.png","name":"避孕套","id":109255010,"frontDesc":"给爱爱一层安全感","type":0,"subCateList":[],"frontName":"给爱爱一层安全感"},{"categoryType":0,"showIndex":28,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8ea84f70b41e0441b8df48bd2f88b26e.png","name":"女用情趣","id":109255011,"frontDesc":"解锁身体的快乐秘密","type":0,"subCateList":[],"frontName":"解锁身体的快乐秘密"},{"categoryType":0,"showIndex":29,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/5f2f9f911ff905040f6d5c747a5c9bf5.png","name":"男用情趣","id":109255012,"frontDesc":"男儿硬器，尽兴释放自己","type":0,"subCateList":[],"frontName":"男儿硬器，尽兴释放自己"},{"categoryType":0,"showIndex":30,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/72e99034707dc6ffa890b3e82113c8e6.png","name":"润滑液","id":109255013,"frontDesc":"让亲密接触更湿滑畅意","type":0,"subCateList":[],"frontName":"让亲密接触更湿滑畅意"},{"categoryType":0,"showIndex":31,"superCategoryId":1013001,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1adf88cfc906928959e5741e9455790f.png","name":"计生情趣","id":1037004,"frontDesc":"解锁身体里的快乐秘密","type":0,"subCateList":[],"frontName":"解锁身体里的快乐秘密"}]},{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/9794fdd00c6ac9054a13dc7d8b110d1e.jpg?type=webp&imageView&quality=75&thumbnail=750x0","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"母婴亲子","id":1011000,"type":0,"subCateList":[{"categoryType":0,"showIndex":1,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/97f65393f6a4a7b3d91cbe0cd19c617d.png","name":"防疫榜单","id":109259002,"frontDesc":"清洁洗护 科学防疫","type":0,"subCateList":[],"frontName":"清洁洗护 科学防疫"},{"categoryType":0,"showIndex":2,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ad29850918fab29003201e7778bf84ea.png","name":"宅家好物","id":109255006,"frontDesc":"文具玩具 成长好礼","type":0,"subCateList":[],"frontName":"文具玩具 成长好礼"},{"categoryType":0,"showIndex":3,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9dacf066ccf643c91b64cf93dfb9dfb5.png","name":"初春换新","id":1037005,"frontDesc":"服配居家 等你来挑","type":0,"subCateList":[],"frontName":"服配居家 等你来挑"},{"categoryType":0,"showIndex":4,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e16890ca1f2e296261025a896d5c16e0.png","name":"尾货秒杀","id":1034001,"frontDesc":"限量抢购 抄底折扣","type":0,"subCateList":[],"frontName":"限量抢购 抄底折扣"},{"categoryType":0,"showIndex":5,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4da3ff593625177ec09a23228b338290.png","name":"秋日出游","id":109255007,"frontDesc":"秋高气爽 放心出行","type":0,"subCateList":[],"frontName":"秋高气爽 放心出行"},{"categoryType":0,"showIndex":6,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/5be2729ef9a10df2e201b3084b551ae8.png","name":"五折封顶","id":109255008,"frontDesc":"夏日抄底特惠专区","type":0,"subCateList":[],"frontName":"夏日抄底特惠专区"},{"categoryType":0,"showIndex":7,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f3d5a10fbd65c58e0bb54d6e569597f2.png","name":"新手妈妈指南","id":109255009,"frontDesc":"新妈妈装备 一站购全","type":0,"subCateList":[],"frontName":"新妈妈装备 一站购全"},{"categoryType":0,"showIndex":8,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0e94a5a01e13752b6c5d75e13e3b1283.png","name":"卫衣/毛衫","id":1091003,"frontDesc":"舒适穿搭 精彩童年","type":0,"subCateList":[],"frontName":"舒适穿搭 精彩童年"},{"categoryType":0,"showIndex":9,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/24244fafbbde8f6e6215647a03ebbc7c.png","name":"T恤/polo/衬衫","id":1020003,"frontDesc":"必备上衣 百搭精选","type":0,"subCateList":[],"frontName":"必备上衣 百搭精选"},{"categoryType":0,"showIndex":10,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/60a70b35a24ad07449c763a6f2d16434.png","name":"外套/套装","id":109243018,"frontDesc":"甄选衣橱 陪伴左右","type":0,"subCateList":[],"frontName":"甄选衣橱 陪伴左右"},{"categoryType":0,"showIndex":11,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8ae80697a24aefe4069f1066ebe142fc.png","name":"裤子/裙装","id":109243019,"frontDesc":"实用下装 方便活动","type":0,"subCateList":[],"frontName":"实用下装 方便活动"},{"categoryType":0,"showIndex":12,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/cfbe20d66ea16903d786d5a19976d5d0.png","name":"裙装","id":109243020,"frontDesc":"气质裙装 优雅大方","type":0,"subCateList":[],"frontName":"气质裙装 优雅大方"},{"categoryType":0,"showIndex":13,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/6df0eecd6458ca390b1cfefeb910f33b.png","name":"连体衣/礼盒","id":109243021,"frontDesc":"A类无荧光 给宝宝更好的","type":0,"subCateList":[],"frontName":"A类无荧光 给宝宝更好的"},{"categoryType":0,"showIndex":14,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/772eb195bae088cb2c3bef9987ae75b9.png","name":"内衣/配搭","id":1089001,"frontDesc":"孩子衣橱里的配搭好物","type":0,"subCateList":[],"frontName":"孩子衣橱里的配搭好物"},{"categoryType":0,"showIndex":15,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/514726ef6c2ec1d0bd377a903666e9da.png","name":"儿童鞋","id":1037006,"frontDesc":"活力鞋品 孩子必备","type":0,"subCateList":[],"frontName":"活力鞋品 孩子必备"},{"categoryType":0,"showIndex":16,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/cee62d001b384e8f16ba290d37c04e10.png","name":"学步鞋","id":109243022,"frontDesc":"宝宝学步 专业科学","type":0,"subCateList":[],"frontName":"宝宝学步 专业科学"},{"categoryType":0,"showIndex":17,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a1a521de2a5708b3c3f4a93471346f58.png","name":"尿裤纸品","id":109255004,"frontDesc":"呵护宝宝的每寸肌肤","type":0,"subCateList":[],"frontName":"呵护宝宝的每寸肌肤"},{"categoryType":0,"showIndex":18,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b0ae93ae9133420fb688c193462eeabc.png","name":"洗护","id":1020004,"frontDesc":"天然专业 呵护宝宝肌","type":0,"subCateList":[],"frontName":"天然专业 呵护宝宝肌"},{"categoryType":0,"showIndex":19,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/eb8c8e70f88d8cb4866a811a34badb51.png","name":"喂养","id":1020007,"frontDesc":"宝宝吃得香 妈妈才放心","type":0,"subCateList":[],"frontName":"宝宝吃得香 妈妈才放心"},{"categoryType":0,"showIndex":20,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4843c411dec12e6873dc8d6ff0b4b3b1.png","name":"儿童家具收纳","id":109206012,"frontDesc":"有你才有家 成长快乐窝","type":0,"subCateList":[],"frontName":"有你才有家 成长快乐窝"},{"categoryType":0,"showIndex":21,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/cea5a4dcff63ff83c1f34ca576ccb8d9.png","name":"婴童被枕芯类","id":1020005,"frontDesc":"甄选贴肤材质 宝宝舒眠甜梦","type":0,"subCateList":[],"frontName":"甄选贴肤材质 宝宝舒眠甜梦"},{"categoryType":0,"showIndex":22,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c230d5a5edf629bd921ee37dabb5cb03.png","name":"婴童床品套件","id":109245001,"frontDesc":"甄选天然面料 亲肤透气","type":0,"subCateList":[],"frontName":"甄选天然面料 亲肤透气"},{"categoryType":0,"showIndex":23,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/126545cd9cd34dc4e63b815e83ec4a06.png","name":"抱被睡袋","id":109245002,"frontDesc":"贴心设计 好眠助成长","type":0,"subCateList":[],"frontName":"贴心设计 好眠助成长"},{"categoryType":0,"showIndex":24,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9556bfa01dde5eb46cf56a0bbc3c6461.png","name":"推车/安全座椅","id":109243027,"frontDesc":"安全严苛标准 溜娃神器","type":0,"subCateList":[],"frontName":"安全严苛标准 溜娃神器"},{"categoryType":0,"showIndex":25,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/064b9f83a29735b3c6517f6c6be35d47.png","name":"童包/雨具","id":109206013,"frontDesc":"出行必备包包雨具","type":0,"subCateList":[],"frontName":"出行必备包包雨具"},{"categoryType":0,"showIndex":26,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e5ae3db7c2819731768ac50b2ff04d64.png","name":"玩具","id":1020006,"frontDesc":"益智趣味 在玩乐中学习","type":0,"subCateList":[],"frontName":"益智趣味 在玩乐中学习"},{"categoryType":0,"showIndex":27,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/76a23e423710c88ac1070aed906580b2.png","name":"文具","id":1089000,"frontDesc":"本册纸笔 翻译利器","type":0,"subCateList":[],"frontName":"本册纸笔 翻译利器"},{"categoryType":0,"showIndex":28,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/628b0985bf900d543c3aad06d1f40c46.png","name":"图书","id":109243023,"frontDesc":"开拓视野 亲子共读","type":0,"subCateList":[],"frontName":"开拓视野 亲子共读"},{"showIndex":29,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2d96684c2b2dc89df9a001235abd0a6d.png","bannerUrl":"","frontDesc":"妈咪贴身衣物 承诺无荧光剂","type":0,"frontName":"妈咪贴身衣物 承诺无荧光剂","categoryType":0,"superCategoryId":1011000,"name":"孕妈服饰","iconUrl":"","id":1011001,"subCateList":[]},{"categoryType":0,"showIndex":30,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8ab1afb09ce988aef93263280e2c2097.png","name":"妈咪用品","id":109206015,"frontDesc":"新手妈妈 必备用品","type":0,"subCateList":[],"frontName":"新手妈妈 必备用品"},{"categoryType":0,"showIndex":31,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9b7bb9df09836b1cb7e46f9fefb1b2c0.png","name":"孕妈装","id":109206014,"frontDesc":"时尚大方 安全无荧光剂","type":0,"subCateList":[],"frontName":"时尚大方 安全无荧光剂"},{"categoryType":0,"showIndex":32,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b51b268801f04b6f9210967a0136e0bb.png","name":"安全座椅","id":109243026,"frontDesc":"比安全更周全 专业安全","type":0,"subCateList":[],"frontName":"比安全更周全 专业安全"},{"categoryType":0,"showIndex":33,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/7a347426bb41f4e5221001855dcbc65c.png","name":"毛巾口水巾","id":109206011,"frontDesc":"婴童高标准毛巾","type":0,"subCateList":[],"frontName":"婴童高标准毛巾"},{"categoryType":0,"showIndex":34,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c6557651e50d82d7d9f8184f8a0e955b.png","name":"儿童雨具/泳具","id":109255005,"frontDesc":"趣味玩水 放肆一夏","type":0,"subCateList":[],"frontName":"趣味玩水 放肆一夏"},{"categoryType":0,"showIndex":35,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1f93797e2f77cb0e0ac3c153183d2697.png","name":"防走丢包","id":109243024,"frontDesc":"防护牵引 安全出行","type":0,"subCateList":[],"frontName":"防护牵引 安全出行"},{"categoryType":0,"showIndex":36,"superCategoryId":1011000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/34f22f5e50082da73d91e07794a9afea.png","name":"其它箱包","id":109243025,"frontDesc":"休闲实用 出游必备","type":0,"subCateList":[],"frontName":"休闲实用 出游必备"}]},{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/36929e72018bce053af17a80a262c4bb.jpg?type=webp&imageView&quality=75&thumbnail=750x0","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"运动旅行","id":109243029,"type":0,"subCateList":[{"categoryType":0,"showIndex":1,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ba81ce10c1e0fab23d010736d65ba0a7.jpg","name":"Yessing","id":109256006,"frontDesc":"穿出你的个性态度","type":0,"subCateList":[],"frontName":"穿出你的个性态度"},{"categoryType":0,"showIndex":1,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/87e3129e372b7ebf73767f10be8a15a2.png","name":"男式运动","id":1020010,"frontDesc":"细节讲究 合身剪裁不束缚","type":0,"subCateList":[],"frontName":"细节讲究 合身剪裁不束缚"},{"categoryType":0,"showIndex":3,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/18d5a7a3ed8b3731d4e37394a37a6dd3.png","name":"健身系列","id":109254039,"frontDesc":"静体静心 养生健体","type":0,"subCateList":[],"frontName":"静体静心 养生健体"},{"categoryType":0,"showIndex":4,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2e8953d954d410a2ae2c9321651b85f1.png","name":"出行好物","id":109254040,"frontDesc":"出行好物 贴心相伴","type":0,"subCateList":[],"frontName":"出行好物 贴心相伴"},{"categoryType":0,"showIndex":5,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c2871979efcc7ed2d40bc569c7fe70a2.png","name":"男式运动外套/卫衣","id":109254042,"frontDesc":"运动工作自由切换","type":0,"subCateList":[],"frontName":"运动工作自由切换"},{"categoryType":0,"showIndex":6,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/23cbe4d7d1e3e23d4cc097a67f57b6f9.png","name":"男式运动裤装","id":109254043,"frontDesc":"运动中 让双腿更自如","type":0,"subCateList":[],"frontName":"运动中 让双腿更自如"},{"categoryType":0,"showIndex":7,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/26f8b210ff0dba32cee3e2f374c47e9b.png","name":"男式户外服装","id":109254044,"frontDesc":"防风防水 户外防晒","type":0,"subCateList":[],"frontName":"防风防水 户外防晒"},{"categoryType":0,"showIndex":8,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0ccd33322fda8fc8ad7ccc61b1207afa.png","name":"男式运动T恤","id":109254041,"frontDesc":"经典款式 运动通勤皆可","type":0,"subCateList":[],"frontName":"经典款式 运动通勤皆可"},{"categoryType":0,"showIndex":11,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/dae55f67c05dd3a544c68aaf91e2d2bd.png","name":"女式运动外套/卫衣","id":109254047,"frontDesc":"运动工作自由切换","type":0,"subCateList":[],"frontName":"运动工作自由切换"},{"categoryType":0,"showIndex":12,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3715a4db6b8449843105cd819c1b4fb3.png","name":"女式运动裤装","id":109254048,"frontDesc":"运动中 让双腿更自如","type":0,"subCateList":[],"frontName":"运动中 让双腿更自如"},{"categoryType":0,"showIndex":13,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a49e9afcf7d91826cbaa86c04c94e94d.png","name":"女式户外服装","id":109254049,"frontDesc":"防风防水 户外防晒","type":0,"subCateList":[],"frontName":"防风防水 户外防晒"},{"categoryType":0,"showIndex":14,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/639008fcca7a3a4ecc9ce5cf9e28506e.png","name":"女式运动T恤","id":109254045,"frontDesc":"经典款式 运动通勤皆可","type":0,"subCateList":[],"frontName":"经典款式 运动通勤皆可"},{"categoryType":0,"showIndex":14,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/20c2a3b3b7b1795954c58d8088e6d05e.png","name":"女式运动","id":1035002,"frontDesc":"高质感面料","type":0,"subCateList":[],"frontName":"高质感面料"},{"categoryType":0,"showIndex":15,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f2ccaf4abc6ecf8dca27b50602a61f6a.png","name":"女式运动内衣/泳装","id":109254046,"frontDesc":"运动承托 保护胸部","type":0,"subCateList":[],"frontName":"运动承托 保护胸部"},{"categoryType":0,"showIndex":15,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a1a82637fc8e1ab9eafdd7ae3eec4d4f.png","name":"男式运动下装","id":1015001,"frontDesc":"立体裁剪，专为国人打造","type":0,"subCateList":[],"frontName":"自在而潇洒的穿着感"},{"categoryType":0,"showIndex":16,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4088b6af21f8174909d62084848ef198.png","name":"女式运动下装","id":109214005,"frontDesc":"女士修身运动","type":0,"subCateList":[],"frontName":"女士修身运动"},{"categoryType":0,"showIndex":17,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4415c184ae39afbd59b5e34eed42ed4f.png","name":"男式户外","id":1078000,"frontDesc":"专业休闲运动风","type":0,"subCateList":[],"frontName":"运动休闲多场景任意切换"},{"categoryType":0,"showIndex":18,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9f820db8517536cd0fe2632955198722.png","bannerUrl":"","name":"女式户外","id":1010001,"frontDesc":"户外运动休闲运动","type":0,"subCateList":[],"frontName":"户外运动休闲运动"},{"categoryType":0,"showIndex":19,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/bc18133d4c92124c95c801f5c2582cd2.png","name":"男式运动鞋","id":109249011,"frontDesc":"热血潮流 畅快奔跑","type":0,"subCateList":[],"frontName":"热血潮流 畅快奔跑"},{"categoryType":0,"showIndex":20,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e2bf3f81c3d0916d2f7a14b6d44dcd56.png","name":"女式运动鞋","id":109249012,"frontDesc":"青春运动 轻便舒适","type":0,"subCateList":[],"frontName":"青春运动 轻便舒适"},{"categoryType":0,"showIndex":21,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/63e23cd56352d2cb3c835560e643bf9a.png","name":"旅行用品","id":1020000,"frontDesc":"便携设计 轻便旅途","type":0,"subCateList":[],"frontName":"出行小物 贴心相伴"},{"categoryType":0,"showIndex":22,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3c37a0b380fdcca237d64552db99cce0.png","name":"行李箱","id":109243030,"frontDesc":"带着梦想即刻出发","type":0,"subCateList":[],"frontName":"带着梦想即刻出发"},{"categoryType":0,"showIndex":23,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/cc5ff5a9d325a70b0693795644803d5d.png","name":"颈枕眼罩","id":109261036,"frontDesc":"多功能使用 舒适旅途","type":0,"subCateList":[],"frontName":"多功能使用 舒适旅途"},{"categoryType":0,"showIndex":24,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a97b4100cf9e753d1c51d8f38bdc3a38.png","name":"雨具","id":109261037,"frontDesc":"晴雨两用 随身出行","type":0,"subCateList":[],"frontName":"晴雨两用 随身出行"},{"categoryType":0,"showIndex":25,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b5950f5984ede4241d12ca14620c321a.png","name":"旅行收纳","id":109254051,"frontDesc":"整理你的旅行箱","type":0,"subCateList":[],"frontName":"整理你的旅行箱"},{"categoryType":0,"showIndex":26,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/01ceeee87efb0f66ee19d5b4a2c156e4.png","name":"出行用品","id":109254050,"frontDesc":"让旅途更轻松","type":0,"subCateList":[],"frontName":"让旅途更轻松"},{"categoryType":0,"showIndex":27,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c5550b962058846f3e7e45b137d1ca5f.png","name":"露营野餐","id":109243031,"frontDesc":"趣味露营 享受户外","type":0,"subCateList":[],"frontName":"趣味露营 享受户外"},{"categoryType":0,"showIndex":28,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f821a3c1d8894e89a72d396a19890810.png","name":"徒步登山","id":109261038,"frontDesc":"户外行走 探索无限","type":0,"subCateList":[],"frontName":"户外行走 探索无限"},{"categoryType":0,"showIndex":29,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b91545cb45289cc89e0bcc1a006621b9.png","name":"健身器械","id":109254052,"frontDesc":"打造自己的健身房","type":0,"subCateList":[],"frontName":"打造自己的健身房"},{"categoryType":0,"showIndex":30,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/84464237e022135f1e5e5e1c1c4f9f84.png","name":"按摩护具","id":109243033,"frontDesc":"运动防护 无惧伤害","type":0,"subCateList":[],"frontName":"运动防护 无惧伤害"},{"categoryType":0,"showIndex":31,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0ffac069b042edf1bf24090face6a4bb.png","name":"瑜伽美体","id":109261040,"frontDesc":"静体静心 养生健体","type":0,"subCateList":[],"frontName":"静体静心 养生健体"},{"categoryType":0,"showIndex":32,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2c2f4c3457c2c3c94567cd97157f43c2.png","name":"运动配件","id":109243032,"frontDesc":"运动伴侣 助力训练","type":0,"subCateList":[],"frontName":"运动伴侣 助力训练"},{"categoryType":0,"showIndex":32,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/f2bec10d8188a4980f0d5bab26ffa201.png","name":"游泳装备","id":109261041,"frontDesc":"自由泳者","type":0,"subCateList":[],"frontName":"自由泳者"},{"categoryType":0,"showIndex":32,"superCategoryId":109243029,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/12aef6f81b524bd1e9d5aa051266ca65.png","name":"球类运动","id":109261042,"frontDesc":"运动随心","type":0,"subCateList":[],"frontName":"运动随心"}]},{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/3d4fbbc11172e79e3842671c447daea9.jpg?type=webp&imageView&quality=75&thumbnail=750x0","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"数码家电","id":1043000,"type":0,"subCateList":[{"categoryType":0,"showIndex":1,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/00bc575e28c69cd85e59ec39adcb5de6.png","name":"当季热销","id":109255020,"frontDesc":"消毒抑菌/除湿烘干/清洁除螨","type":0,"subCateList":[],"frontName":"消毒抑菌/除湿烘干/清洁除螨"},{"categoryType":0,"showIndex":2,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/d2ac4fa7cf365849707e378f15e7d6e3.png","name":"新品首发","id":109255021,"frontDesc":"率先掌握上新资讯","type":0,"subCateList":[],"frontName":"率先掌握上新资讯"},{"categoryType":0,"showIndex":3,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1ca73b12b6338a54421add710d406364.png","name":"甄选爆款","id":109255019,"frontDesc":"严选用户高好评爆款","type":0,"subCateList":[],"frontName":"严选用户高好评爆款"},{"categoryType":0,"showIndex":4,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/61d16210f6dfff72668ff425b79c7190.png","name":"身体护理","id":109249010,"frontDesc":"爱护身体，方寸间蕴出肌肤之美","type":0,"subCateList":[],"frontName":"爱护身体，方寸间蕴出肌肤之美"},{"categoryType":0,"showIndex":5,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e6c44e8dd451090b324fe127e3e8616d.png","name":"口腔护理","id":109249005,"frontDesc":"清新口气，健康牙齿","type":0,"subCateList":[],"frontName":"清新口气，健康牙齿"},{"categoryType":0,"showIndex":6,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/2de6707340d511031a3fcb3d98ae770d.png","name":"面部护理","id":109249006,"frontDesc":"美容护肤，让你闪耀脱颖而出","type":0,"subCateList":[],"frontName":"美容护肤，让你闪耀脱颖而出"},{"categoryType":0,"showIndex":7,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/117270efbbb5f5520dbc609dda5d5b44.png","name":"头发护理","id":109249007,"frontDesc":"头发亮泽光彩，随心造型","type":0,"subCateList":[],"frontName":"头发亮泽光彩，随心造型"},{"categoryType":0,"showIndex":8,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/8bdd8292aae3861f52b5739174764d99.png","name":"两季电器","id":109249000,"frontDesc":"冬天温暖舒适，夏天清凉舒爽","type":0,"subCateList":[],"frontName":"冬天温暖舒适，夏天清凉舒爽"},{"categoryType":0,"showIndex":9,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c650bffea04dd2749d04d9f63edae464.png","name":"清洁电器","id":109249002,"frontDesc":"清洁好助手，每天都像住新家","type":0,"subCateList":[],"frontName":"清洁好助手，每天都像住新家"},{"categoryType":0,"showIndex":10,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b0e72093d1d047bbd0de7b3160b1506c.png","name":"衣物护理","id":109249001,"frontDesc":"焕然一新，陶醉在衣物的平顺里","type":0,"subCateList":[],"frontName":"焕然一新，陶醉在衣物的平顺里"},{"categoryType":0,"showIndex":11,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0427066bea93d5639f1ba79672ab846b.png","name":"空气调节","id":109249003,"frontDesc":"除湿/加湿/净化，空气焕然一新","type":0,"subCateList":[],"frontName":"除湿/加湿/净化，空气焕然一新"},{"categoryType":0,"showIndex":12,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/591fe5284130069a3e408517443a78dd.png","name":"厨房电器","id":1023000,"frontDesc":"囿于厨房与爱，准备丰富大餐","type":0,"subCateList":[],"frontName":"囿于厨房与爱，准备丰富大餐"},{"categoryType":0,"showIndex":13,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0a563ba0f5e2c9e75031f5f160aee9ae.png","name":"按摩器","id":109249009,"frontDesc":"你的专属按摩大师","type":0,"subCateList":[],"frontName":"你的专属按摩大师"},{"categoryType":0,"showIndex":14,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e05ec7535fb083138a4afb683c63b45b.png","name":"按摩椅","id":109249004,"frontDesc":"仿真人手按摩，享受全方位放松","type":0,"subCateList":[],"frontName":"仿真人手按摩，享受全方位放松"},{"categoryType":0,"showIndex":15,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/32481c037b206627d500daf078087ad7.png","name":"智能家居","id":109249008,"frontDesc":"智能升级家居，提升生活幸福感","type":0,"subCateList":[],"frontName":"智能升级家居，提升生活幸福感"},{"categoryType":0,"showIndex":16,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/590c1c397c52cee5cc0d13c5ccd3dc34.png","name":"智能出行","id":109255018,"frontDesc":"出行黑科技，陪你探索有趣的世界","type":0,"subCateList":[],"frontName":"出行黑科技，陪你探索有趣的世界"},{"categoryType":0,"showIndex":17,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/47e953a95e4378907b131205ce3cbc45.png","name":"3C数码","id":1022000,"frontDesc":"专为职场精英和学生设计","type":0,"subCateList":[],"frontName":"专为职场精英和学生设计"},{"categoryType":0,"showIndex":18,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/620d2c977da93f5130eb5aed639850a0.png","name":"手机配件","id":109243035,"frontDesc":"高颜值配件，武装随身装备","type":0,"subCateList":[],"frontName":"高颜值配件，武装随身装备"},{"categoryType":0,"showIndex":19,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/09c8b36ba252b486eec081479606baa7.png","name":"车载用品","id":109243036,"frontDesc":"车载神器陪你跨过山和大海","type":0,"subCateList":[],"frontName":"车载神器陪你跨过山和大海"},{"showIndex":20,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9d635abb986bd40f217dba2ac67df7f2.png","bannerUrl":"https://yanxuan.nosdn.127.net/ea626506991f03f638dc32b72212e8a3.png","frontDesc":"找回书写的力量","type":0,"frontName":"找回书写的力量","categoryType":0,"superCategoryId":1043000,"name":"办公文具","iconUrl":"https://yanxuan.nosdn.127.net/8ccf1a360077d2a8e37d33cd6427801c.png","id":109243046,"subCateList":[]},{"showIndex":21,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a2170cc17ed18303f4f18949fea341b9.png","bannerUrl":"","frontDesc":"视听盛宴","type":0,"frontName":"视听盛宴","categoryType":0,"superCategoryId":1043000,"name":"影音娱乐","iconUrl":"","id":1008006,"subCateList":[]},{"categoryType":0,"showIndex":22,"superCategoryId":1043000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/77847b8066205331eb22c9c363e3740e.png","bannerUrl":"","name":"乐器","id":1028001,"frontDesc":"造乐，开启一段别具一格的音乐历程","type":0,"subCateList":[],"frontName":"造乐，开启一段别具一格的音乐历程"}]},{"categoryType":0,"imgUrl":"https://yanxuan.nosdn.127.net/fbdf6fb0eedb27d0adc33c5bc105b5f5.jpg?type=webp&imageView&quality=75&thumbnail=750x0","showIndex":0,"superCategoryId":0,"bannerUrl":"","name":"全球特色","id":1019000,"type":0,"subCateList":[{"showIndex":1,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/70ae2b665302d78224b2e209d32f6454.jpg","bannerUrl":"https://yanxuan.nosdn.127.net/3437871ce35a1bb291d461f15a7e2beb.jpg","frontDesc":"健康身体 全球守护","type":0,"frontName":"健康身体 全球守护","categoryType":0,"superCategoryId":1019000,"name":"全球防护","iconUrl":"https://yanxuan.nosdn.127.net/85f8d354cf9c41cf1855685ae2cb9a22.jpg","id":109268001,"subCateList":[]},{"categoryType":0,"showIndex":2,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9b809562dfee86bab55e49638fc0bd92.png","name":"当季星品","id":109254027,"frontDesc":"秋冬暖心 全球好物","type":0,"subCateList":[],"frontName":"秋冬暖心 全球好物"},{"categoryType":0,"showIndex":3,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/d49727b5068e5d07ef12121131ba57f1.png","name":"好评推荐","id":109245000,"frontDesc":"口碑爆款 无限回购","type":0,"subCateList":[],"frontName":"口碑爆款 无限回购"},{"categoryType":0,"showIndex":4,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e98025a8dc0578fce04a78f19b29b5f7.png","name":"礼品点卡","id":1025000,"frontDesc":"严选礼品卡/话费充值/游戏点卡","type":0,"subCateList":[],"frontName":"严选礼品卡/话费充值/游戏点卡"},{"showIndex":5,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3294b591e402e50a859499bf343190cc.png","bannerUrl":"https://yanxuan.nosdn.127.net/e25f623df42af8929ffbc6a8abd2134c.png","frontDesc":"地方特色，匠心独运","type":0,"frontName":"地方特色，匠心独运","categoryType":0,"superCategoryId":1019000,"name":"特色手工艺","iconUrl":"https://yanxuan.nosdn.127.net/c06bf9ac1b93ddaa98091661993b72a9.png","id":109270000,"subCateList":[]},{"categoryType":0,"showIndex":6,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ef0e7cea476170bf5ea27e5fbfaaf063.png","name":"床品家纺","id":109256014,"frontDesc":"产地原料 家居推荐","type":0,"subCateList":[],"frontName":"产地原料 家居推荐"},{"categoryType":0,"showIndex":7,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/efc1a0fa662f5e199c578d24b8b39281.png","name":"餐厨用品","id":109256015,"frontDesc":"匠心名品 艺术烹饪","type":0,"subCateList":[],"frontName":"匠心名品 艺术烹饪"},{"categoryType":0,"showIndex":8,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/6cc34e3f44e2da140a2aca023d2dc61b.png","name":"日用百货","id":109256016,"frontDesc":"品质生活 悦享升级","type":0,"subCateList":[],"frontName":"品质生活 悦享升级"},{"categoryType":0,"showIndex":9,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a131ac5e43cba3d03481221d9e258531.png","name":"美妆个护","id":109256017,"frontDesc":"口碑精选 焕醒美肌","type":0,"subCateList":[],"frontName":"口碑精选 焕醒美肌"},{"categoryType":0,"showIndex":10,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/492c8129ea3933ba389b8cc5a2be78b9.png","name":"口腔护理","id":109256018,"frontDesc":"健康口腔 璀璨笑容","type":0,"subCateList":[],"frontName":"健康口腔 璀璨笑容"},{"categoryType":0,"showIndex":11,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/079e00fe5f2100c8e2e80d8f28677656.png","name":"家清卫浴","id":109256019,"frontDesc":"专业高效清洁","type":0,"subCateList":[],"frontName":"专业高效清洁"},{"categoryType":0,"showIndex":12,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4a00b88682ab9646c1a598914dfb6800.png","name":"休闲美食","id":109256021,"frontDesc":"足不出户 食遍全球","type":0,"subCateList":[],"frontName":"足不出户 食遍全球"},{"categoryType":0,"showIndex":13,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3f482ed16162d2e14090802ca3aa8997.png","name":"营养保健","id":109256020,"frontDesc":"营养健康 保健佳品","type":0,"subCateList":[],"frontName":"营养健康 保健佳品"},{"categoryType":0,"showIndex":14,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/46d8b6bda0dfd1bb0a6d8ea15b5e51fc.png","name":"高级珠宝","id":109256022,"frontDesc":"璀璨闪耀 品质甄选","type":0,"subCateList":[],"frontName":"璀璨闪耀 品质甄选"},{"categoryType":0,"showIndex":15,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1e24297816459c8a3b2d2fb568180695.png","name":"时尚配搭","id":109256023,"frontDesc":"潮流设计 彰显品味","type":0,"subCateList":[],"frontName":"潮流设计 彰显品味"},{"categoryType":0,"showIndex":16,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/c39ff69de9baf07222994196d007c335.png","name":"日韩馆","id":1065001,"frontDesc":"日韩制造生活好物","type":0,"subCateList":[],"frontName":"日韩制造生活好物"},{"categoryType":0,"showIndex":17,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/abc716169323f1b7ec9b11f243a1c742.png","name":"东南亚馆","id":1065005,"frontDesc":"东南亚特色好物","type":0,"subCateList":[],"frontName":"东南亚特色好物"},{"categoryType":0,"showIndex":18,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b8e0d041ccff6967364311588f3ef2e1.png","name":"欧美馆","id":1065004,"frontDesc":"欧美制造好物","type":0,"subCateList":[],"frontName":"欧美制造好物"},{"categoryType":0,"showIndex":19,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/06ce9b7401d93bca1869d68adb6e7a61.png","name":"澳新馆","id":1065002,"frontDesc":"澳大利亚、新西兰制造天然好物","type":0,"subCateList":[],"frontName":"澳大利亚、新西兰制造天然好物"},{"showIndex":20,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/750465c2faa5391c217601550563babc.png","bannerUrl":"https://yanxuan.nosdn.127.net/b79c71f0a896c8b650e95500644ef1e9.png","frontDesc":"8地特色，助力扶贫","type":0,"frontName":"8地特色，助力扶贫","categoryType":0,"superCategoryId":1019000,"name":"乡间好物","iconUrl":"https://yanxuan.nosdn.127.net/6f1d81d5cb39310cab92ef97891460e0.png","id":109270001,"subCateList":[]},{"categoryType":0,"showIndex":21,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/11f3825726d6ba6cf683ab529a351902.png","name":"春风馆","id":1065007,"frontDesc":"网易原创情趣品牌，专为亚洲年轻人设计","type":0,"subCateList":[],"frontName":"网易原创情趣品牌，专为亚洲年轻人设计"},{"categoryType":0,"showIndex":22,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/3835a4198a9955b6047a44998b92dc6c.png","name":"味央馆","id":1065008,"frontDesc":"网易味央精品黑猪肉","type":0,"subCateList":[],"frontName":"网易味央精品黑猪肉"},{"categoryType":0,"showIndex":23,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0fc461daa1fe3a479a2d745141ebe45b.png","name":"Yessing馆","id":109202001,"frontDesc":"Yessing品牌馆，衣生元气","type":0,"subCateList":[],"frontName":"Yessing品牌馆，衣生元气"},{"categoryType":0,"showIndex":24,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/0203a26ab1b38a3a0841eb97d93fa4b5.png","name":"国风馆","id":1038001,"frontDesc":"发现东方美学","type":0,"subCateList":[],"frontName":"发现东方美学"},{"categoryType":0,"showIndex":25,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/915a6f1e93a0f422021325c48863b331.png","name":"东方草木馆","id":1047000,"frontDesc":"大师甄选天下好茶","type":0,"subCateList":[],"frontName":"大师甄选天下好茶"},{"categoryType":0,"showIndex":26,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ef13f4b0eb17ed2c5da7fe816900f7ec.png","name":"礼盒","id":109243037,"frontDesc":"馈赠佳品","type":0,"subCateList":[],"frontName":"馈赠佳品"},{"categoryType":0,"showIndex":27,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/75d351532c2e5cf03cc1c6b37caa6216.png","name":"话费点卡","id":1050000,"frontDesc":"给信仰充值","type":0,"subCateList":[],"frontName":"给信仰充值"},{"categoryType":0,"showIndex":28,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/9e8462ef0d9d8a132fe9d5429c0706a7.png","name":"黑胶/CD","id":109257024,"frontDesc":"乐享人生","type":0,"subCateList":[],"frontName":"乐享人生"},{"categoryType":0,"showIndex":29,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/26ee378c85e9bfc7f8c31dffac0117d2.png","name":"童书/育儿","id":109244000,"frontDesc":"为孩子严选好书","type":0,"subCateList":[],"frontName":"为孩子严选好书"},{"categoryType":0,"showIndex":30,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/d11985fe7852e9fe4fcfc281e2ee9e96.png","name":"文学/小说","id":109244001,"frontDesc":"君子不器","type":0,"subCateList":[],"frontName":"君子不器"},{"categoryType":0,"showIndex":31,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/40b88a59cc3d9769f054e2ce8f381e14.png","name":"生活/娱乐","id":109251000,"frontDesc":"把日子过成诗","type":0,"subCateList":[],"frontName":"把日子过成诗"},{"categoryType":0,"showIndex":32,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/30c9826ef1eb4a088270dcc59b2960b0.png","name":"人文/社科","id":109248000,"frontDesc":"遇见思想的火花","type":0,"subCateList":[],"frontName":"遇见思想的火花"},{"categoryType":0,"showIndex":33,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4ec4e12201baabc563a4a39ee856147b.png","name":"技能/成长","id":109252000,"frontDesc":"日益精进","type":0,"subCateList":[],"frontName":"日益精进"},{"categoryType":0,"showIndex":34,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/97ee8a9031cf562a746958347cc90787.png","name":"云音乐周边","id":1065009,"frontDesc":"网易云音乐周边发售","type":0,"subCateList":[],"frontName":"网易云音乐周边发售"},{"categoryType":0,"showIndex":35,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e70587ace9f936e45198514ff8074e8d.png","name":"暴雪周边","id":1066000,"frontDesc":"暴雪周边商品发售","type":0,"subCateList":[],"frontName":"暴雪周边商品发售"},{"categoryType":0,"showIndex":36,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/98f700a137c2f8e63e5e8b8261e2030e.png","name":"我的世界","id":1041001,"frontDesc":"我的世界游戏周边","type":0,"subCateList":[],"frontName":"我的世界游戏周边"},{"categoryType":0,"showIndex":37,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b011aba7843fe35523cd084f02de4d2f.png","name":"梦幻西游","id":1033000,"frontDesc":"梦幻西游精品周边","type":0,"subCateList":[],"frontName":"梦幻西游精品周边"},{"categoryType":0,"showIndex":38,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/4615c4af82fb22d5e31cb41249982ea8.png","name":"大话西游","id":1036004,"frontDesc":"大话西游正版周边","type":0,"subCateList":[],"frontName":"大话西游正版周边"},{"categoryType":0,"showIndex":39,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/64196ac59c60923bb4023c8881376ef2.png","name":"阴阳师","id":1039000,"frontDesc":"快到寮里来","type":0,"subCateList":[],"frontName":"欧气，快到寮里来"},{"categoryType":0,"showIndex":40,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/dc5ea3f67a9312a19d685d85aae68474.png","name":"游戏印象","id":1018000,"frontDesc":"网易多款经典游戏周边","type":0,"subCateList":[],"frontName":"网易多款经典游戏周边"},{"categoryType":0,"showIndex":41,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a09ba4fc348225a055a7a3c82e05e49b.png","name":"文创周边","id":1032001,"frontDesc":"大英博物馆等文创周边","type":0,"subCateList":[],"frontName":"大英博物馆等文创周边"},{"categoryType":0,"showIndex":42,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/b47bd562bedb8631c27e639da1e92b43.png","name":"影视周边","id":1069000,"frontDesc":"漫威、DC等影视周边","type":0,"subCateList":[],"frontName":"漫威、DC等影视周边"},{"categoryType":0,"showIndex":43,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/1785d77ba60a7b7f4d7641c702c3cf5f.png","name":"动漫电玩","id":1069001,"frontDesc":"初音、任天堂等动漫游戏周边","type":0,"subCateList":[],"frontName":"初音、任天堂等动漫游戏周边"},{"categoryType":0,"showIndex":44,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/ca7287d399e71f7e10a722fcfcb725b6.png","name":"严选推荐馆","id":1065010,"frontDesc":"严选推荐精品好物","type":0,"subCateList":[],"frontName":"严选推荐精品好物"},{"categoryType":0,"showIndex":45,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/e074795f61a83292d0f20eb7d124e2ac.png","bannerUrl":"","name":"文具","id":1012003,"frontDesc":"极简设计，环保材质","type":0,"subCateList":[],"frontName":"找回书写的力量"},{"categoryType":0,"showIndex":46,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a15c33fdefe11388b6f4ed5280919fdd.png","bannerUrl":"","name":"运动户外","id":1008005,"frontDesc":"踏青出游，便携不误好心情","type":0,"subCateList":[],"frontName":"MUJI、Nike等制造商出品"},{"categoryType":0,"showIndex":47,"superCategoryId":1019000,"level":"L2","wapBannerUrl":"https://yanxuan.nosdn.127.net/a1e185658914642b71a7d51170108195.png","name":"韩国馆","id":1065003,"frontDesc":"韩国制造精巧好物","type":0,"subCateList":[],"frontName":"韩国制造精巧好物"}]}];
-
-/***/ }),
-/* 25 */
-/*!*************************************************************************************!*\
-  !*** C:/Users/Apple/Desktop/study/13-网易严选/project_app_wyyx/common/datas/index.json ***!
-  \*************************************************************************************/
-/*! exports provided: tagList, bigPromotionModule, policyDescList, popularItemList, categoryHotSellModule, newItemList, freshmanFlag, flashSaleModule, focusList, sceneLightShoppingGuideModule, kingKongModule, indexActivityModule, default */
-/***/ (function(module) {
-
-module.exports = {"tagList":[{"floorPrice":39.9,"picUrl":"https://yanxuan.nosdn.127.net/133cf0d8a4e10ac8532cad89db0dd794.png","newOnShelf":false,"webIndexVerticalPicUrl":"https://yanxuan.nosdn.127.net/133cf0d8a4e10ac8532cad89db0dd794.png","extra":{"materialContentFrom":1,"materialName":"MUJI制造商","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":4,"materialType":"制造商id","crmUserGroupId":"0","materialId":"45272774","taskId":"54643334"},"simpleDesc":"严选精选了MUJI制造商和生产原料，\n用几乎零利润的价格，剔除品牌溢价，\n让用户享受原品牌的品质生活。","name":"MUJI制造商","appListPicUrl":"https://yanxuan.nosdn.127.net/3743ffe302c32e167fd65179ac109710.jpg","id":1001000},{"floorPrice":9.9,"picUrl":"https://yanxuan.nosdn.127.net/74e2ea8f81004d0a60f90fc8e4649058.png","newOnShelf":true,"webIndexVerticalPicUrl":"https://yanxuan.nosdn.127.net/74e2ea8f81004d0a60f90fc8e4649058.png","simpleDesc":"严选海外团队，寻访日韩欧美等十几个国家，\n从打样到成型，把关数十道工序，\n只为给您带来海外直供的超值好物。","name":"海外制造商","appListPicUrl":"https://yanxuan.nosdn.127.net/f474cbb97dc23e3a6af6255bc3baa7fc.jpg","id":1080000},{"floorPrice":29.9,"picUrl":"https://yanxuan.nosdn.127.net/c097be14110f769d58245cdad73e15c3.png","newOnShelf":false,"webIndexVerticalPicUrl":"https://yanxuan.nosdn.127.net/c097be14110f769d58245cdad73e15c3.png","simpleDesc":"严选寻访Calvin Klein品牌的制造商，\n深入世界领带第一生产地，设计与品质并重，\n致力于给消费者带来优质典雅的服饰用品。","name":"CK制造商","appListPicUrl":"https://yanxuan.nosdn.127.net/61f5523c9988ae6720da4c3c81a37386.jpg","id":1026000},{"floorPrice":169,"picUrl":"https://yanxuan.nosdn.127.net/66a23d776f41cba70d00803a5231124b.png","newOnShelf":false,"webIndexVerticalPicUrl":"https://yanxuan.nosdn.127.net/66a23d776f41cba70d00803a5231124b.png","simpleDesc":"严选为制作品质与颜值兼具的箱包，\n选定新秀丽、CK、Ricardo等品牌合作的制造商，\n拥有国内先进流水线20余条，实力保障品质。","name":"新秀丽制造商","appListPicUrl":"https://yanxuan.nosdn.127.net/42f994296d3393bcb4d54b7db13db5eb.png","id":1001037}],"bigPromotionModule":{"backgroundUrl":"","floorList":[{"layout":2,"cells":[{"subTitleColor":"","schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html","title":"","picUrl":"https://yanxuan.nosdn.127.net/5db28c137605ea7576c986e9c285e1c6.png","itemCnt":20,"itemFrom":1,"subTitle":"","titleColor":"","showPrice":true,"extra":{"resource":{"materialContentFrom":1,"materialName":"抗击疫情 舒适宅家","rcmdSort":false,"taskType":1,"itemFrom":2,"resourcesId":1,"materialType":"首页大促模块","schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html","crmUserGroupId":"0","materialId":"54640074","taskId":"54647396"},"abtest_dis":"0_0","modelType":1},"popupUrl":"","leftTime":0,"itemList":[{"primarySkuPreSellStatus":0,"picUrl":"https://yanxuan-item.nosdn.127.net/e272316176963bd54052126a7657bbb9.png","pieceUnitDesc":"件","pieceNum":0,"colorNum":0,"schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html?_hid=RXAYHzE1soqc&_iid=3538009","primarySkuPreSellPrice":0,"counterPrice":59,"id":3538009,"retailPrice":53},{"primarySkuPreSellStatus":0,"picUrl":"https://yanxuan-item.nosdn.127.net/d57f7ed82ebb2b55bbd66e52b5996577.png","pieceUnitDesc":"件","pieceNum":0,"colorNum":0,"schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html?_hid=PH3zdX6FBYxM&_iid=1019000","primarySkuPreSellPrice":0,"counterPrice":99.9,"id":1019000,"retailPrice":99.9},{"primarySkuPreSellStatus":0,"picUrl":"https://yanxuan-item.nosdn.127.net/38253e4bc864ded67fe49a34fcbf70b0.png","pieceUnitDesc":"件","pieceNum":0,"colorNum":0,"schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html?_hid=WPsstBil0Zdx&_iid=1327000","primarySkuPreSellPrice":0,"counterPrice":119,"id":1327000,"retailPrice":119},{"primarySkuPreSellStatus":0,"picUrl":"https://yanxuan-item.nosdn.127.net/faaac4a8e885f65949e2752b7b4b286f.png","pieceUnitDesc":"件","pieceNum":0,"colorNum":0,"schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html?_hid=wBea8N7d8yen&_iid=1675063","primarySkuPreSellPrice":0,"counterPrice":29.9,"id":1675063,"retailPrice":29.9},{"primarySkuPreSellStatus":0,"picUrl":"https://yanxuan-item.nosdn.127.net/b8d8fad9d32d9709be5bbeff5d0724a1.png","pieceUnitDesc":"件","pieceNum":0,"colorNum":0,"schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html?_hid=LKIiZJU4IE&_iid=1296000","primarySkuPreSellPrice":0,"counterPrice":9,"id":1296000,"retailPrice":9},{"primarySkuPreSellStatus":0,"picUrl":"https://yanxuan-item.nosdn.127.net/ee68e4fe05aa55837e3d55e8b9ae85d6.png","pieceUnitDesc":"件","pieceNum":0,"colorNum":0,"schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html?_hid=fe9XWgSrqx0K&_iid=1586039","primarySkuPreSellPrice":0,"counterPrice":669,"id":1586039,"retailPrice":459},{"primarySkuPreSellStatus":0,"picUrl":"https://yanxuan-item.nosdn.127.net/d361f2992d6c688b7480ef2397ecf3fe.png","pieceUnitDesc":"件","pieceNum":0,"colorNum":0,"schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html?_hid=1Opw4q8GTWKd&_iid=1486021","primarySkuPreSellPrice":0,"counterPrice":59,"id":1486021,"retailPrice":59},{"primarySkuPreSellStatus":0,"picUrl":"https://yanxuan-item.nosdn.127.net/58b7b4a5277dddbfd9b99b07f38b6c20.png","pieceUnitDesc":"件","pieceNum":0,"colorNum":0,"schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html?_hid=BWut4BmB2xHp&_iid=1114010","primarySkuPreSellPrice":0,"counterPrice":19.9,"id":1114010,"retailPrice":19.9},{"primarySkuPreSellStatus":0,"picUrl":"https://yanxuan-item.nosdn.127.net/ae8c3cda95b2a807d0b8518f7145eda4.png","pieceUnitDesc":"件","pieceNum":0,"colorNum":0,"schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html?_hid=yjnNkJCXQKWy&_iid=3815073","primarySkuPreSellPrice":0,"counterPrice":49,"id":3815073,"retailPrice":49},{"primarySkuPreSellStatus":0,"picUrl":"https://yanxuan-item.nosdn.127.net/0b43bd83a86fd132f39e7d76829ed78f.png","pieceUnitDesc":"件","pieceNum":0,"colorNum":0,"schemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html?_hid=gc0DysDFRU1T&_iid=3811049","primarySkuPreSellPrice":0,"counterPrice":19,"id":3811049,"retailPrice":19}],"id":"rb10rnjzwE30"}],"columnNum":1,"floorType":0,"style":1,"taskId":54647396,"height":360},{"layout":1,"cells":[{"subTitleColor":"","schemeUrl":"https://act.you.163.com/pub/L62FoIBG4A.html","title":"","picUrl":"https://yanxuan.nosdn.127.net/be539f8235a88cd06a43227aeaf4df02.gif","itemCnt":0,"itemFrom":1,"subTitle":"","titleColor":"","showPrice":false,"extra":{"resource":{"materialContentFrom":1,"materialName":"网易严选防疫物资预约","rcmdSort":false,"taskType":1,"itemFrom":1,"resourcesId":2,"materialType":"首页大促模块","schemeUrl":"https://act.you.163.com/pub/L62FoIBG4A.html","crmUserGroupId":"0","materialId":"54640116","taskId":"54647404"},"modelType":1},"popupUrl":"","leftTime":0,"itemList":[],"id":"L62FoIBG4A"}],"columnNum":1,"floorType":0,"style":4,"taskId":54647404,"height":240},{"layout":1,"cells":[{"subTitleColor":"","schemeUrl":"https://act.you.163.com/act/pub/HW3LkZ184cR5.html","title":"","picUrl":"https://yanxuan.nosdn.127.net/28244c6ae7ef78424ea5317a0d72dd6a.png","itemCnt":0,"itemFrom":1,"subTitle":"","titleColor":"","showPrice":false,"extra":{"resource":{"materialContentFrom":1,"materialName":"抗击疫情 吃喝到家 强健抵抗力","rcmdSort":true,"taskType":1,"itemFrom":1,"resourcesId":3,"materialType":"首页大促模块","schemeUrl":"https://act.you.163.com/act/pub/HW3LkZ184cR5.html","crmUserGroupId":"0","materialId":"54640104","taskId":"54647361"},"modelType":1},"popupUrl":"","leftTime":0,"itemList":[],"id":"HW3LkZ184cR5"},{"subTitleColor":"","schemeUrl":"https://you.163.com/topic/v1/pub/p2tDbYocHKd2.html","title":"","picUrl":"https://yanxuan.nosdn.127.net/15b56691109bba3adf6156fd44f14073.png","itemCnt":0,"itemFrom":1,"subTitle":"","titleColor":"","showPrice":false,"extra":{"resource":{"materialContentFrom":1,"materialName":"科学防护 用心生活","rcmdSort":true,"taskType":1,"itemFrom":1,"resourcesId":3,"materialType":"首页大促模块","schemeUrl":"https://you.163.com/topic/v1/pub/p2tDbYocHKd2.html","crmUserGroupId":"0","materialId":"54640104","taskId":"54647361"},"modelType":1},"popupUrl":"","leftTime":0,"itemList":[],"id":"p2tDbYocHKd2"}],"columnNum":2,"floorType":0,"style":1,"taskId":54647361,"height":279},{"layout":1,"cells":[{"subTitleColor":"","schemeUrl":"https://act.you.163.com/act/pub/KR5ebCKbCQtR.html","title":"","picUrl":"https://yanxuan.nosdn.127.net/83b35324b02e31aa202a12971fa7f8c3.png","itemCnt":0,"itemFrom":1,"subTitle":"","titleColor":"","showPrice":false,"extra":{"resource":{"materialContentFrom":1,"materialName":"宅家玩乐 消灭无聊","rcmdSort":true,"taskType":1,"itemFrom":1,"resourcesId":3,"materialType":"首页大促模块","schemeUrl":"https://act.you.163.com/act/pub/KR5ebCKbCQtR.html","crmUserGroupId":"0","materialId":"54640104","taskId":"54647361"},"modelType":1},"popupUrl":"","leftTime":0,"itemList":[],"id":"KR5ebCKbCQtR"},{"subTitleColor":"","schemeUrl":"https://you.163.com/topic/v1/pub/NOvLN2wFt7PX.html","title":"","picUrl":"https://yanxuan.nosdn.127.net/2c98b2002572ec4cd0824bc810d7d31f.png","itemCnt":0,"itemFrom":1,"subTitle":"","titleColor":"","showPrice":false,"extra":{"resource":{"materialContentFrom":1,"materialName":"抗击疫情 新品快报","rcmdSort":true,"taskType":1,"itemFrom":1,"resourcesId":3,"materialType":"首页大促模块","schemeUrl":"https://you.163.com/topic/v1/pub/NOvLN2wFt7PX.html","crmUserGroupId":"0","materialId":"54640104","taskId":"54647361"},"modelType":1},"popupUrl":"","leftTime":0,"itemList":[],"id":"NOvLN2wFt7PX"}],"columnNum":2,"floorType":0,"style":1,"taskId":54647361,"height":279}],"backgroundColor":"1674e3"},"policyDescList":[{"icon":"https://yanxuan.nosdn.127.net/a03dd909803b9ac032eba58b7253a2f6.png","schemeUrl":"","desc":"网易自营品牌"},{"icon":"https://yanxuan.nosdn.127.net/2d0402ffcd52b3ec3b07422681c42a89.png","schemeUrl":"","desc":"30天无忧退货"},{"icon":"https://yanxuan.nosdn.127.net/eb61ee48e8942dbd1784c9ee75ebe955.png","schemeUrl":"","desc":"48小时快速退款"}],"popularItemList":[],"categoryHotSellModule":{"titleTargetUrl":"","categoryList":[{"categorys":[{"picUrl":"https://yanxuan-item.nosdn.127.net/5ad3990d8d1ca731b56ee11d151facfd.png","itemPicBeanList":[{"itemId":3986451,"picUrl":"https://yanxuan-item.nosdn.127.net/5ad3990d8d1ca731b56ee11d151facfd.png"},{"itemId":3986451,"picUrl":"https://yanxuan-item.nosdn.127.net/5ad3990d8d1ca731b56ee11d151facfd.png"},{"itemId":3986451,"picUrl":"https://yanxuan-item.nosdn.127.net/5ad3990d8d1ca731b56ee11d151facfd.png"},{"itemId":3477011,"picUrl":"https://yanxuan-item.nosdn.127.net/3bd7a2e27f9ced5f72d9ce4c069c7326.png"},{"itemId":3477011,"picUrl":"https://yanxuan-item.nosdn.127.net/3bd7a2e27f9ced5f72d9ce4c069c7326.png"},{"itemId":1318002,"picUrl":"https://yanxuan-item.nosdn.127.net/644a27b8e168b8fe8e43ccaad934b24e.png"},{"itemId":3986451,"picUrl":"https://yanxuan-item.nosdn.127.net/5ad3990d8d1ca731b56ee11d151facfd.png"},{"itemId":3446012,"picUrl":"https://yanxuan-item.nosdn.127.net/d7393e6b604cd89022361c65b1b03183.png"},{"itemId":3446012,"picUrl":"https://yanxuan-item.nosdn.127.net/d7393e6b604cd89022361c65b1b03183.png"},{"itemId":3446012,"picUrl":"https://yanxuan-item.nosdn.127.net/d7393e6b604cd89022361c65b1b03183.png"},{"itemId":3446012,"picUrl":"https://yanxuan-item.nosdn.127.net/d7393e6b604cd89022361c65b1b03183.png"},{"itemId":1625008,"picUrl":"https://yanxuan-item.nosdn.127.net/c89c4c86c6cb31805bd537d8c772a231.png"},{"itemId":1625008,"picUrl":"https://yanxuan-item.nosdn.127.net/c89c4c86c6cb31805bd537d8c772a231.png"},{"itemId":1604016,"picUrl":"https://yanxuan-item.nosdn.127.net/74662d24f6d217b520178c5a6d031457.png"},{"itemId":1604016,"picUrl":"https://yanxuan-item.nosdn.127.net/74662d24f6d217b520178c5a6d031457.png"},{"itemId":1545016,"picUrl":"https://yanxuan-item.nosdn.127.net/6cdb3da46a4b95b36dea89d6d47d3bd9.png"},{"itemId":1545016,"picUrl":"https://yanxuan-item.nosdn.127.net/6cdb3da46a4b95b36dea89d6d47d3bd9.png"},{"itemId":1398016,"picUrl":"https://yanxuan-item.nosdn.127.net/9d581d4ec02cf86ff2a05cf81868f159.png"},{"itemId":1398016,"picUrl":"https://yanxuan-item.nosdn.127.net/9d581d4ec02cf86ff2a05cf81868f159.png"},{"itemId":1674003,"picUrl":"https://yanxuan-item.nosdn.127.net/e30375922143f7fad7465fb56bc5acd6.png"},{"itemId":1674003,"picUrl":"https://yanxuan-item.nosdn.127.net/e30375922143f7fad7465fb56bc5acd6.png"},{"itemId":1674003,"picUrl":"https://yanxuan-item.nosdn.127.net/e30375922143f7fad7465fb56bc5acd6.png"},{"itemId":3988892,"picUrl":"https://yanxuan-item.nosdn.127.net/d691b12d383ea93c2108a383e2b1d3cc.png"},{"itemId":1134066,"picUrl":"https://yanxuan-item.nosdn.127.net/1b8e4a484e128c28a050cd2bc0c64396.png"},{"itemId":1134066,"picUrl":"https://yanxuan-item.nosdn.127.net/1b8e4a484e128c28a050cd2bc0c64396.png"},{"itemId":1572030,"picUrl":"https://yanxuan-item.nosdn.127.net/a4c5c5c63d8e3595f15a95819b2cf758.png"},{"itemId":1572030,"picUrl":"https://yanxuan-item.nosdn.127.net/a4c5c5c63d8e3595f15a95819b2cf758.png"},{"itemId":1535011,"picUrl":"https://yanxuan-item.nosdn.127.net/e37656ecad9a2494f456e222fe7800a2.png"},{"itemId":1535011,"picUrl":"https://yanxuan-item.nosdn.127.net/e37656ecad9a2494f456e222fe7800a2.png"},{"itemId":3815073,"picUrl":"https://yanxuan-item.nosdn.127.net/ae8c3cda95b2a807d0b8518f7145eda4.png"},{"itemId":3815073,"picUrl":"https://yanxuan-item.nosdn.127.net/ae8c3cda95b2a807d0b8518f7145eda4.png"}],"categoryName":"热销榜","targetUrl":"https://m.you.163.com/item/saleRank","showPicUrl":"https://yanxuan-item.nosdn.127.net/5ad3990d8d1ca731b56ee11d151facfd.png","extra":{"operationResource":{"categoryName":"热销榜","itemIdList":["3986451","3986451","3986451","3477011","3477011","1318002","3986451","3446012","3446012","3446012","3446012","1625008","1625008","1604016","1604016","1545016","1545016","1398016","1398016","1674003","1674003","1674003","3988892","1134066","1134066","1572030","1572030","1535011","1535011","3815073","3815073"],"categoryId":"0"},"modelType":5}},{"picUrl":"https://yanxuan-item.nosdn.127.net/167a29187b6f8963c45da5a5eda02598.png","itemPicBeanList":[{"itemId":3988757,"picUrl":"https://yanxuan-item.nosdn.127.net/2057746c0f31ce6faf10ae5a1257a2ba.png"},{"itemId":3481285,"picUrl":"https://yanxuan-item.nosdn.127.net/167a29187b6f8963c45da5a5eda02598.png"},{"itemId":3986076,"picUrl":"https://yanxuan-item.nosdn.127.net/d1132e557a1c2f94673dde8e6c18e4a2.png"},{"itemId":1548001,"picUrl":"https://yanxuan-item.nosdn.127.net/bb9025c24057dfb89403055ac5b9f85c.png"},{"itemId":3987496,"picUrl":"https://yanxuan-item.nosdn.127.net/3e901ce30de874724aefaed030a2436a.png"},{"itemId":3986478,"picUrl":"https://yanxuan-item.nosdn.127.net/eb841bdf69fb606edb8426e9ec659d9f.png"},{"itemId":3987072,"picUrl":"https://yanxuan-item.nosdn.127.net/7436d376016c68bc7b0b20fd26ecddca.png"},{"itemId":3986078,"picUrl":"https://yanxuan-item.nosdn.127.net/1c46042c0d5621efe2f603b173d86cfd.png"},{"itemId":3889009,"picUrl":"https://yanxuan-item.nosdn.127.net/13ec8a8a5f53ce6ae749f7a4ecbea303.png"},{"itemId":3986610,"picUrl":"https://yanxuan-item.nosdn.127.net/db7da2d6bffbc494d4294a4c7f340803.png"},{"itemId":3835007,"picUrl":"https://yanxuan-item.nosdn.127.net/eea064c1198b70f1b80b86c4fc579141.png"},{"itemId":3987561,"picUrl":"https://yanxuan-item.nosdn.127.net/3aeaeca579722ec4bb3f20e9165e2843.png"},{"itemId":3440087,"picUrl":"https://yanxuan-item.nosdn.127.net/41f9f2b2fdf811df27a2b2a115151264.png"},{"itemId":3814061,"picUrl":"https://yanxuan-item.nosdn.127.net/bd1402ac25aaa08776e3333aa89a76e2.png"},{"itemId":3986593,"picUrl":"https://yanxuan-item.nosdn.127.net/1a958527eed0524c9967832bba80266c.png"},{"itemId":3829004,"picUrl":"https://yanxuan-item.nosdn.127.net/f0fb8d25330a9287c4ceed84d1054f1b.png"},{"itemId":3440174,"picUrl":"https://yanxuan-item.nosdn.127.net/ef76f6daebdc9144e16805a256733204.png"},{"itemId":3841017,"picUrl":"https://yanxuan-item.nosdn.127.net/0eaa052d6e85e569a22c84b8ceabf53c.png"},{"itemId":3842002,"picUrl":"https://yanxuan-item.nosdn.127.net/ed97bc1603a6cee30ec37be1f18de066.png"},{"itemId":3887003,"picUrl":"https://yanxuan-item.nosdn.127.net/1a57efba2c5a84b9c1863f1568f5aa3b.png"},{"itemId":3837000,"picUrl":"https://yanxuan-item.nosdn.127.net/93626f99e2ada07262dc927d825f6bf4.png"},{"itemId":3986873,"picUrl":"https://yanxuan-item.nosdn.127.net/c8f29bf1b565722b3e41f1b78a737a78.png"},{"itemId":3452065,"picUrl":"https://yanxuan-item.nosdn.127.net/50b8f1872bbecfebdad2e685cb2bbf9b.png"},{"itemId":3879027,"picUrl":"https://yanxuan-item.nosdn.127.net/23092082bbd97d6254d0771f2108ec6b.png"},{"itemId":3826045,"picUrl":"https://yanxuan-item.nosdn.127.net/e41b15e64ce3aaf2c98bc772ddac0717.png"},{"itemId":3876015,"picUrl":"https://yanxuan-item.nosdn.127.net/169dc00563839b9608ff7adad30554a6.png"},{"itemId":1649004,"picUrl":"https://yanxuan-item.nosdn.127.net/8224171cf2701207ed8f2c2f2b36aa90.png"},{"itemId":3509074,"picUrl":"https://yanxuan-item.nosdn.127.net/1adac0418956931d445e1f6e8dba08f1.png"},{"itemId":1666047,"picUrl":"https://yanxuan-item.nosdn.127.net/cd25ed880fd5b55dd19444a1cc2e0549.png"},{"itemId":1296000,"picUrl":"https://yanxuan-item.nosdn.127.net/b8d8fad9d32d9709be5bbeff5d0724a1.png"},{"itemId":1636013,"picUrl":"https://yanxuan-item.nosdn.127.net/7f76d9225c0fe72da5e4d9f0fc7e2792.png"}],"categoryName":"好评榜","targetUrl":"https://m.you.163.com/item/praiseRank","showPicUrl":"https://yanxuan-item.nosdn.127.net/167a29187b6f8963c45da5a5eda02598.png","extra":{"operationResource":{"categoryName":"好评榜","itemIdList":["3988757","3481285","3986076","1548001","3987496","3986478","3987072","3986078","3889009","3986610","3835007","3987561","3440087","3814061","3986593","3829004","3440174","3841017","3842002","3887003","3837000","3986873","3452065","3879027","3826045","3876015","1649004","3509074","1666047","1296000","1636013"],"categoryId":"0"},"modelType":5}}]},{"categorys":[{"picUrl":"https://yanxuan-item.nosdn.127.net/3bd7a2e27f9ced5f72d9ce4c069c7326.png","itemPicBeanList":[{"itemId":3477011,"picUrl":"https://yanxuan-item.nosdn.127.net/3bd7a2e27f9ced5f72d9ce4c069c7326.png"},{"itemId":1398016,"picUrl":"https://yanxuan-item.nosdn.127.net/9d581d4ec02cf86ff2a05cf81868f159.png"},{"itemId":1572030,"picUrl":"https://yanxuan-item.nosdn.127.net/a4c5c5c63d8e3595f15a95819b2cf758.png"},{"itemId":1535011,"picUrl":"https://yanxuan-item.nosdn.127.net/e37656ecad9a2494f456e222fe7800a2.png"},{"itemId":3815073,"picUrl":"https://yanxuan-item.nosdn.127.net/ae8c3cda95b2a807d0b8518f7145eda4.png"},{"itemId":1535010,"picUrl":"https://yanxuan-item.nosdn.127.net/59eb7e52ab114c894a8179bc2991122b.png"},{"itemId":1667011,"picUrl":"https://yanxuan-item.nosdn.127.net/f4cccc00bf214181daa940a415e7006f.png"},{"itemId":3536062,"picUrl":"https://yanxuan-item.nosdn.127.net/df1cd9bde3b5e7f5839ee1a7445d07e0.png"},{"itemId":3988289,"picUrl":"https://yanxuan-item.nosdn.127.net/0fd9f9e40f287ecfe3b54aaafda914f6.png"},{"itemId":1546002,"picUrl":"https://yanxuan-item.nosdn.127.net/61593601cd7a375c4932f3e9bee3974a.png"},{"itemId":3431002,"picUrl":"https://yanxuan-item.nosdn.127.net/cfba711ea8e5709e7eded536e07c2353.png"},{"itemId":1667007,"picUrl":"https://yanxuan-item.nosdn.127.net/5800035cda4787b4bf8d8da8c151bdc2.png"},{"itemId":3829051,"picUrl":"https://yanxuan-item.nosdn.127.net/858cc027d5dae682799a633cd331a29a.png"},{"itemId":1468002,"picUrl":"https://yanxuan-item.nosdn.127.net/bd2842f9eda908dae2d71f980eeb282e.png"},{"itemId":3827015,"picUrl":"https://yanxuan-item.nosdn.127.net/3d97f83a2dad069a504bb4ae0296f9ca.png"},{"itemId":3988762,"picUrl":"https://yanxuan-item.nosdn.127.net/f346d2ec9b751e79e36461fa497f0802.png"},{"itemId":3411026,"picUrl":"https://yanxuan-item.nosdn.127.net/69b84734318007147dfed06136a452a2.png"},{"itemId":1685016,"picUrl":"https://yanxuan-item.nosdn.127.net/48f3d7c6c7f345c5cbe9142082cf22da.png"},{"itemId":1146006,"picUrl":"https://yanxuan-item.nosdn.127.net/6763c33e5242040e7e678630b4e6eba5.png"},{"itemId":3987262,"picUrl":"https://yanxuan-item.nosdn.127.net/4b7e018166760dca3c4db0197603201d.png"},{"itemId":1146007,"picUrl":"https://yanxuan-item.nosdn.127.net/0188adf6cdc4c1159fe647fa5092cb0f.png"},{"itemId":3464032,"picUrl":"https://yanxuan-item.nosdn.127.net/1dc64c483ca555e291b2efda6d187c7f.png"},{"itemId":3408026,"picUrl":"https://yanxuan-item.nosdn.127.net/10d1e7f4306328d551724235120a9e3f.png"},{"itemId":1097000,"picUrl":"https://yanxuan-item.nosdn.127.net/6e05a3a46a46a34e7fa5b86c122a0787.png"},{"itemId":1321000,"picUrl":"https://yanxuan-item.nosdn.127.net/39e5df244905c79abf947fb4a534699d.png"},{"itemId":3807037,"picUrl":"https://yanxuan-item.nosdn.127.net/dfaf80d547d4c4f76aa13c492a9f3b7e.png"},{"itemId":1417023,"picUrl":"https://yanxuan-item.nosdn.127.net/6f8849cd376ea181f977f0ae40f309eb.png"},{"itemId":3478058,"picUrl":"https://yanxuan-item.nosdn.127.net/e03b4bda61111be8002a3954b668152b.png"}],"categoryName":"美食酒水榜","targetUrl":"https://m.you.163.com/item/saleRank?categoryId=1005002","showPicUrl":"https://yanxuan-item.nosdn.127.net/3bd7a2e27f9ced5f72d9ce4c069c7326.png","extra":{"operationResource":{"categoryName":"美食酒水","itemIdList":["3477011","1398016","1572030","1535011","3815073","1535010","1667011","3536062","3988289","1546002","3431002","1667007","3829051","1468002","3827015","3988762","3411026","1685016","1146006","3987262","1146007","3464032","3408026","1097000","1321000","3807037","1417023","3478058"],"categoryId":"1005002"},"modelType":5}},{"picUrl":"https://yanxuan-item.nosdn.127.net/644a27b8e168b8fe8e43ccaad934b24e.png","itemPicBeanList":[{"itemId":1318002,"picUrl":"https://yanxuan-item.nosdn.127.net/644a27b8e168b8fe8e43ccaad934b24e.png"},{"itemId":1625008,"picUrl":"https://yanxuan-item.nosdn.127.net/c89c4c86c6cb31805bd537d8c772a231.png"},{"itemId":1545016,"picUrl":"https://yanxuan-item.nosdn.127.net/6cdb3da46a4b95b36dea89d6d47d3bd9.png"},{"itemId":1674003,"picUrl":"https://yanxuan-item.nosdn.127.net/e30375922143f7fad7465fb56bc5acd6.png"},{"itemId":1116033,"picUrl":"https://yanxuan-item.nosdn.127.net/91a264d84fed57f97c48dc107370e941.png"},{"itemId":3829116,"picUrl":"https://yanxuan-item.nosdn.127.net/4fc7ea43e829af4ed31e09673f68db89.png"},{"itemId":1110003,"picUrl":"https://yanxuan-item.nosdn.127.net/9a33f08a3b0f5c06fdf4c586d51b2f7c.png"},{"itemId":1418015,"picUrl":"https://yanxuan-item.nosdn.127.net/98b31f57668b2b5b4f3adba5c3d96723.png"},{"itemId":3408074,"picUrl":"https://yanxuan-item.nosdn.127.net/609452a430143ec9e691abddb067ec67.png"},{"itemId":1435024,"picUrl":"https://yanxuan-item.nosdn.127.net/0bd018282b7ba6db74b21f8c0daed220.png"},{"itemId":1624016,"picUrl":"https://yanxuan-item.nosdn.127.net/eed2ed6e83189517ba35f3781271f773.png"},{"itemId":3413004,"picUrl":"https://yanxuan-item.nosdn.127.net/30fe9253a061b5c4c7c389b7caf24a67.png"},{"itemId":1602000,"picUrl":"https://yanxuan-item.nosdn.127.net/05b82f4f46da9dc58dc873b365598292.png"},{"itemId":1045004,"picUrl":"https://yanxuan-item.nosdn.127.net/a2585d4686f7cba87f3f12a7e6d45b50.png"},{"itemId":1108008,"picUrl":"https://yanxuan-item.nosdn.127.net/0fecbab07b9a3522015958ba8f31e27a.png"},{"itemId":3828015,"picUrl":"https://yanxuan-item.nosdn.127.net/ab098b429e5a1f9715d938cd7d54f26a.png"},{"itemId":3439006,"picUrl":"https://yanxuan-item.nosdn.127.net/073f16bf0c7ad8634c3abb7636e063c2.png"},{"itemId":3986654,"picUrl":"https://yanxuan-item.nosdn.127.net/197283c8f697f9063674779345ccbabe.png"},{"itemId":3407081,"picUrl":"https://yanxuan-item.nosdn.127.net/75085afc77fc5bc5e74a35e6838b1846.png"},{"itemId":1666005,"picUrl":"https://yanxuan-item.nosdn.127.net/32609b32caf1c24b5f8b8262fd9c21dc.png"},{"itemId":3425016,"picUrl":"https://yanxuan-item.nosdn.127.net/e20c17ba8be5eaa596303bc47ebefc32.png"},{"itemId":1088001,"picUrl":"https://yanxuan-item.nosdn.127.net/24493db956be11a09de5e71d389010c7.png"},{"itemId":3823052,"picUrl":"https://yanxuan-item.nosdn.127.net/280cfa5d1739fe7f079933ea133e9841.png"},{"itemId":1149000,"picUrl":"https://yanxuan-item.nosdn.127.net/16b4d581afc5a9cd36e8adc8ed6ceb4f.png"},{"itemId":1435025,"picUrl":"https://yanxuan-item.nosdn.127.net/a7f4693aa7f7c1683340c6cd64286529.png"},{"itemId":1630007,"picUrl":"https://yanxuan-item.nosdn.127.net/86989f8cb0ece3d5ebf903b988abae79.png"},{"itemId":1619034,"picUrl":"https://yanxuan-item.nosdn.127.net/fcac9df3f0cc28e91b3daaf703a3ab7c.png"},{"itemId":3440021,"picUrl":"https://yanxuan-item.nosdn.127.net/12bd7528fc75e16b775fa2cb1024f80a.jpg"}],"categoryName":"居家生活榜","targetUrl":"https://m.you.163.com/item/saleRank?categoryId=1005000","showPicUrl":"https://yanxuan-item.nosdn.127.net/644a27b8e168b8fe8e43ccaad934b24e.png","extra":{"operationResource":{"categoryName":"居家生活","itemIdList":["1318002","1625008","1545016","1674003","1116033","3829116","1110003","1418015","3408074","1435024","1624016","3413004","1602000","1045004","1108008","3828015","3439006","3986654","3407081","1666005","3425016","1088001","3823052","1149000","1435025","1630007","1619034","3440021"],"categoryId":"1005000"},"modelType":5}},{"picUrl":"https://yanxuan-item.nosdn.127.net/7806718d4928df310d5c64300183664d.png","itemPicBeanList":[{"itemId":3986451,"picUrl":"https://yanxuan-item.nosdn.127.net/5ad3990d8d1ca731b56ee11d151facfd.png"},{"itemId":1652019,"picUrl":"https://yanxuan-item.nosdn.127.net/7806718d4928df310d5c64300183664d.png"},{"itemId":1113001,"picUrl":"https://yanxuan-item.nosdn.127.net/431a09a43914483f4d70aeda8ecb8a59.png"},{"itemId":3829116,"picUrl":"https://yanxuan-item.nosdn.127.net/4fc7ea43e829af4ed31e09673f68db89.png"},{"itemId":3826011,"picUrl":"https://yanxuan-item.nosdn.127.net/901be61b95ed8dfc89947125cbdc603b.png"},{"itemId":1333015,"picUrl":"https://yanxuan-item.nosdn.127.net/24dd7f6f16154871f09e86766cc92a94.png"},{"itemId":1077003,"picUrl":"https://yanxuan-item.nosdn.127.net/a10ed5c19533c9e1e2abf1d8cb843c24.png"},{"itemId":3402020,"picUrl":"https://yanxuan-item.nosdn.127.net/2c0147161faaa160cf10b6770f1e290d.png"},{"itemId":1418015,"picUrl":"https://yanxuan-item.nosdn.127.net/98b31f57668b2b5b4f3adba5c3d96723.png"},{"itemId":3434003,"picUrl":"https://yanxuan-item.nosdn.127.net/fd9ab8ca4a9e89cb71d24ef2c27783c0.png"},{"itemId":1501008,"picUrl":"https://yanxuan-item.nosdn.127.net/fbae3a43b448d2e6e6671936ba665b99.png"},{"itemId":1657008,"picUrl":"https://yanxuan-item.nosdn.127.net/107dae4c67a6247355771369b8182725.png"},{"itemId":1683007,"picUrl":"https://yanxuan-item.nosdn.127.net/1f93923086cbb7d63be958c920289f05.png"},{"itemId":1127007,"picUrl":"https://yanxuan-item.nosdn.127.net/ecef155d279e1a485b4f31f87daa3698.png"},{"itemId":1540017,"picUrl":"https://yanxuan-item.nosdn.127.net/7137bfc9887a2baf0c9188f7a62c5e6e.png"},{"itemId":3416001,"picUrl":"https://yanxuan-item.nosdn.127.net/899d91ae4b28e9bb42d617aa6691276d.png"},{"itemId":1154003,"picUrl":"https://yanxuan-item.nosdn.127.net/7a0e064c1fd99b5eb16608bca9b7aa0d.png"},{"itemId":3408014,"picUrl":"https://yanxuan-item.nosdn.127.net/0434f5cb29b2c6c6ade2f1c0487ae97c.png"},{"itemId":3988757,"picUrl":"https://yanxuan-item.nosdn.127.net/2057746c0f31ce6faf10ae5a1257a2ba.png"},{"itemId":3406010,"picUrl":"https://yanxuan-item.nosdn.127.net/85b1bd60c128affe100068ed20037787.png"},{"itemId":1085007,"picUrl":"https://yanxuan-item.nosdn.127.net/05eed5e90b2d6002600dddd4dd66260d.png"},{"itemId":3407065,"picUrl":"https://yanxuan-item.nosdn.127.net/8710b394afc12ff039fac08dfb9333bb.png"},{"itemId":3444027,"picUrl":"https://yanxuan-item.nosdn.127.net/846dacb553fd65090b6fc9c3eef06cdf.png"},{"itemId":3850013,"picUrl":"https://yanxuan-item.nosdn.127.net/cff84f8844c856004e8de2595b76f570.png"},{"itemId":1637002,"picUrl":"https://yanxuan-item.nosdn.127.net/f5b1cba9a449797089d43cfe6939933d.png"},{"itemId":3506034,"picUrl":"https://yanxuan-item.nosdn.127.net/71e2c597d7c02912c9fe635cdc2a9c0d.png"},{"itemId":3835007,"picUrl":"https://yanxuan-item.nosdn.127.net/eea064c1198b70f1b80b86c4fc579141.png"},{"itemId":3987388,"picUrl":"https://yanxuan-item.nosdn.127.net/c97ed9ccfdf8441a8a6f54727ea149b8.png"},{"itemId":3527154,"picUrl":"https://yanxuan-item.nosdn.127.net/02dd07dbee4575a71afa30fd680a6ec7.png"},{"itemId":1389000,"picUrl":"https://yanxuan-item.nosdn.127.net/64c3915f7edb71c10dbfbd18441f271c.png"}],"categoryName":"个护清洁榜","targetUrl":"https://m.you.163.com/item/saleRank?categoryId=1013001","showPicUrl":"https://yanxuan-item.nosdn.127.net/7806718d4928df310d5c64300183664d.png","extra":{"operationResource":{"categoryName":"个护清洁","itemIdList":["3986451","1652019","1113001","3829116","3826011","1333015","1077003","3402020","1418015","3434003","1501008","1657008","1683007","1127007","1540017","3416001","1154003","3408014","3988757","3406010","1085007","3407065","3444027","3850013","1637002","3506034","3835007","3987388","3527154","1389000"],"categoryId":"1013001"},"modelType":5}},{"picUrl":"https://yanxuan-item.nosdn.127.net/d7393e6b604cd89022361c65b1b03183.png","itemPicBeanList":[{"itemId":3446012,"picUrl":"https://yanxuan-item.nosdn.127.net/d7393e6b604cd89022361c65b1b03183.png"},{"itemId":1545016,"picUrl":"https://yanxuan-item.nosdn.127.net/6cdb3da46a4b95b36dea89d6d47d3bd9.png"},{"itemId":3988892,"picUrl":"https://yanxuan-item.nosdn.127.net/d691b12d383ea93c2108a383e2b1d3cc.png"},{"itemId":3413006,"picUrl":"https://yanxuan-item.nosdn.127.net/cf6cbe1d80601f109a85fd48cbe27478.png"},{"itemId":1632002,"picUrl":"https://yanxuan-item.nosdn.127.net/6035c5adac64b2c2913e81661a2ea0f9.png"},{"itemId":1624001,"picUrl":"https://yanxuan-item.nosdn.127.net/51348ec7731f5ed5c4bb9e0bed88717c.png"},{"itemId":3987138,"picUrl":"https://yanxuan-item.nosdn.127.net/d85a7584368da59994f84651affc4dab.png"},{"itemId":3827023,"picUrl":"https://yanxuan-item.nosdn.127.net/a517938254c7d2f480827debf355127a.png"},{"itemId":1624016,"picUrl":"https://yanxuan-item.nosdn.127.net/eed2ed6e83189517ba35f3781271f773.png"},{"itemId":1127007,"picUrl":"https://yanxuan-item.nosdn.127.net/ecef155d279e1a485b4f31f87daa3698.png"},{"itemId":1154003,"picUrl":"https://yanxuan-item.nosdn.127.net/7a0e064c1fd99b5eb16608bca9b7aa0d.png"},{"itemId":3408014,"picUrl":"https://yanxuan-item.nosdn.127.net/0434f5cb29b2c6c6ade2f1c0487ae97c.png"},{"itemId":3827027,"picUrl":"https://yanxuan-item.nosdn.127.net/6628f73e4ff16ae5fdb12f5be75c5557.png"},{"itemId":1327018,"picUrl":"https://yanxuan-item.nosdn.127.net/e9730c230d3df388ce6c32e037642c2d.png"},{"itemId":1401002,"picUrl":"https://yanxuan-item.nosdn.127.net/ca3c524b92922b9b03fdd7dc965c9401.png"},{"itemId":1685001,"picUrl":"https://yanxuan-item.nosdn.127.net/c7feab536c0d0fa95ed12d987e9bd667.png"},{"itemId":1401006,"picUrl":"https://yanxuan-item.nosdn.127.net/5e702b909a7d0cf391bfa8d3fce03c92.png"},{"itemId":3407065,"picUrl":"https://yanxuan-item.nosdn.127.net/8710b394afc12ff039fac08dfb9333bb.png"},{"itemId":1637002,"picUrl":"https://yanxuan-item.nosdn.127.net/f5b1cba9a449797089d43cfe6939933d.png"},{"itemId":1663026,"picUrl":"https://yanxuan-item.nosdn.127.net/db3837ad978e07ab908fbd3814eb1104.png"},{"itemId":3534014,"picUrl":"https://yanxuan-item.nosdn.127.net/75ce66f46c287cc512749f9e8328f0b3.png"},{"itemId":3835007,"picUrl":"https://yanxuan-item.nosdn.127.net/eea064c1198b70f1b80b86c4fc579141.png"},{"itemId":3527154,"picUrl":"https://yanxuan-item.nosdn.127.net/02dd07dbee4575a71afa30fd680a6ec7.png"},{"itemId":1505029,"picUrl":"https://yanxuan-item.nosdn.127.net/ea9af61f4504871f72c4b9ef38ca4799.png"},{"itemId":3986478,"picUrl":"https://yanxuan-item.nosdn.127.net/eb841bdf69fb606edb8426e9ec659d9f.png"},{"itemId":3986451,"picUrl":"https://yanxuan-item.nosdn.127.net/5ad3990d8d1ca731b56ee11d151facfd.png"},{"itemId":3839008,"picUrl":"https://yanxuan-item.nosdn.127.net/ea324a88d74978c5a11fe99ece5734ae.png"},{"itemId":3986456,"picUrl":"https://yanxuan-item.nosdn.127.net/dd2e334e302eaaa35eb1e32962fa2270.png"},{"itemId":1497001,"picUrl":"https://yanxuan-item.nosdn.127.net/7c850ef50fc408c4eab4d7abdb920da3.png"}],"categoryName":"数码家电榜","targetUrl":"https://m.you.163.com/item/saleRank?categoryId=1043000","showPicUrl":"https://yanxuan-item.nosdn.127.net/d7393e6b604cd89022361c65b1b03183.png","extra":{"operationResource":{"categoryName":"数码家电","itemIdList":["3446012","1545016","3988892","3413006","1632002","1624001","3987138","3827023","1624016","1127007","1154003","3408014","3827027","1327018","1401002","1685001","1401006","3407065","1637002","1663026","3534014","3835007","3527154","1505029","3986478","3986451","3839008","3986456","1497001"],"categoryId":"1043000"},"modelType":5}},{"picUrl":"https://yanxuan-item.nosdn.127.net/073f16bf0c7ad8634c3abb7636e063c2.png","itemPicBeanList":[{"itemId":3439006,"picUrl":"https://yanxuan-item.nosdn.127.net/073f16bf0c7ad8634c3abb7636e063c2.png"},{"itemId":1165077,"picUrl":"https://yanxuan-item.nosdn.127.net/e3601637765b05a45663e8769f543c2a.png"},{"itemId":1619034,"picUrl":"https://yanxuan-item.nosdn.127.net/fcac9df3f0cc28e91b3daaf703a3ab7c.png"},{"itemId":3815050,"picUrl":"https://yanxuan-item.nosdn.127.net/9c77ddefae8fa0f16d8a43bf0aa1513d.png"},{"itemId":1021020,"picUrl":"https://yanxuan-item.nosdn.127.net/445689c4faa55f8186c500e68bff73d6.png"},{"itemId":3544005,"picUrl":"https://yanxuan-item.nosdn.127.net/451ebe1c8725d9490ca7e2aa27b05a0f.png"},{"itemId":1092026,"picUrl":"https://yanxuan-item.nosdn.127.net/58fdbceab428754d9b8e8b3019d84c4e.png"},{"itemId":1579024,"picUrl":"https://yanxuan-item.nosdn.127.net/fc6cc915cd1908496330bc6565e02a95.png"},{"itemId":3807047,"picUrl":"https://yanxuan-item.nosdn.127.net/d2dd346577e3e12bd2be6f2876bfd0a5.png"},{"itemId":3988685,"picUrl":"https://yanxuan-item.nosdn.127.net/d2a6ef279ffdde2da008b5e0ecc077da.png"},{"itemId":3989003,"picUrl":"https://yanxuan-item.nosdn.127.net/d4464eb557bfc669e723b6446c75425a.png"},{"itemId":3438018,"picUrl":"https://yanxuan-item.nosdn.127.net/864633a00a776555b1c53abd50df0a40.png"},{"itemId":3987228,"picUrl":"https://yanxuan-item.nosdn.127.net/d0a9acac56c9a656d133be31082442ff.png"},{"itemId":3844004,"picUrl":"https://yanxuan-item.nosdn.127.net/5f3c4891e0f21c9e8148b9c1125a0c33.png"},{"itemId":3829003,"picUrl":"https://yanxuan-item.nosdn.127.net/a8eea196aa7c107b2814cfa2976caec6.png"},{"itemId":1114010,"picUrl":"https://yanxuan-item.nosdn.127.net/58b7b4a5277dddbfd9b99b07f38b6c20.png"},{"itemId":3827062,"picUrl":"https://yanxuan-item.nosdn.127.net/e628bb179d408c27d6a001c01ba507da.png"},{"itemId":3803003,"picUrl":"https://yanxuan-item.nosdn.127.net/dd17a2568c133b642930acbfe6923d32.png"},{"itemId":3804052,"picUrl":"https://yanxuan-item.nosdn.127.net/e49e636cb6049b12822bee7e96c0adad.png"},{"itemId":1638000,"picUrl":"https://yanxuan-item.nosdn.127.net/671b2fc5d8a5fd7c8ed3527482a50507.png"},{"itemId":3827036,"picUrl":"https://yanxuan-item.nosdn.127.net/755bdc78a25c9e0e8a4652de863af649.png"},{"itemId":1306027,"picUrl":"https://yanxuan-item.nosdn.127.net/271eb0b3d94e80579afdeb614cc240ad.png"},{"itemId":3879023,"picUrl":"https://yanxuan-item.nosdn.127.net/5e051676b8a7a8006fadee20186d07be.png"},{"itemId":1056000,"picUrl":"https://yanxuan-item.nosdn.127.net/7be46223373b04fc2f42e0bd2add4d61.png"},{"itemId":1164006,"picUrl":"https://yanxuan-item.nosdn.127.net/e9de2a3b586c3cbed7fd621d7810d2f4.png"},{"itemId":1647014,"picUrl":"https://yanxuan-item.nosdn.127.net/68659daa403d8ec16bc898b744448936.png"},{"itemId":1269023,"picUrl":"https://yanxuan-item.nosdn.127.net/3a33addfccd4a624a9d86b04c0717ef9.png"},{"itemId":1165015,"picUrl":"https://yanxuan-item.nosdn.127.net/17c3596d257753108d1d471b8ea4d385.png"},{"itemId":3430055,"picUrl":"https://yanxuan-item.nosdn.127.net/e7c9f9a6dd880e47ba8287d1ba89b61d.png"},{"itemId":3826032,"picUrl":"https://yanxuan-item.nosdn.127.net/762201923f701baa5325df5762684e50.png"}],"categoryName":"服饰鞋包榜","targetUrl":"https://m.you.163.com/item/saleRank?categoryId=1010000","showPicUrl":"https://yanxuan-item.nosdn.127.net/073f16bf0c7ad8634c3abb7636e063c2.png","extra":{"operationResource":{"categoryName":"服饰鞋包","itemIdList":["3439006","1165077","1619034","3815050","1021020","3544005","1092026","1579024","3807047","3988685","3989003","3438018","3987228","3844004","3829003","1114010","3827062","3803003","3804052","1638000","3827036","1306027","3879023","1056000","1164006","1647014","1269023","1165015","3430055","3826032"],"categoryId":"1010000"},"modelType":5}},{"picUrl":"https://yanxuan-item.nosdn.127.net/4b72ba8cdcf9eccd3ed1e6be35b09ab8.png","itemPicBeanList":[{"itemId":1076017,"picUrl":"https://yanxuan-item.nosdn.127.net/4b72ba8cdcf9eccd3ed1e6be35b09ab8.png"},{"itemId":3446012,"picUrl":"https://yanxuan-item.nosdn.127.net/d7393e6b604cd89022361c65b1b03183.png"},{"itemId":1674003,"picUrl":"https://yanxuan-item.nosdn.127.net/e30375922143f7fad7465fb56bc5acd6.png"},{"itemId":1546002,"picUrl":"https://yanxuan-item.nosdn.127.net/61593601cd7a375c4932f3e9bee3974a.png"},{"itemId":3431002,"picUrl":"https://yanxuan-item.nosdn.127.net/cfba711ea8e5709e7eded536e07c2353.png"},{"itemId":1076018,"picUrl":"https://yanxuan-item.nosdn.127.net/82de8fdea1c8bba21b26099612ff5605.png"},{"itemId":1683007,"picUrl":"https://yanxuan-item.nosdn.127.net/1f93923086cbb7d63be958c920289f05.png"},{"itemId":1685016,"picUrl":"https://yanxuan-item.nosdn.127.net/48f3d7c6c7f345c5cbe9142082cf22da.png"},{"itemId":1602000,"picUrl":"https://yanxuan-item.nosdn.127.net/05b82f4f46da9dc58dc873b365598292.png"},{"itemId":1076015,"picUrl":"https://yanxuan-item.nosdn.127.net/e1d87f845a5773665bd7042d28cbf11a.png"},{"itemId":3464032,"picUrl":"https://yanxuan-item.nosdn.127.net/1dc64c483ca555e291b2efda6d187c7f.png"},{"itemId":3807037,"picUrl":"https://yanxuan-item.nosdn.127.net/dfaf80d547d4c4f76aa13c492a9f3b7e.png"},{"itemId":1076016,"picUrl":"https://yanxuan-item.nosdn.127.net/a31d7ecdec0f914e1c375fac666c1183.png"},{"itemId":3806051,"picUrl":"https://yanxuan-item.nosdn.127.net/13610915f5e3cdcc1bff067a1e967cb4.png"},{"itemId":3827027,"picUrl":"https://yanxuan-item.nosdn.127.net/6628f73e4ff16ae5fdb12f5be75c5557.png"},{"itemId":1666005,"picUrl":"https://yanxuan-item.nosdn.127.net/32609b32caf1c24b5f8b8262fd9c21dc.png"},{"itemId":1354000,"picUrl":"https://yanxuan-item.nosdn.127.net/d3fa5c27c960809f119e42dab99fed4d.png"},{"itemId":1149000,"picUrl":"https://yanxuan-item.nosdn.127.net/16b4d581afc5a9cd36e8adc8ed6ceb4f.png"},{"itemId":3444027,"picUrl":"https://yanxuan-item.nosdn.127.net/846dacb553fd65090b6fc9c3eef06cdf.png"},{"itemId":3850013,"picUrl":"https://yanxuan-item.nosdn.127.net/cff84f8844c856004e8de2595b76f570.png"},{"itemId":1637002,"picUrl":"https://yanxuan-item.nosdn.127.net/f5b1cba9a449797089d43cfe6939933d.png"},{"itemId":3528024,"picUrl":"https://yanxuan-item.nosdn.127.net/afa5ffed53da00d519fdb1bc765cdf38.png"},{"itemId":3534014,"picUrl":"https://yanxuan-item.nosdn.127.net/75ce66f46c287cc512749f9e8328f0b3.png"},{"itemId":3987388,"picUrl":"https://yanxuan-item.nosdn.127.net/c97ed9ccfdf8441a8a6f54727ea149b8.png"},{"itemId":1389000,"picUrl":"https://yanxuan-item.nosdn.127.net/64c3915f7edb71c10dbfbd18441f271c.png"},{"itemId":1023014,"picUrl":"https://yanxuan-item.nosdn.127.net/056e0e74a683d7e0011bd583d0084b7c.png"},{"itemId":3986195,"picUrl":"https://yanxuan-item.nosdn.127.net/ff51113995d5c8e1a78fb4a93b0765ec.png"},{"itemId":3986552,"picUrl":"https://yanxuan-item.nosdn.127.net/364bb4175dd73987f11dc1a701e28a2f.png"},{"itemId":1494003,"picUrl":"https://yanxuan-item.nosdn.127.net/0ac21674d619c4558d99c0f380fd5b71.png"},{"itemId":3398008,"picUrl":"https://yanxuan-item.nosdn.127.net/dfc5f3de3aeaf0b4616c644b23df35a8.png"}],"categoryName":"全球特色榜","targetUrl":"https://m.you.163.com/item/saleRank?categoryId=1019000","showPicUrl":"https://yanxuan-item.nosdn.127.net/4b72ba8cdcf9eccd3ed1e6be35b09ab8.png","extra":{"operationResource":{"categoryName":"全球特色","itemIdList":["1076017","3446012","1674003","1546002","3431002","1076018","1683007","1685016","1602000","1076015","3464032","3807037","1076016","3806051","3827027","1666005","1354000","1149000","3444027","3850013","1637002","3528024","3534014","3987388","1389000","1023014","3986195","3986552","1494003","3398008"],"categoryId":"1019000"},"modelType":5}},{"picUrl":"https://yanxuan-item.nosdn.127.net/74662d24f6d217b520178c5a6d031457.png","itemPicBeanList":[{"itemId":1604016,"picUrl":"https://yanxuan-item.nosdn.127.net/74662d24f6d217b520178c5a6d031457.png"},{"itemId":1134066,"picUrl":"https://yanxuan-item.nosdn.127.net/1b8e4a484e128c28a050cd2bc0c64396.png"},{"itemId":1606002,"picUrl":"https://yanxuan-item.nosdn.127.net/f444ac11115a8249a92dc95dccad6e07.png"},{"itemId":1572013,"picUrl":"https://yanxuan-item.nosdn.127.net/7e4db021bc68c9af8eddecdb1aa96c36.png"},{"itemId":1116034,"picUrl":"https://yanxuan-item.nosdn.127.net/cfd2ab8d2ea2188ff422c5c91c1d920c.png"},{"itemId":1552005,"picUrl":"https://yanxuan-item.nosdn.127.net/00382181864967c1125b75bd5289c8d3.png"},{"itemId":3986078,"picUrl":"https://yanxuan-item.nosdn.127.net/1c46042c0d5621efe2f603b173d86cfd.png"},{"itemId":3986728,"picUrl":"https://yanxuan-item.nosdn.127.net/17967f3d15414239a5c3c33a7892f301.png"},{"itemId":1145038,"picUrl":"https://yanxuan-item.nosdn.127.net/80c440036a9c27cac336a7e50be53484.png"},{"itemId":1506021,"picUrl":"https://yanxuan-item.nosdn.127.net/98f00e8b15f30c11e3e64f1da7fba591.png"},{"itemId":1295000,"picUrl":"https://yanxuan-item.nosdn.127.net/4467776eb370a1d46e0dac48a6ae9893.png"},{"itemId":3986076,"picUrl":"https://yanxuan-item.nosdn.127.net/d1132e557a1c2f94673dde8e6c18e4a2.png"},{"itemId":1621036,"picUrl":"https://yanxuan-item.nosdn.127.net/d77d0a70cfa7efdf313b3a03dbfb699b.png"},{"itemId":1542005,"picUrl":"https://yanxuan-item.nosdn.127.net/d044967f76d92def0fb74ce862c10e73.png"},{"itemId":1519013,"picUrl":"https://yanxuan-item.nosdn.127.net/a7282c351cd083c116449a7eec8e7ee0.png"},{"itemId":1572014,"picUrl":"https://yanxuan-item.nosdn.127.net/209d87bdf39b3854b6baaaf70ee58067.png"},{"itemId":3440174,"picUrl":"https://yanxuan-item.nosdn.127.net/ef76f6daebdc9144e16805a256733204.png"},{"itemId":1686131,"picUrl":"https://yanxuan-item.nosdn.127.net/4b051d129f25cbb48989b7c50f5b8f2c.png"},{"itemId":3465086,"picUrl":"https://yanxuan-item.nosdn.127.net/eee600116ae63125c7039ae22363efdc.png"},{"itemId":1683030,"picUrl":"https://yanxuan-item.nosdn.127.net/24999493f12f64dfa49d32c2a980dc35.png"},{"itemId":1687102,"picUrl":"https://yanxuan-item.nosdn.127.net/f694a24583a2f174ac5ec8f8e92d4c26.png"},{"itemId":3444037,"picUrl":"https://yanxuan-item.nosdn.127.net/b7479401c6bcf1e793efff5a771d9e27.png"},{"itemId":3407077,"picUrl":"https://yanxuan-item.nosdn.127.net/30a1c84b7810a5765974e577e2554930.png"},{"itemId":1087003,"picUrl":"https://yanxuan-item.nosdn.127.net/e1ae521258e83b2e1f0654725a6e0613.png"},{"itemId":3518001,"picUrl":"https://yanxuan-item.nosdn.127.net/31e5fe96e442201b115ff56cd2780465.png"},{"itemId":1561001,"picUrl":"https://yanxuan-item.nosdn.127.net/0064e22029d052276c2f8e49b1f3973d.png"},{"itemId":3465083,"picUrl":"https://yanxuan-item.nosdn.127.net/a43c2c9578659e7f8a36018a070ae0dc.jpg"},{"itemId":3551096,"picUrl":"https://yanxuan-item.nosdn.127.net/48e950097b26963768f1406b594cf19c.png"},{"itemId":3844033,"picUrl":"https://yanxuan-item.nosdn.127.net/3ddebc9df09f6b10b9b301d1edf2c303.png"},{"itemId":1296000,"picUrl":"https://yanxuan-item.nosdn.127.net/b8d8fad9d32d9709be5bbeff5d0724a1.png"}],"categoryName":"母婴亲子榜","targetUrl":"https://m.you.163.com/item/saleRank?categoryId=1011000","showPicUrl":"https://yanxuan-item.nosdn.127.net/74662d24f6d217b520178c5a6d031457.png","extra":{"operationResource":{"categoryName":"母婴亲子","itemIdList":["1604016","1134066","1606002","1572013","1116034","1552005","3986078","3986728","1145038","1506021","1295000","3986076","1621036","1542005","1519013","1572014","3440174","1686131","3465086","1683030","1687102","3444037","3407077","1087003","3518001","1561001","3465083","3551096","3844033","1296000"],"categoryId":"1011000"},"modelType":5}},{"picUrl":"https://yanxuan-item.nosdn.127.net/a9d6de39ab17ab82d5424205dafc4136.png","itemPicBeanList":[{"itemId":1690003,"picUrl":"https://yanxuan-item.nosdn.127.net/a9d6de39ab17ab82d5424205dafc4136.png"},{"itemId":3988074,"picUrl":"https://yanxuan-item.nosdn.127.net/605284004e9bc314b081bea86e22faab.jpg"},{"itemId":3988462,"picUrl":"https://yanxuan-item.nosdn.127.net/797a29814fea9f623efb204d96fd3e3e.png"},{"itemId":3548011,"picUrl":"https://yanxuan-item.nosdn.127.net/3a4f384b28c9d98f5e78080cfb4180dd.png"},{"itemId":3498011,"picUrl":"https://yanxuan-item.nosdn.127.net/84334e0d0a33897bb8f5fee654fa0cee.jpg"},{"itemId":3815050,"picUrl":"https://yanxuan-item.nosdn.127.net/9c77ddefae8fa0f16d8a43bf0aa1513d.png"},{"itemId":1092026,"picUrl":"https://yanxuan-item.nosdn.127.net/58fdbceab428754d9b8e8b3019d84c4e.png"},{"itemId":3986845,"picUrl":"https://yanxuan-item.nosdn.127.net/df6809f00fcf5c333dc73828180b68fb.png"},{"itemId":3814094,"picUrl":"https://yanxuan-item.nosdn.127.net/6fd807743e8e25472aca8b6b0b8f3039.png"},{"itemId":1667018,"picUrl":"https://yanxuan-item.nosdn.127.net/b47e916d628ff9a755ba4cbaa61047c4.png"},{"itemId":3406006,"picUrl":"https://yanxuan-item.nosdn.127.net/9e5ae955b287d65e2a7ba5b868b81f2b.png"},{"itemId":1459005,"picUrl":"https://yanxuan-item.nosdn.127.net/c442593e0cf25a42d37941554b587418.png"},{"itemId":1621018,"picUrl":"https://yanxuan-item.nosdn.127.net/b051b5aa933cde8d952905becd2046d8.png"},{"itemId":1306027,"picUrl":"https://yanxuan-item.nosdn.127.net/271eb0b3d94e80579afdeb614cc240ad.png"},{"itemId":3507202,"picUrl":"https://yanxuan-item.nosdn.127.net/3246fe9bab23cb76c64dde0d15bba98f.png"},{"itemId":1245014,"picUrl":"https://yanxuan-item.nosdn.127.net/068b1375219cec84915cebcb8488f693.png"},{"itemId":3490048,"picUrl":"https://yanxuan-item.nosdn.127.net/9bd9a7f5e71a42fc38b54163aab1ecb8.png"},{"itemId":1281002,"picUrl":"https://yanxuan-item.nosdn.127.net/2da94f0a57bd6e9b5270bd2246564dde.png"},{"itemId":1436030,"picUrl":"https://yanxuan-item.nosdn.127.net/ebc0e2183705ee6f8aa572ecf6ad87a1.png"},{"itemId":1306026,"picUrl":"https://yanxuan-item.nosdn.127.net/63967eb40b0af505f1fd066442952bab.png"},{"itemId":1114011,"picUrl":"https://yanxuan-item.nosdn.127.net/0fe562392cd8af853a565fb5c302fe3f.png"},{"itemId":1092025,"picUrl":"https://yanxuan-item.nosdn.127.net/07fbaf7a9dd2c7fdf751eacb0248197c.png"},{"itemId":3843007,"picUrl":"https://yanxuan-item.nosdn.127.net/6025face64c792f05772c398e63b0cc8.png"},{"itemId":1156006,"picUrl":"https://yanxuan-item.nosdn.127.net/61b90e0df4c551cb05f7c601646bf2f7.png"},{"itemId":3810003,"picUrl":"https://yanxuan-item.nosdn.127.net/6c7f73dbf8ae911fefaeef6ecea8a054.jpg"},{"itemId":1446001,"picUrl":"https://yanxuan-item.nosdn.127.net/7a151bad1d4dde3015d5471c4fd6e172.png"},{"itemId":1555000,"picUrl":"https://yanxuan-item.nosdn.127.net/57103d892fa09deae9ef9e56c301f14a.png"},{"itemId":1085019,"picUrl":"https://yanxuan-item.nosdn.127.net/c27abf14fa51f922122d9c81d7e68bd8.png"},{"itemId":1023001,"picUrl":"https://yanxuan-item.nosdn.127.net/f313e44efaff1acfe83745f1a3da40ec.png"}],"categoryName":"运动旅行榜","targetUrl":"https://m.you.163.com/item/saleRank?categoryId=109243029","showPicUrl":"https://yanxuan-item.nosdn.127.net/a9d6de39ab17ab82d5424205dafc4136.png","extra":{"operationResource":{"categoryName":"运动旅行","itemIdList":["1690003","3988074","3988462","3548011","3498011","3815050","1092026","3986845","3814094","1667018","3406006","1459005","1621018","1306027","3507202","1245014","3490048","1281002","1436030","1306026","1114011","1092025","3843007","1156006","3810003","1446001","1555000","1085019","1023001"],"categoryId":"109243029"},"modelType":5}}]}],"title":"类目热销榜"},"newItemList":[{"goodCmtCount":0,"couponConflict":true,"scenePicUrl":"https://yanxuan-item.nosdn.127.net/00672a49574126cce712b9f5d5354391.jpg","listPicUrl":"https://yanxuan-item.nosdn.127.net/cc66ac0e306d77a241f6fd9ac34b2a00.png","tagId":0,"simpleDesc":"轻松手剥，多汁化渣","primarySkuPreSellPrice":0,"limitedFlag":204,"newItemFlag":true,"showPicUrl":"https://yanxuan-item.nosdn.127.net/0fd9f9e40f287ecfe3b54aaafda914f6.png","itemTagList":[{"itemId":3988289,"tagId":0,"freshmanExclusive":false,"name":"新品","subType":0,"forbidJump":false,"type":1},{"itemId":3988289,"tagId":128129559,"freshmanExclusive":false,"name":"特价","subType":204,"forbidJump":false,"type":2}],"primarySkuPreSellStatus":0,"pieceNum":0,"extra":{"resource":{"materialType":"商品id","materialId":"54639954","itemId":"3988289","materialContentFrom":1,"materialName":"赏味正当时，春见耙耙柑 5斤","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":1,"itemIdList":["3988289"],"crmUserGroupId":"0","taskId":"54646758"},"modelType":1},"id":3988289,"sellVolume":678,"isCouponConflict":true,"colorNum":0,"primaryPicUrl":"https://yanxuan-item.nosdn.127.net/0fd9f9e40f287ecfe3b54aaafda914f6.png","displaySkuId":300197090,"pieceUnitDesc":"件","resourcesId":0,"discountFlag":false,"name":"赏味正当时，春见耙耙柑 5斤","productPlace":"","counterPrice":69,"couponPrice":0,"cutFlag":false,"retailPrice":59,"primary":true,"status":2},{"goodCmtCount":0,"couponConflict":true,"scenePicUrl":"https://yanxuan-item.nosdn.127.net/ed57e215a3a926fbc8577b58fd6463d0.jpg","listPicUrl":"https://yanxuan-item.nosdn.127.net/e83757662dab293c7af8da0e599a5eb4.png","tagId":0,"simpleDesc":"高达30%的免疫球蛋白","primarySkuPreSellPrice":0,"limitedFlag":204,"newItemFlag":true,"showPicUrl":"https://yanxuan-item.nosdn.127.net/f346d2ec9b751e79e36461fa497f0802.png","itemTagList":[{"itemId":3988762,"tagId":0,"freshmanExclusive":false,"name":"新品","subType":0,"forbidJump":false,"type":1},{"itemId":3988762,"tagId":128129529,"freshmanExclusive":false,"name":"特价","subType":204,"forbidJump":false,"type":2}],"primarySkuPreSellStatus":0,"pieceNum":0,"extra":{"resource":{"materialType":"商品id","materialId":"54639819","itemId":"3988762","materialContentFrom":1,"materialName":"富含免疫球蛋白，纯牛初乳粉 1克*30袋*2罐","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":2,"itemIdList":["3988762"],"crmUserGroupId":"0","taskId":"54646759"},"modelType":1},"id":3988762,"sellVolume":510,"isCouponConflict":true,"colorNum":0,"primaryPicUrl":"https://yanxuan-item.nosdn.127.net/f346d2ec9b751e79e36461fa497f0802.png","displaySkuId":300198968,"pieceUnitDesc":"件","resourcesId":0,"discountFlag":false,"name":"富含免疫球蛋白，纯牛初乳粉 1克*30袋*2罐","productPlace":"","counterPrice":399,"couponPrice":0,"cutFlag":false,"retailPrice":298,"primary":true,"status":2},{"goodCmtCount":0,"couponConflict":true,"scenePicUrl":"https://yanxuan-item.nosdn.127.net/38a509d18e8c388173f560ceb51e00a6.jpg","listPicUrl":"https://yanxuan-item.nosdn.127.net/ebfdce31ffb1a2c1d297ba4cbc47c99d.png","tagId":0,"simpleDesc":"采用紫外灯深层照射水雾，确保水雾纯净清新","primarySkuPreSellPrice":0,"limitedFlag":0,"newItemFlag":true,"showPicUrl":"https://yanxuan-item.nosdn.127.net/b924f1025d1aa8bc437b97e23201f81a.jpg","itemTagList":[{"itemId":3988903,"tagId":0,"freshmanExclusive":false,"name":"新品","subType":0,"forbidJump":false,"type":1}],"primarySkuPreSellStatus":0,"pieceNum":0,"extra":{"resource":{"materialType":"商品id","materialId":"54639955","itemId":"3988903","materialContentFrom":1,"materialName":"【UV紫外线杀菌】水质净化加湿器 5L大容量","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":3,"itemIdList":["3988903"],"crmUserGroupId":"0","taskId":"54646760"},"modelType":1},"id":3988903,"sellVolume":598,"isCouponConflict":true,"colorNum":0,"primaryPicUrl":"https://yanxuan-item.nosdn.127.net/b924f1025d1aa8bc437b97e23201f81a.jpg","displaySkuId":300200082,"pieceUnitDesc":"件","resourcesId":0,"discountFlag":false,"name":"【UV紫外线杀菌】水质净化加湿器 5L大容量","productPlace":"","couponPrice":0,"cutFlag":false,"retailPrice":139,"primary":true,"status":2},{"goodCmtCount":0,"couponConflict":true,"scenePicUrl":"https://yanxuan-item.nosdn.127.net/22e3d3086c99647e7abb9acf7ec49d88.jpg","listPicUrl":"https://yanxuan-item.nosdn.127.net/0841f96ee9a6f05bceb358b15cb8da25.png","tagId":0,"simpleDesc":"三重玻尿酸深层补水 长效锁水 肌肤水润透白","primarySkuPreSellPrice":0,"limitedFlag":0,"newItemFlag":false,"showPicUrl":"https://yanxuan-item.nosdn.127.net/c97ed9ccfdf8441a8a6f54727ea149b8.png","itemTagList":[{"itemId":3987388,"tagId":0,"freshmanExclusive":false,"name":"满88顺丰包邮","subType":0,"forbidJump":false,"type":0}],"primarySkuPreSellStatus":0,"pieceNum":0,"extra":{"resource":{"materialType":"商品id","materialId":"54639456","itemId":"3987388","materialContentFrom":1,"materialName":"敷出水润仙女肌 西班牙玻尿酸深层补水面膜","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":4,"itemIdList":["3987388"],"crmUserGroupId":"0","taskId":"54646761"},"modelType":1},"id":3987388,"sellVolume":236,"isCouponConflict":true,"colorNum":0,"primaryPicUrl":"https://yanxuan-item.nosdn.127.net/c97ed9ccfdf8441a8a6f54727ea149b8.png","displaySkuId":300192878,"pieceUnitDesc":"件","resourcesId":0,"discountFlag":false,"name":"敷出水润仙女肌 西班牙玻尿酸深层补水面膜","productPlace":"","couponPrice":0,"cutFlag":false,"retailPrice":159,"primary":true,"status":2},{"goodCmtCount":0,"couponConflict":true,"scenePicUrl":"https://yanxuan-item.nosdn.127.net/7e47621006f247f02601bf96e407c96c.png","listPicUrl":"https://yanxuan-item.nosdn.127.net/dc413d2d5e81dc11997b8a0ca0abab2f.png","tagId":0,"simpleDesc":"99.99%高效环保杀菌，每天都用新牙刷！","primarySkuPreSellPrice":0,"limitedFlag":0,"newItemFlag":true,"showPicUrl":"https://yanxuan-item.nosdn.127.net/d691b12d383ea93c2108a383e2b1d3cc.png","itemTagList":[{"itemId":3988892,"tagId":0,"freshmanExclusive":false,"name":"新品","subType":0,"forbidJump":false,"type":1}],"primarySkuPreSellStatus":0,"pieceNum":0,"extra":{"resource":{"materialType":"商品id","materialId":"54640059","itemId":"3988892","materialContentFrom":1,"materialName":"不要把病菌刷到嘴里，紫外线牙刷消毒收纳架","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":6,"itemIdList":["3988892"],"crmUserGroupId":"0","taskId":"54646763"},"modelType":1},"id":3988892,"sellVolume":687,"isCouponConflict":true,"colorNum":0,"primaryPicUrl":"https://yanxuan-item.nosdn.127.net/d691b12d383ea93c2108a383e2b1d3cc.png","displaySkuId":300199920,"pieceUnitDesc":"件","resourcesId":0,"discountFlag":false,"name":"不要把病菌刷到嘴里，紫外线牙刷消毒收纳架","productPlace":"","couponPrice":0,"cutFlag":false,"retailPrice":298,"primary":true,"status":2},{"goodCmtCount":0,"couponConflict":true,"scenePicUrl":"https://yanxuan-item.nosdn.127.net/d421db66d7dd061ededcc2bc430780e4.jpg","listPicUrl":"https://yanxuan-item.nosdn.127.net/5b8a31f4fa0045defafbd54c60f7346c.png","tagId":0,"simpleDesc":"泰国进口，绵密香醇","primarySkuPreSellPrice":0,"limitedFlag":204,"newItemFlag":false,"showPicUrl":"https://yanxuan-item.nosdn.127.net/190ef99484d669354838b4f37e0dd336.png","itemTagList":[{"itemId":3986150,"tagId":128129527,"freshmanExclusive":false,"name":"特价","subType":204,"forbidJump":false,"type":2}],"primarySkuPreSellStatus":0,"pieceNum":0,"extra":{"resource":{"materialType":"商品id","materialId":"54639236","itemId":"3986150","materialContentFrom":1,"materialName":"冰封住的绵密香甜，泰国金枕榴莲冻肉 300克","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":7,"itemIdList":["3986150"],"crmUserGroupId":"0","taskId":"54646764"},"modelType":1},"id":3986150,"sellVolume":7901,"isCouponConflict":true,"colorNum":0,"primaryPicUrl":"https://yanxuan-item.nosdn.127.net/5b8a31f4fa0045defafbd54c60f7346c.png","displaySkuId":300185954,"pieceUnitDesc":"件","resourcesId":0,"discountFlag":false,"name":"冰封住的绵密香甜，泰国金枕榴莲冻肉 300克","productPlace":"泰国","counterPrice":68,"couponPrice":0,"cutFlag":false,"retailPrice":63,"primary":true,"status":2}],"freshmanFlag":true,"flashSaleModule":{"activityPrice":199,"primaryPicUrl":"https://yanxuan-item.nosdn.127.net/a5486fc786b49e02cb3fc65686ba89f6.png","nextStartTime":1581904800000,"itemList":[{"itemId":1625008,"picUrl":"https://yanxuan-item.nosdn.127.net/a5486fc786b49e02cb3fc65686ba89f6.png","activityPrice":199,"originPrice":259,"showPicUrl":"https://yanxuan-item.nosdn.127.net/c89c4c86c6cb31805bd537d8c772a231.png"},{"itemId":3529053,"picUrl":"https://yanxuan-item.nosdn.127.net/7d147d6c9f1707f0e0f9b3d825d69775.png","activityPrice":599,"originPrice":799,"showPicUrl":"https://yanxuan-item.nosdn.127.net/bc869ed5218e472655526a89224a6517.png"},{"itemId":1116033,"picUrl":"https://yanxuan-item.nosdn.127.net/d96e57a0fad3675e2f88890e64b8cbd9.png","activityPrice":1189,"originPrice":1399,"showPicUrl":"https://yanxuan-item.nosdn.127.net/91a264d84fed57f97c48dc107370e941.png"},{"itemId":1009013,"picUrl":"https://yanxuan-item.nosdn.127.net/3bbb65a733f290ca6adf5e7772dd761d.png","activityPrice":79,"originPrice":99,"showPicUrl":"https://yanxuan-item.nosdn.127.net/3b7a448ea9a148b76e399b699d78f6c5.png"},{"itemId":3416001,"picUrl":"https://yanxuan-item.nosdn.127.net/9df8cd5635ef6cbe7bbaa008de70caf5.png","activityPrice":55.9,"originPrice":69,"showPicUrl":"https://yanxuan-item.nosdn.127.net/899d91ae4b28e9bb42d617aa6691276d.png"},{"itemId":1683007,"picUrl":"https://yanxuan-item.nosdn.127.net/6b642811e46781dea284df964dd0a68b.png","activityPrice":239,"originPrice":299,"showPicUrl":"https://yanxuan-item.nosdn.127.net/1f93923086cbb7d63be958c920289f05.png"}],"remainTime":1178252,"showFlash":true,"flashSaleScreenId":115102115},"focusList":[{"picUrl":"https://yanxuan.nosdn.127.net/a18ab9d5f61b74b67732a928e8a5ad0f.jpg","expireTime":0,"extra":{"materialContentFrom":1,"materialName":"防疫活动-主会场v2-2.4-2.24","rcmdSort":false,"taskType":1,"itemFrom":0,"resourcesId":1,"materialType":"广告banner","crmUserGroupId":"0","materialId":"54639872","taskId":"54647271"},"name":"防疫活动-主会场v2-2.4-2.24","onlineTime":0,"id":54639872,"originSchemeUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html","targetUrl":"https://act.you.163.com/act/pub/rb10rnjzwE30.html"},{"picUrl":"https://yanxuan.nosdn.127.net/b61633b348f010c7284837c1d7fc9cdd.jpg","expireTime":0,"extra":{"materialContentFrom":1,"materialName":"（智能合图）食品-24节气春季活动-2.17-2.22","rcmdSort":false,"taskType":1,"itemFrom":0,"resourcesId":2,"materialType":"广告banner","crmUserGroupId":"0","materialId":"54640120","taskId":"54647349"},"name":"（智能合图）食品-24节气春季活动-2.17-2.22","onlineTime":0,"id":54640120,"originSchemeUrl":"https://act.you.163.com/act/pub/aBDdgGR7skrV.html","targetUrl":"https://act.you.163.com/act/pub/aBDdgGR7skrV.html"},{"picUrl":"https://yanxuan.nosdn.127.net/fb5a9555c539bca5af2a4721923365a4.jpg","expireTime":0,"extra":{"materialContentFrom":1,"materialName":"食品-吃喝到家 强健抵抗力-2.11-2.24","rcmdSort":false,"taskType":1,"itemFrom":0,"resourcesId":3,"materialType":"广告banner","crmUserGroupId":"0","materialId":"54639858","taskId":"54647354"},"name":"食品-吃喝到家 强健抵抗力-2.11-2.24","onlineTime":0,"id":54639858,"originSchemeUrl":"https://act.you.163.com/act/pub/HW3LkZ184cR5.html","targetUrl":"https://act.you.163.com/act/pub/HW3LkZ184cR5.html"},{"picUrl":"https://yanxuan.nosdn.127.net/6b1ebd19470cea9a7b8e81a52485f414.jpg","expireTime":0,"extra":{"materialContentFrom":1,"materialName":"防疫活动-春运榜单-2.5-长期","rcmdSort":false,"taskType":1,"itemFrom":0,"resourcesId":4,"materialType":"广告banner","crmUserGroupId":"0","materialId":"54639594","taskId":"54647422"},"name":"防疫活动-春运榜单-2.5-长期","onlineTime":0,"id":54639594,"originSchemeUrl":"https://m.you.163.com/topic/v1/pub/ythX1hoqoUBs.html","targetUrl":"https://m.you.163.com/topic/v1/pub/ythX1hoqoUBs.html"},{"picUrl":"https://yanxuan.nosdn.127.net/b87939fc55cf938f3a32c2eadb14afc9.jpg","expireTime":0,"extra":{"materialContentFrom":1,"materialName":"防疫活动-居家v2-2.4-2.24","rcmdSort":false,"taskType":1,"itemFrom":0,"resourcesId":5,"materialType":"广告banner","crmUserGroupId":"0","materialId":"54639567","taskId":"54647274"},"name":"防疫活动-居家v2-2.4-2.24","onlineTime":0,"id":54639567,"originSchemeUrl":"https://act.you.163.com/act/pub/tKsjjWIXOli3.html","targetUrl":"https://act.you.163.com/act/pub/tKsjjWIXOli3.html"},{"picUrl":"https://yanxuan.nosdn.127.net/8c5af34810092b0cfe59d1020b28bcfe.jpg","expireTime":0,"extra":{"materialContentFrom":1,"materialName":"专题-防疫活动-高效清洁剂系列-2.6-长期","rcmdSort":false,"taskType":1,"itemFrom":0,"resourcesId":6,"materialType":"广告banner","crmUserGroupId":"0","materialId":"54639639","taskId":"54647275"},"name":"专题-防疫活动-高效清洁剂系列-2.6-长期","onlineTime":0,"id":54639639,"originSchemeUrl":"https://m.you.163.com/featuredSeries/detail?id=1000071","targetUrl":"https://m.you.163.com/featuredSeries/detail?id=1000071"},{"picUrl":"https://yanxuan.nosdn.127.net/810f6d9c5a04bb6eadbe20259784c16f.jpg","expireTime":0,"extra":{"materialContentFrom":1,"materialName":"专题-养生茶选购指南-2.14-2.29","rcmdSort":false,"taskType":1,"itemFrom":0,"resourcesId":7,"materialType":"广告banner","crmUserGroupId":"0","materialId":"54640089","taskId":"54647276"},"name":"专题-养生茶选购指南-2.14-2.29","onlineTime":0,"id":54640089,"originSchemeUrl":"https://act.you.163.com/act/pub/0ld8l37apcST.html","targetUrl":"https://act.you.163.com/act/pub/0ld8l37apcST.html"},{"picUrl":"https://yanxuan.nosdn.127.net/1d7c3ba8e117391e9377c2d0f4780e5b.jpg","expireTime":0,"extra":{"materialContentFrom":1,"materialName":"一个人住的好生活-长期","rcmdSort":false,"taskType":1,"itemFrom":0,"resourcesId":8,"materialType":"广告banner","crmUserGroupId":"0","materialId":"54639753","taskId":"54647350"},"name":"一个人住的好生活-长期","onlineTime":0,"id":54639753,"originSchemeUrl":"https://m.you.163.com/topic/v1/pub/OZIAh5mKTwac.html","targetUrl":"https://m.you.163.com/topic/v1/pub/OZIAh5mKTwac.html"}],"sceneLightShoppingGuideModule":[{"styleItem":{"backgroundUrl":"https://yanxuan.nosdn.127.net/b143c18172b5433310ff1f2adf281792.png","descColor":"7f7f7f","itemFrom":3,"picUrlList":["https://yanxuan-item.nosdn.127.net/5e818e36e0cfd0bb474c57f27e76b46d.png","https://yanxuan-item.nosdn.127.net/445689c4faa55f8186c500e68bff73d6.png"],"titleColor":"333333","extra":{"materialContentFrom":1,"materialName":"专题 断货补单王-new","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":1,"materialType":"场景轻导购","crmUserGroupId":"0","materialId":"46963134","taskId":"54644161"},"itemPicBeanList":[{"itemId":1006014,"picUrl":"https://yanxuan-item.nosdn.127.net/b097972db0ed9d5b47fbed0e2dbd1d99.png"},{"itemId":1009024,"picUrl":"https://yanxuan-item.nosdn.127.net/5e818e36e0cfd0bb474c57f27e76b46d.png"},{"itemId":1021020,"picUrl":"https://yanxuan-item.nosdn.127.net/445689c4faa55f8186c500e68bff73d6.png"},{"itemId":1023003,"picUrl":"https://yanxuan-item.nosdn.127.net/38d4d231bfa58be9998fd2feba15e908.png"},{"itemId":1085019,"picUrl":"https://yanxuan-item.nosdn.127.net/c27abf14fa51f922122d9c81d7e68bd8.png"},{"itemId":1108008,"picUrl":"https://yanxuan-item.nosdn.127.net/0fecbab07b9a3522015958ba8f31e27a.png"},{"itemId":1109013,"picUrl":"https://yanxuan-item.nosdn.127.net/3b7bbecb7acfe2e56a515ccebc060e77.png"},{"itemId":1109034,"picUrl":"https://yanxuan-item.nosdn.127.net/ccf82ca5058794d1fc27a8db204dec17.png"},{"itemId":1110003,"picUrl":"https://yanxuan-item.nosdn.127.net/9a33f08a3b0f5c06fdf4c586d51b2f7c.png"},{"itemId":1115009,"picUrl":"https://yanxuan-item.nosdn.127.net/6df81c2f8582dbc597acadf8f1089a6a.png"},{"itemId":1115059,"picUrl":"https://yanxuan-item.nosdn.127.net/cb80f9a76a8b4fbbedde4379ecad4b1e.png"},{"itemId":1116033,"picUrl":"https://yanxuan-item.nosdn.127.net/91a264d84fed57f97c48dc107370e941.png"},{"itemId":1127003,"picUrl":"https://yanxuan-item.nosdn.127.net/84454f5de65796c78a5ef9f3d6b7d843.png"},{"itemId":1127007,"picUrl":"https://yanxuan-item.nosdn.127.net/ecef155d279e1a485b4f31f87daa3698.png"},{"itemId":1130056,"picUrl":"https://yanxuan-item.nosdn.127.net/89d86a4e463115e366daf841b9bcff46.png"},{"itemId":1135047,"picUrl":"https://yanxuan-item.nosdn.127.net/eddaeb4852b8a4732102eab839641c95.png"},{"itemId":1145021,"picUrl":"https://yanxuan-item.nosdn.127.net/9929e5ba245313a3db4a80ea7504f61d.png"},{"itemId":1149000,"picUrl":"https://yanxuan-item.nosdn.127.net/16b4d581afc5a9cd36e8adc8ed6ceb4f.png"},{"itemId":1154003,"picUrl":"https://yanxuan-item.nosdn.127.net/7a0e064c1fd99b5eb16608bca9b7aa0d.png"},{"itemId":1193014,"picUrl":"https://yanxuan-item.nosdn.127.net/bf56acb6a6fa46a44f17c25e70645501.png"},{"itemId":1197009,"picUrl":"https://yanxuan-item.nosdn.127.net/451ee6d21410297df3b2ed923f45d07d.png"},{"itemId":1221001,"picUrl":"https://yanxuan-item.nosdn.127.net/8f4265e206020ecfbbe34c2a2d230fb2.png"},{"itemId":1292003,"picUrl":"https://yanxuan-item.nosdn.127.net/1d85a516aadbeb11978f325f205820b9.png"},{"itemId":1298009,"picUrl":"https://yanxuan-item.nosdn.127.net/024f82132c69893cef7f6db17d7ca8f1.png"},{"itemId":1305017,"picUrl":"https://yanxuan-item.nosdn.127.net/659500940eba07cf9b9940e996d4bc66.png"},{"itemId":1306026,"picUrl":"https://yanxuan-item.nosdn.127.net/63967eb40b0af505f1fd066442952bab.png"},{"itemId":1306027,"picUrl":"https://yanxuan-item.nosdn.127.net/271eb0b3d94e80579afdeb614cc240ad.png"},{"itemId":1318002,"picUrl":"https://yanxuan-item.nosdn.127.net/644a27b8e168b8fe8e43ccaad934b24e.png"},{"itemId":1365002,"picUrl":"https://yanxuan-item.nosdn.127.net/50d83c848125577c2bcc1f60c16280ac.png"},{"itemId":1369013,"picUrl":"https://yanxuan-item.nosdn.127.net/91210d925dd625e0c2a81e54890bf345.png"},{"itemId":1389000,"picUrl":"https://yanxuan-item.nosdn.127.net/64c3915f7edb71c10dbfbd18441f271c.png"},{"itemId":1398016,"picUrl":"https://yanxuan-item.nosdn.127.net/9d581d4ec02cf86ff2a05cf81868f159.png"},{"itemId":1401006,"picUrl":"https://yanxuan-item.nosdn.127.net/5e702b909a7d0cf391bfa8d3fce03c92.png"},{"itemId":1417023,"picUrl":"https://yanxuan-item.nosdn.127.net/6f8849cd376ea181f977f0ae40f309eb.png"},{"itemId":1429006,"picUrl":"https://yanxuan-item.nosdn.127.net/88632d540cae0e1c05f0134d3c76905d.png"},{"itemId":1435022,"picUrl":"https://yanxuan-item.nosdn.127.net/7b5815dba28684d89601e0643e2a1b56.png"},{"itemId":1450007,"picUrl":"https://yanxuan-item.nosdn.127.net/dcabfb063d4d0f84688a49941d5deb11.png"},{"itemId":1458000,"picUrl":"https://yanxuan-item.nosdn.127.net/e290e08fca0e9d2cf9605272a2b07aa6.png"},{"itemId":1460022,"picUrl":"https://yanxuan-item.nosdn.127.net/26ff24df419c0b051c4e46574403c7ad.png"},{"itemId":1462040,"picUrl":"https://yanxuan-item.nosdn.127.net/e4c7e5a4ccb531e0ad6b066df0429813.png"},{"itemId":1468014,"picUrl":"https://yanxuan-item.nosdn.127.net/8ff83d4079c2dbf64db5ef984fbbaa2b.png"},{"itemId":1476005,"picUrl":"https://yanxuan-item.nosdn.127.net/c10eb9001206096698f2451f3c383c7b.png"},{"itemId":1487026,"picUrl":"https://yanxuan-item.nosdn.127.net/2b43ce0ad0b9e95b264b023cb60a4353.png"},{"itemId":1497001,"picUrl":"https://yanxuan-item.nosdn.127.net/7c850ef50fc408c4eab4d7abdb920da3.png"},{"itemId":1498025,"picUrl":"https://yanxuan-item.nosdn.127.net/23e2ba8b86ecdc9a46ec9df99d00e86d.png"},{"itemId":1505027,"picUrl":"https://yanxuan-item.nosdn.127.net/17aeee124855d7e7eb24b19579e230e5.png"},{"itemId":1505029,"picUrl":"https://yanxuan-item.nosdn.127.net/ea9af61f4504871f72c4b9ef38ca4799.png"},{"itemId":1506045,"picUrl":"https://yanxuan-item.nosdn.127.net/1e18863d306689a49ca0370a269ba0db.png"},{"itemId":1512034,"picUrl":"https://yanxuan-item.nosdn.127.net/4501a4154cf56c90d555701b5b435947.png"},{"itemId":1516008,"picUrl":"https://yanxuan-item.nosdn.127.net/6b172c71a23491d31db63b97a39f1f53.png"},{"itemId":1535010,"picUrl":"https://yanxuan-item.nosdn.127.net/59eb7e52ab114c894a8179bc2991122b.png"},{"itemId":1535011,"picUrl":"https://yanxuan-item.nosdn.127.net/e37656ecad9a2494f456e222fe7800a2.png"},{"itemId":1545016,"picUrl":"https://yanxuan-item.nosdn.127.net/6cdb3da46a4b95b36dea89d6d47d3bd9.png"},{"itemId":1553041,"picUrl":"https://yanxuan-item.nosdn.127.net/11d98dbe3f5b1099b479dfb8dacdf89d.png"},{"itemId":1572026,"picUrl":"https://yanxuan-item.nosdn.127.net/83f18fba460c27b4785cc65f19385a34.png"},{"itemId":1589012,"picUrl":"https://yanxuan-item.nosdn.127.net/08ba712ea8e3074922c9046601218fc3.png"},{"itemId":1601000,"picUrl":"https://yanxuan-item.nosdn.127.net/7bb60cd94cb436726b8db296fda698fc.png"},{"itemId":1604016,"picUrl":"https://yanxuan-item.nosdn.127.net/74662d24f6d217b520178c5a6d031457.png"},{"itemId":1606002,"picUrl":"https://yanxuan-item.nosdn.127.net/f444ac11115a8249a92dc95dccad6e07.png"},{"itemId":1620018,"picUrl":"https://yanxuan-item.nosdn.127.net/00bd304b98650d5fe73b68635771ea4d.png"},{"itemId":1621018,"picUrl":"https://yanxuan-item.nosdn.127.net/b051b5aa933cde8d952905becd2046d8.png"},{"itemId":1621025,"picUrl":"https://yanxuan-item.nosdn.127.net/b74d5c3b31398f145b30bf761d72affc.png"},{"itemId":1622005,"picUrl":"https://yanxuan-item.nosdn.127.net/cc9556998b8b3047bc18ba8f23c86ed3.png"},{"itemId":1623004,"picUrl":"https://yanxuan-item.nosdn.127.net/47a68d94263be9494482d55caed9bed8.png"},{"itemId":1624001,"picUrl":"https://yanxuan-item.nosdn.127.net/51348ec7731f5ed5c4bb9e0bed88717c.png"},{"itemId":1625008,"picUrl":"https://yanxuan-item.nosdn.127.net/c89c4c86c6cb31805bd537d8c772a231.png"},{"itemId":1629001,"picUrl":"https://yanxuan-item.nosdn.127.net/f95b39abadbcb55953abd2cff2e0c001.png"},{"itemId":1630007,"picUrl":"https://yanxuan-item.nosdn.127.net/86989f8cb0ece3d5ebf903b988abae79.png"},{"itemId":1636017,"picUrl":"https://yanxuan-item.nosdn.127.net/4d0c383d52e675f7c5d9aad6b8799699.png"},{"itemId":1669011,"picUrl":"https://yanxuan-item.nosdn.127.net/b70e5e1786a175c574514c293bd88971.png"},{"itemId":1672038,"picUrl":"https://yanxuan-item.nosdn.127.net/79fb28d0a101f704d2fa3665273dbc1a.png"},{"itemId":1674003,"picUrl":"https://yanxuan-item.nosdn.127.net/e30375922143f7fad7465fb56bc5acd6.png"},{"itemId":1686032,"picUrl":"https://yanxuan-item.nosdn.127.net/52c5108883fa57ca1707d22c7ed41aa7.png"},{"itemId":1690003,"picUrl":"https://yanxuan-item.nosdn.127.net/a9d6de39ab17ab82d5424205dafc4136.png"},{"itemId":3381014,"picUrl":"https://yanxuan-item.nosdn.127.net/ed85b7028d4620bdcd46db6405b445b4.png"},{"itemId":3398008,"picUrl":"https://yanxuan-item.nosdn.127.net/dfc5f3de3aeaf0b4616c644b23df35a8.png"},{"itemId":3407065,"picUrl":"https://yanxuan-item.nosdn.127.net/8710b394afc12ff039fac08dfb9333bb.png"},{"itemId":3408014,"picUrl":"https://yanxuan-item.nosdn.127.net/0434f5cb29b2c6c6ade2f1c0487ae97c.png"},{"itemId":3413004,"picUrl":"https://yanxuan-item.nosdn.127.net/30fe9253a061b5c4c7c389b7caf24a67.png"},{"itemId":3440070,"picUrl":"https://yanxuan-item.nosdn.127.net/2445e4d9070508d170ade17135e6cacc.png"},{"itemId":3447007,"picUrl":"https://yanxuan-item.nosdn.127.net/b74cd5601ba0e3b205e694943e978c5f.png"},{"itemId":3455001,"picUrl":"https://yanxuan-item.nosdn.127.net/d82be6b363e282825bf858696ce40ee3.png"},{"itemId":3478023,"picUrl":"https://yanxuan-item.nosdn.127.net/08f6e74986069813ab7dab4c2491cf96.png"},{"itemId":3526027,"picUrl":"https://yanxuan-item.nosdn.127.net/b9cda216c597fd2297432a893d3da371.png"},{"itemId":3534014,"picUrl":"https://yanxuan-item.nosdn.127.net/75ce66f46c287cc512749f9e8328f0b3.png"},{"itemId":3802025,"picUrl":"https://yanxuan-item.nosdn.127.net/f961b628a67e5a95150b962a48963b6d.png"}],"originSchemeUrl":"https://m.you.163.com/cms-op/wap/17.html","title":"断货补单王","targetUrl":"https://m.you.163.com/cms-op/wap/17.html","desc":"紧急补仓疯抢中"}},{"styleItem":{"backgroundUrl":"https://yanxuan.nosdn.127.net/f874dbb9da6101748d015d972a44d78e.png","descColor":"7f7f7f","itemFrom":3,"picUrlList":["https://yanxuan-item.nosdn.127.net/1eecf74b769af3ed4c7817aeb5d6bb2b.png","https://yanxuan-item.nosdn.127.net/be4d030d4b4a8a4bf096714ec5b2a4aa.png"],"titleColor":"333333","extra":{"materialContentFrom":1,"materialName":"专题 回购榜new-文案","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"","resourcesId":2,"materialType":"场景轻导购","crmUserGroupId":"0","materialId":"46564203","taskId":"54644162"},"itemPicBeanList":[{"itemId":1006058,"picUrl":"https://yanxuan-item.nosdn.127.net/1eecf74b769af3ed4c7817aeb5d6bb2b.png"},{"itemId":1021020,"picUrl":"https://yanxuan-item.nosdn.127.net/445689c4faa55f8186c500e68bff73d6.png"},{"itemId":1023000,"picUrl":"https://yanxuan-item.nosdn.127.net/be4d030d4b4a8a4bf096714ec5b2a4aa.png"},{"itemId":1023014,"picUrl":"https://yanxuan-item.nosdn.127.net/056e0e74a683d7e0011bd583d0084b7c.png"},{"itemId":1031002,"picUrl":"https://yanxuan-item.nosdn.127.net/42cb1e188fac9347eabdb8cfc8c27f74.png"},{"itemId":1046005,"picUrl":"https://yanxuan-item.nosdn.127.net/8a8eeefd81555eec03a673abbc24615a.png"},{"itemId":1055027,"picUrl":"https://yanxuan-item.nosdn.127.net/6db2949655ada5b2148f5f667e10172d.png"},{"itemId":1056000,"picUrl":"https://yanxuan-item.nosdn.127.net/7be46223373b04fc2f42e0bd2add4d61.png"},{"itemId":1056006,"picUrl":"https://yanxuan-item.nosdn.127.net/f608f7868d43c5ac67fc03189b07c589.png"},{"itemId":1056013,"picUrl":"https://yanxuan-item.nosdn.127.net/4f10a45de3d6818dbd75e9bfb119cac1.png"},{"itemId":1057033,"picUrl":"https://yanxuan-item.nosdn.127.net/2a6c649e26ddd566b3ea8c38cab20155.png"},{"itemId":1060007,"picUrl":"https://yanxuan-item.nosdn.127.net/79ffc02578c43ae1dc10782b9a98c225.png"},{"itemId":1062033,"picUrl":"https://yanxuan-item.nosdn.127.net/569ab2c87df93c56de39b8c890463242.png"},{"itemId":1076004,"picUrl":"https://yanxuan-item.nosdn.127.net/39e2e51fabe9256a3bba0fab776d5e33.png"},{"itemId":1077003,"picUrl":"https://yanxuan-item.nosdn.127.net/a10ed5c19533c9e1e2abf1d8cb843c24.png"},{"itemId":1085007,"picUrl":"https://yanxuan-item.nosdn.127.net/05eed5e90b2d6002600dddd4dd66260d.png"},{"itemId":1092026,"picUrl":"https://yanxuan-item.nosdn.127.net/58fdbceab428754d9b8e8b3019d84c4e.png"},{"itemId":1097000,"picUrl":"https://yanxuan-item.nosdn.127.net/6e05a3a46a46a34e7fa5b86c122a0787.png"},{"itemId":1108028,"picUrl":"https://yanxuan-item.nosdn.127.net/38779b7e649b2e02f2a689bff17cbc42.png"},{"itemId":1109013,"picUrl":"https://yanxuan-item.nosdn.127.net/3b7bbecb7acfe2e56a515ccebc060e77.png"},{"itemId":1113001,"picUrl":"https://yanxuan-item.nosdn.127.net/431a09a43914483f4d70aeda8ecb8a59.png"},{"itemId":1114010,"picUrl":"https://yanxuan-item.nosdn.127.net/58b7b4a5277dddbfd9b99b07f38b6c20.png"},{"itemId":1115009,"picUrl":"https://yanxuan-item.nosdn.127.net/6df81c2f8582dbc597acadf8f1089a6a.png"},{"itemId":1116034,"picUrl":"https://yanxuan-item.nosdn.127.net/cfd2ab8d2ea2188ff422c5c91c1d920c.png"},{"itemId":1124015,"picUrl":"https://yanxuan-item.nosdn.127.net/3f9a412e160d7e864442ce28f42d7e08.png"},{"itemId":1127007,"picUrl":"https://yanxuan-item.nosdn.127.net/ecef155d279e1a485b4f31f87daa3698.png"},{"itemId":1129016,"picUrl":"https://yanxuan-item.nosdn.127.net/3f06df1af8138410617e9b9aa05c3330.png"},{"itemId":1134051,"picUrl":"https://yanxuan-item.nosdn.127.net/0c807260926eb396d65e8d697d923bbf.png"},{"itemId":1134066,"picUrl":"https://yanxuan-item.nosdn.127.net/1b8e4a484e128c28a050cd2bc0c64396.png"},{"itemId":1135047,"picUrl":"https://yanxuan-item.nosdn.127.net/eddaeb4852b8a4732102eab839641c95.png"},{"itemId":1137006,"picUrl":"https://yanxuan-item.nosdn.127.net/af7fe534423a1d316e49bf84986a01c2.png"},{"itemId":1142056,"picUrl":"https://yanxuan-item.nosdn.127.net/af034280b9feb9795d01052496eef8d7.png"},{"itemId":1146006,"picUrl":"https://yanxuan-item.nosdn.127.net/6763c33e5242040e7e678630b4e6eba5.png"},{"itemId":1146007,"picUrl":"https://yanxuan-item.nosdn.127.net/0188adf6cdc4c1159fe647fa5092cb0f.png"},{"itemId":1149005,"picUrl":"https://yanxuan-item.nosdn.127.net/8427b14107deadbc140e95367ae38d5e.png"},{"itemId":1156005,"picUrl":"https://yanxuan-item.nosdn.127.net/d3fa30a9d0152e3223ce8a945e5a20d7.png"},{"itemId":1156119,"picUrl":"https://yanxuan-item.nosdn.127.net/600a367b9e1ea02cbbdddbc528610155.png"},{"itemId":1164006,"picUrl":"https://yanxuan-item.nosdn.127.net/e9de2a3b586c3cbed7fd621d7810d2f4.png"},{"itemId":1165015,"picUrl":"https://yanxuan-item.nosdn.127.net/17c3596d257753108d1d471b8ea4d385.png"},{"itemId":1165060,"picUrl":"https://yanxuan-item.nosdn.127.net/1d4c2ef77a2bb131239904b450d13972.png"},{"itemId":1189010,"picUrl":"https://yanxuan-item.nosdn.127.net/327fcfaa9ad513279fba3ac896ea4336.png"},{"itemId":1197009,"picUrl":"https://yanxuan-item.nosdn.127.net/451ee6d21410297df3b2ed923f45d07d.png"},{"itemId":1199020,"picUrl":"https://yanxuan-item.nosdn.127.net/e40487bb477b7392456f8f876d51ba58.png"},{"itemId":1199024,"picUrl":"https://yanxuan-item.nosdn.127.net/f6020d78fddf899a2622e4f4502ae967.png"},{"itemId":1225000,"picUrl":"https://yanxuan-item.nosdn.127.net/a730a83e9599459d80096a0dec8c500e.png"},{"itemId":1242000,"picUrl":"https://yanxuan-item.nosdn.127.net/c118cd431a41c3942bd34f9aa4ca80cc.png"},{"itemId":1253002,"picUrl":"https://yanxuan-item.nosdn.127.net/b49de3cf17c7dc92746f994b2296fd05.png"},{"itemId":1292003,"picUrl":"https://yanxuan-item.nosdn.127.net/1d85a516aadbeb11978f325f205820b9.png"},{"itemId":1306019,"picUrl":"https://yanxuan-item.nosdn.127.net/74eb39b9cd945dd0a336a3ce0f196fbc.png"},{"itemId":1314016,"picUrl":"https://yanxuan-item.nosdn.127.net/c73e4aa55503b7900209aa454be55dbf.png"},{"itemId":1318002,"picUrl":"https://yanxuan-item.nosdn.127.net/644a27b8e168b8fe8e43ccaad934b24e.png"},{"itemId":1321000,"picUrl":"https://yanxuan-item.nosdn.127.net/39e5df244905c79abf947fb4a534699d.png"},{"itemId":1323007,"picUrl":"https://yanxuan-item.nosdn.127.net/588d3261656320815632763a70925527.png"},{"itemId":1325028,"picUrl":"https://yanxuan-item.nosdn.127.net/e7f4dec7ff46ee289621e24cc78bc8df.png"},{"itemId":1356013,"picUrl":"https://yanxuan-item.nosdn.127.net/a57c294dbf1ef6c476703ae5a57b6b4b.png"},{"itemId":1358009,"picUrl":"https://yanxuan-item.nosdn.127.net/e5dac755e5d501f67e992d88fa401ce8.png"},{"itemId":1369012,"picUrl":"https://yanxuan-item.nosdn.127.net/516f9a53f493673fa6da347cd2bf93a7.png"},{"itemId":1391001,"picUrl":"https://yanxuan-item.nosdn.127.net/08ed8b0e068a3ff2a0aae8c427db1858.png"},{"itemId":1397006,"picUrl":"https://yanxuan-item.nosdn.127.net/65da8671e33bf88c98c2acdd694b156d.png"},{"itemId":1398011,"picUrl":"https://yanxuan-item.nosdn.127.net/84455b9ed53b6f29d3463d05fa6bf907.png"},{"itemId":1398015,"picUrl":"https://yanxuan-item.nosdn.127.net/1985e340c80c8b8b92555368faadbd89.png"},{"itemId":1435022,"picUrl":"https://yanxuan-item.nosdn.127.net/7b5815dba28684d89601e0643e2a1b56.png"},{"itemId":1469019,"picUrl":"https://yanxuan-item.nosdn.127.net/0040559ca37f3a088d2edd247d71f721.png"},{"itemId":1490004,"picUrl":"https://yanxuan-item.nosdn.127.net/664f2823ff24deab4ddbac4257e74c50.png"},{"itemId":1503004,"picUrl":"https://yanxuan-item.nosdn.127.net/c449cda7439ae40e1c0e16f2a701619a.png"},{"itemId":1506021,"picUrl":"https://yanxuan-item.nosdn.127.net/98f00e8b15f30c11e3e64f1da7fba591.png"},{"itemId":1506032,"picUrl":"https://yanxuan-item.nosdn.127.net/4808526f99e3e912a645dd2e4c5a20d0.png"},{"itemId":1512027,"picUrl":"https://yanxuan-item.nosdn.127.net/d3f4d9b6df8ea22c43f637469363abcf.png"},{"itemId":1513025,"picUrl":"https://yanxuan-item.nosdn.127.net/6fc85a398808d3247d1ffcb4810298bb.png"},{"itemId":1513031,"picUrl":"https://yanxuan-item.nosdn.127.net/9b3447a8a2716c284859a72b9b03b53d.png"},{"itemId":1527004,"picUrl":"https://yanxuan-item.nosdn.127.net/ded687f676cc7a8a858cc00bc8c5119a.png"},{"itemId":1552007,"picUrl":"https://yanxuan-item.nosdn.127.net/36f83fc61bab85ae138638f479f42fa3.png"},{"itemId":1561001,"picUrl":"https://yanxuan-item.nosdn.127.net/0064e22029d052276c2f8e49b1f3973d.png"},{"itemId":1564054,"picUrl":"https://yanxuan-item.nosdn.127.net/951f0223f005fb0d5d85cffba86622d6.png"},{"itemId":1572013,"picUrl":"https://yanxuan-item.nosdn.127.net/7e4db021bc68c9af8eddecdb1aa96c36.png"},{"itemId":1605001,"picUrl":"https://yanxuan-item.nosdn.127.net/b89e1647728d4ad29180ce52a6ebbedb.png"},{"itemId":1624017,"picUrl":"https://yanxuan-item.nosdn.127.net/b6dd9b0d4c403d38c208019f207a69e3.png"},{"itemId":1656012,"picUrl":"https://yanxuan-item.nosdn.127.net/f08f80a81ecef8418b2434f083c7129d.png"},{"itemId":1666060,"picUrl":"https://yanxuan-item.nosdn.127.net/355e0781cabbdfa084bf947aabceacf0.png"},{"itemId":1672002,"picUrl":"https://yanxuan-item.nosdn.127.net/59e8fa6fa2ffec391fae8d99e9c9aeee.png"},{"itemId":1673009,"picUrl":"https://yanxuan-item.nosdn.127.net/6b396a24be431d003b00316495b98a52.png"},{"itemId":3394032,"picUrl":"https://yanxuan-item.nosdn.127.net/951ecc96ffd33ddd680257c48d64a484.png"},{"itemId":3395000,"picUrl":"https://yanxuan-item.nosdn.127.net/3680159bab0ac5fc0c404640a6593b93.png"},{"itemId":3402020,"picUrl":"https://yanxuan-item.nosdn.127.net/2c0147161faaa160cf10b6770f1e290d.png"},{"itemId":3408049,"picUrl":"https://yanxuan-item.nosdn.127.net/03faa79c841e439c9aeb645977f4f8f7.png"},{"itemId":3408050,"picUrl":"https://yanxuan-item.nosdn.127.net/5a0d395159cf7f51d48c45599b96df3f.png"},{"itemId":3432036,"picUrl":"https://yanxuan-item.nosdn.127.net/4a89b652c30fbfc6b40adfe08d996aa3.png"},{"itemId":3447007,"picUrl":"https://yanxuan-item.nosdn.127.net/b74cd5601ba0e3b205e694943e978c5f.png"},{"itemId":3455001,"picUrl":"https://yanxuan-item.nosdn.127.net/d82be6b363e282825bf858696ce40ee3.png"},{"itemId":3469054,"picUrl":"https://yanxuan-item.nosdn.127.net/591ce4c819434a8c4365d06b5ca6e75e.png"},{"itemId":3481270,"picUrl":"https://yanxuan-item.nosdn.127.net/00e55362f57545ed4efdb32d83fe389f.png"}],"originSchemeUrl":"https://m.you.163.com/topic/v1/pub/GpCIMFZBO2.html","title":"无限回购榜单","targetUrl":"https://m.you.163.com/topic/v1/pub/GpCIMFZBO2.html","desc":"买了又买的超值好物"}},{"styleItem":{"backgroundUrl":"https://yanxuan.nosdn.127.net/e9cf9142f68e0fd944b07940ce9d8ec7.png","descColor":"7f7f7f","itemFrom":3,"picUrlList":["https://yanxuan-item.nosdn.127.net/3321ee2d70b1e062422b40e4cb2cc74b.png","https://yanxuan-item.nosdn.127.net/b2065eab67acc5923a8ec71167a35f6a.png"],"titleColor":"333333","extra":{"materialContentFrom":1,"materialName":"必买好物-2月篇","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"无分组","resourcesId":3,"materialType":"场景轻导购","crmUserGroupId":"0","materialId":"54639337","taskId":"54646221"},"itemPicBeanList":[{"itemId":1009024,"picUrl":"https://yanxuan-item.nosdn.127.net/5e818e36e0cfd0bb474c57f27e76b46d.png"},{"itemId":1027017,"picUrl":"https://yanxuan-item.nosdn.127.net/3321ee2d70b1e062422b40e4cb2cc74b.png"},{"itemId":1037001,"picUrl":"https://yanxuan-item.nosdn.127.net/b2065eab67acc5923a8ec71167a35f6a.png"},{"itemId":1075011,"picUrl":"https://yanxuan-item.nosdn.127.net/c2e290dda5250cb83de7bfce5dfb1b32.png"},{"itemId":1097000,"picUrl":"https://yanxuan-item.nosdn.127.net/6e05a3a46a46a34e7fa5b86c122a0787.png"},{"itemId":1109013,"picUrl":"https://yanxuan-item.nosdn.127.net/3b7bbecb7acfe2e56a515ccebc060e77.png"},{"itemId":1116033,"picUrl":"https://yanxuan-item.nosdn.127.net/91a264d84fed57f97c48dc107370e941.png"},{"itemId":1129016,"picUrl":"https://yanxuan-item.nosdn.127.net/3f06df1af8138410617e9b9aa05c3330.png"},{"itemId":1164007,"picUrl":"https://yanxuan-item.nosdn.127.net/7d4bacc5e3f4ed6c302db032cd953204.png"},{"itemId":1173006,"picUrl":"https://yanxuan-item.nosdn.127.net/ea8f5714ef50441d01930f4638eb98e1.png"},{"itemId":1197009,"picUrl":"https://yanxuan-item.nosdn.127.net/451ee6d21410297df3b2ed923f45d07d.png"},{"itemId":1241013,"picUrl":"https://yanxuan-item.nosdn.127.net/ff3cfd89ce1664eb70701f4f273ee562.png"},{"itemId":1245014,"picUrl":"https://yanxuan-item.nosdn.127.net/068b1375219cec84915cebcb8488f693.png"},{"itemId":1275000,"picUrl":"https://yanxuan-item.nosdn.127.net/c6c31c7160d2e6f7e367b74b23fd5c64.png"},{"itemId":1283015,"picUrl":"https://yanxuan-item.nosdn.127.net/467d1114d8bfb3208eda60c47619838a.png"},{"itemId":1325030,"picUrl":"https://yanxuan-item.nosdn.127.net/7f77125f98386cfd48938a5f43b30af0.png"},{"itemId":1382009,"picUrl":"https://yanxuan-item.nosdn.127.net/2f8347e13a8d7174704b87a8a05918d3.png"},{"itemId":1397017,"picUrl":"https://yanxuan-item.nosdn.127.net/de1812569b00c3cd600589b160893db4.png"},{"itemId":1419007,"picUrl":"https://yanxuan-item.nosdn.127.net/ee6eb8203527dbe5a749b9f5f3c6fe27.png"},{"itemId":1435010,"picUrl":"https://yanxuan-item.nosdn.127.net/3a1e52236c16b06d2c433e1ab82cc788.png"},{"itemId":1435017,"picUrl":"https://yanxuan-item.nosdn.127.net/bc0df62fde0d585cb6d001299152328c.png"},{"itemId":1447057,"picUrl":"https://yanxuan-item.nosdn.127.net/09fefff18127bd81742707a4adb56968.png"},{"itemId":1475015,"picUrl":"https://yanxuan-item.nosdn.127.net/793d9e467b2f64348722151a362d4673.png"},{"itemId":1487008,"picUrl":"https://yanxuan-item.nosdn.127.net/57820c78a765022243576b344927fdbb.png"},{"itemId":1487013,"picUrl":"https://yanxuan-item.nosdn.127.net/0542500ca5edef888ad0d0461392853b.png"},{"itemId":1494003,"picUrl":"https://yanxuan-item.nosdn.127.net/0ac21674d619c4558d99c0f380fd5b71.png"},{"itemId":1498025,"picUrl":"https://yanxuan-item.nosdn.127.net/23e2ba8b86ecdc9a46ec9df99d00e86d.png"},{"itemId":1501008,"picUrl":"https://yanxuan-item.nosdn.127.net/fbae3a43b448d2e6e6671936ba665b99.png"},{"itemId":1506015,"picUrl":"https://yanxuan-item.nosdn.127.net/d372755e9371b65f8638a372cac0d177.png"},{"itemId":1512033,"picUrl":"https://yanxuan-item.nosdn.127.net/1dcae085a33838163c69ced60e48a9e8.png"},{"itemId":1516008,"picUrl":"https://yanxuan-item.nosdn.127.net/6b172c71a23491d31db63b97a39f1f53.png"},{"itemId":1549000,"picUrl":"https://yanxuan-item.nosdn.127.net/abe76ae78cdd8ac1a1a82878a03d1deb.png"},{"itemId":1555000,"picUrl":"https://yanxuan-item.nosdn.127.net/57103d892fa09deae9ef9e56c301f14a.png"},{"itemId":1574001,"picUrl":"https://yanxuan-item.nosdn.127.net/ca28789b69f41959f8a7aaf341e42bde.png"},{"itemId":1604004,"picUrl":"https://yanxuan-item.nosdn.127.net/8bbed559f8d497919b929404b8c55110.png"},{"itemId":1625008,"picUrl":"https://yanxuan-item.nosdn.127.net/c89c4c86c6cb31805bd537d8c772a231.png"},{"itemId":1635010,"picUrl":"https://yanxuan-item.nosdn.127.net/c417a2c9ea84671a959d886ad482629d.png"},{"itemId":1635019,"picUrl":"https://yanxuan-item.nosdn.127.net/28dd5050489b6c926ab5e3aee6f9b915.png"},{"itemId":1637002,"picUrl":"https://yanxuan-item.nosdn.127.net/f5b1cba9a449797089d43cfe6939933d.png"},{"itemId":1652009,"picUrl":"https://yanxuan-item.nosdn.127.net/df3b083f7c42a6453fec121db61d0297.png"},{"itemId":1657020,"picUrl":"https://yanxuan-item.nosdn.127.net/bf92d8a1eb0e55d41fd29a71dea1e56e.png"},{"itemId":1657028,"picUrl":"https://yanxuan-item.nosdn.127.net/b92c06b09b0446c8635e8d4db6c502d8.png"},{"itemId":1658025,"picUrl":"https://yanxuan-item.nosdn.127.net/3efe2debeec4d9013ff56e5d69e934e3.png"},{"itemId":1663002,"picUrl":"https://yanxuan-item.nosdn.127.net/b050aa1beaad0960bc0b579848dcc4a9.png"},{"itemId":1675046,"picUrl":"https://yanxuan-item.nosdn.127.net/7835dc10763c48ad53a9830b196de01e.png"},{"itemId":1677004,"picUrl":"https://yanxuan-item.nosdn.127.net/6dace61cf151dae53bf5079297ee38bb.png"},{"itemId":1683016,"picUrl":"https://yanxuan-item.nosdn.127.net/81b2b58106f17dfeee60aba8aabd8a85.png"},{"itemId":1690003,"picUrl":"https://yanxuan-item.nosdn.127.net/a9d6de39ab17ab82d5424205dafc4136.png"},{"itemId":3383008,"picUrl":"https://yanxuan-item.nosdn.127.net/eb5aaec3178da93222aeca4b7fcaf757.png"},{"itemId":3397008,"picUrl":"https://yanxuan-item.nosdn.127.net/892430d8b919681ba3e715a670105bc5.png"},{"itemId":3408015,"picUrl":"https://yanxuan-item.nosdn.127.net/f5c935419855b5b5c8ee021cf2197313.png"},{"itemId":3412043,"picUrl":"https://yanxuan-item.nosdn.127.net/a840c425859a599c0a439067b6ad3ec7.png"},{"itemId":3412045,"picUrl":"https://yanxuan-item.nosdn.127.net/dfcb8036f2cbd7b94f9a6119ddfadb51.png"},{"itemId":3416001,"picUrl":"https://yanxuan-item.nosdn.127.net/899d91ae4b28e9bb42d617aa6691276d.png"},{"itemId":3425014,"picUrl":"https://yanxuan-item.nosdn.127.net/ebf4447ec2851db4cc5617d792658a63.png"},{"itemId":3427014,"picUrl":"https://yanxuan-item.nosdn.127.net/cc234b2950c0bfa28b10daa6fd09f3ac.png"},{"itemId":3438006,"picUrl":"https://yanxuan-item.nosdn.127.net/78a1f661665eb3e9257a947d4cd8ac83.png"},{"itemId":3440224,"picUrl":"https://yanxuan-item.nosdn.127.net/863cd7ac1ebb25ea95f6b716123d5e8b.png"},{"itemId":3464069,"picUrl":"https://yanxuan-item.nosdn.127.net/d129e72169eee8b6c47e30504cd34442.png"},{"itemId":3465028,"picUrl":"https://yanxuan-item.nosdn.127.net/77c3456827d3aaec3cea785680831bb8.png"},{"itemId":3465073,"picUrl":"https://yanxuan-item.nosdn.127.net/5328548b08399e3347cc1d9679d9943f.png"},{"itemId":3469061,"picUrl":"https://yanxuan-item.nosdn.127.net/d5c982eae5e21fbd2397df9b17408c76.png"},{"itemId":3481037,"picUrl":"https://yanxuan-item.nosdn.127.net/e952473fbb0d3a27b20185e68dc6bdf5.png"},{"itemId":3481038,"picUrl":"https://yanxuan-item.nosdn.127.net/1df97688e72a2368aa46a3642939bc1e.png"},{"itemId":3482078,"picUrl":"https://yanxuan-item.nosdn.127.net/3ba85e0b142d0c14332670ed246ec04a.png"},{"itemId":3491114,"picUrl":"https://yanxuan-item.nosdn.127.net/3eca7b34cd80ce4128c98233e3809ece.png"},{"itemId":3498011,"picUrl":"https://yanxuan-item.nosdn.127.net/84334e0d0a33897bb8f5fee654fa0cee.jpg"},{"itemId":3499009,"picUrl":"https://yanxuan-item.nosdn.127.net/58290418f47df80146a7a462ab231b07.png"},{"itemId":3506034,"picUrl":"https://yanxuan-item.nosdn.127.net/71e2c597d7c02912c9fe635cdc2a9c0d.png"},{"itemId":3507203,"picUrl":"https://yanxuan-item.nosdn.127.net/60ebd2ecc9a4fca5b746e6753631e9d5.png"},{"itemId":3507205,"picUrl":"https://yanxuan-item.nosdn.127.net/f3f18a4fe9e7905cd7c9ff28e42ff0c2.png"},{"itemId":3510086,"picUrl":"https://yanxuan-item.nosdn.127.net/e3a108207eb1c518d84b5f24ff6627a3.png"},{"itemId":3510125,"picUrl":"https://yanxuan-item.nosdn.127.net/cf7e3528a9aef4dbcb0796c357699994.png"},{"itemId":3522076,"picUrl":"https://yanxuan-item.nosdn.127.net/a7082a3e10618bff612181bf8d204282.png"},{"itemId":3527154,"picUrl":"https://yanxuan-item.nosdn.127.net/02dd07dbee4575a71afa30fd680a6ec7.png"},{"itemId":3532013,"picUrl":"https://yanxuan-item.nosdn.127.net/e3ae33519b9b62248619ec270934a05c.png"},{"itemId":3550216,"picUrl":"https://yanxuan-item.nosdn.127.net/192a35ff83f0575f797765f5395bf03b.png"},{"itemId":3550317,"picUrl":"https://yanxuan-item.nosdn.127.net/598e04918a3e617e59d58ecab8b60e91.png"},{"itemId":3550346,"picUrl":"https://yanxuan-item.nosdn.127.net/56b9ab8ed17e90bd436a48f874bc4f4b.png"},{"itemId":3553004,"picUrl":"https://yanxuan-item.nosdn.127.net/5d89a6f902e09a90d75db57c39c1b817.png"},{"itemId":3804035,"picUrl":"https://yanxuan-item.nosdn.127.net/28099c9166d4987f3fb595509f6a8897.png"},{"itemId":3804060,"picUrl":"https://yanxuan-item.nosdn.127.net/ab9070b9b1a8b126838fd9b5fe0b6958.png"},{"itemId":3811005,"picUrl":"https://yanxuan-item.nosdn.127.net/580a4e84e1bc630f101a3ee01b71d8c2.png"},{"itemId":3811006,"picUrl":"https://yanxuan-item.nosdn.127.net/10a65a661aeb27006186f57ace454da4.png"},{"itemId":3814094,"picUrl":"https://yanxuan-item.nosdn.127.net/6fd807743e8e25472aca8b6b0b8f3039.png"},{"itemId":3815023,"picUrl":"https://yanxuan-item.nosdn.127.net/1cfcd48aeff9c9789f3eb39a6e3ae773.png"},{"itemId":3817012,"picUrl":"https://yanxuan-item.nosdn.127.net/3f3e946c23aaddf5b9e2c259af03571a.png"},{"itemId":3823002,"picUrl":"https://yanxuan-item.nosdn.127.net/910eba5eb892cb555e1d21d6a5a00c5b.png"},{"itemId":3823005,"picUrl":"https://yanxuan-item.nosdn.127.net/be3010770b6075951c7d7253a3e75b69.png"},{"itemId":3826011,"picUrl":"https://yanxuan-item.nosdn.127.net/901be61b95ed8dfc89947125cbdc603b.png"},{"itemId":3828011,"picUrl":"https://yanxuan-item.nosdn.127.net/aabbab9a31151e49c199937a3d0a0cbd.png"},{"itemId":3829113,"picUrl":"https://yanxuan-item.nosdn.127.net/0056e02c30468162c011487b1236272f.png"},{"itemId":3830010,"picUrl":"https://yanxuan-item.nosdn.127.net/aeccb8ca393435861d87e3978c158e02.png"},{"itemId":3835007,"picUrl":"https://yanxuan-item.nosdn.127.net/eea064c1198b70f1b80b86c4fc579141.png"},{"itemId":3837006,"picUrl":"https://yanxuan-item.nosdn.127.net/f66c8252524832d211e9a9c1caa5f86c.png"},{"itemId":3838014,"picUrl":"https://yanxuan-item.nosdn.127.net/d6a3ff3894437578b137ccbd6be32132.png"},{"itemId":3841036,"picUrl":"https://yanxuan-item.nosdn.127.net/588cbd22ee48928b914acbb0ba91cede.png"},{"itemId":3844039,"picUrl":"https://yanxuan-item.nosdn.127.net/acd948c07ab0ed93e5e53bb3edd55731.png"},{"itemId":3853004,"picUrl":"https://yanxuan-item.nosdn.127.net/3e24ed5f8b9d2f0599367df67a40a5f2.png"},{"itemId":3854022,"picUrl":"https://yanxuan-item.nosdn.127.net/061f5b8a5a0c03d1165deed64ca2db19.png"},{"itemId":3855009,"picUrl":"https://yanxuan-item.nosdn.127.net/0558cf6c29e030f072210755f1ad7db7.png"},{"itemId":3865005,"picUrl":"https://yanxuan-item.nosdn.127.net/074874864fcfe6b25e280ac2c45fe51e.png"},{"itemId":3876017,"picUrl":"https://yanxuan-item.nosdn.127.net/70a1f0ca1a4486284c98f3da2c7d1e36.png"},{"itemId":3876019,"picUrl":"https://yanxuan-item.nosdn.127.net/ddc1a90a6224cca5ba67c568ca8fdb49.png"},{"itemId":3876026,"picUrl":"https://yanxuan-item.nosdn.127.net/fccad0de2abbc2cea599df022ce78fa7.png"},{"itemId":3883028,"picUrl":"https://yanxuan-item.nosdn.127.net/93fcef7402e40ec6d763068ac4180b99.png"},{"itemId":3884006,"picUrl":"https://yanxuan-item.nosdn.127.net/1e1887a1524e74e41a5b3d06befa33bb.png"},{"itemId":3986043,"picUrl":"https://yanxuan-item.nosdn.127.net/ae01357ec23e170d0d0988192c964225.png"},{"itemId":3986044,"picUrl":"https://yanxuan-item.nosdn.127.net/7047b2fb3a7e6e61d3d7e050e534516e.png"},{"itemId":3986130,"picUrl":"https://yanxuan-item.nosdn.127.net/3cebf5b10d11683e59f39056582f3822.png"},{"itemId":3986569,"picUrl":"https://yanxuan-item.nosdn.127.net/a44f4c7eface3314c6e901f478474d55.png"},{"itemId":3986591,"picUrl":"https://yanxuan-item.nosdn.127.net/800ac1231416df2d77cf5da015f67473.png"},{"itemId":3986612,"picUrl":"https://yanxuan-item.nosdn.127.net/06a2aabda57f8233b872dc3aba21c783.png"},{"itemId":3986727,"picUrl":"https://yanxuan-item.nosdn.127.net/866b7cd99ac4c5c555819c5de38ed8f0.png"},{"itemId":3987388,"picUrl":"https://yanxuan-item.nosdn.127.net/c97ed9ccfdf8441a8a6f54727ea149b8.png"},{"itemId":3987554,"picUrl":"https://yanxuan-item.nosdn.127.net/c64630a92d1cb74bf24c443ae1a2acd6.png"},{"itemId":3987797,"picUrl":"https://yanxuan-item.nosdn.127.net/fb569ac82cff11d5aac9cddd163b50d5.png"}],"originSchemeUrl":"http://you.163.com/topic/v1/pub/DAZ7vL3eAdT8.html","title":"应季尖货","targetUrl":"http://you.163.com/topic/v1/pub/DAZ7vL3eAdT8.html","desc":"2月拔草清单"}},{"styleItem":{"backgroundUrl":"https://yanxuan.nosdn.127.net/42396d871da5f7636c29e5dfb33105ed.png","descColor":"7f7f7f","itemFrom":2,"picUrlList":["https://yanxuan-item.nosdn.127.net/24dd7f6f16154871f09e86766cc92a94.png","https://yanxuan-item.nosdn.127.net/3ddebc9df09f6b10b9b301d1edf2c303.png"],"titleColor":"333333","extra":{"materialContentFrom":1,"materialName":"员工精选-2.17","rcmdSort":false,"taskType":1,"itemFrom":0,"crmUserGroupName":"无分组","resourcesId":4,"materialType":"场景轻导购","crmUserGroupId":"0","materialId":"54639986","taskId":"54647179"},"itemPicBeanList":[{"itemId":1333015,"picUrl":"https://yanxuan-item.nosdn.127.net/24dd7f6f16154871f09e86766cc92a94.png"},{"itemId":3844033,"picUrl":"https://yanxuan-item.nosdn.127.net/3ddebc9df09f6b10b9b301d1edf2c303.png"}],"originSchemeUrl":"https://m.you.163.com/topic/v1/pub/MZee3MWrbs.html","title":"网易员工精选","targetUrl":"https://m.you.163.com/topic/v1/pub/MZee3MWrbs.html","desc":"停课不停学 词典笔直降70 "}}],"kingKongModule":{"norColor":"ff000000","selectedColor":"ffffffff","background":"https://yanxuan.nosdn.127.net/fe0bd37a552434cc0d27c1889ff3e1fe.png","kingKongList":[{"schemeUrl":"https://m.you.163.com/item/newItem","picUrl":"https://yanxuan.nosdn.127.net/c6fd8835a6400b7da7a016ad85506b69.png","text":"新品首发","textColor":"333333"},{"schemeUrl":"https://m.you.163.com/item/list?categoryId=1005000&style=pd","picUrl":"https://yanxuan.nosdn.127.net/fede8b110c502ec5799702d5ec824792.png","text":"居家生活","textColor":"333333"},{"schemeUrl":"https://m.you.163.com/item/list?categoryId=1010000&style=pd","picUrl":"https://yanxuan.nosdn.127.net/896a3beac514ae8f40aafe028e5fec56.png","text":"服饰鞋包","textColor":"333333"},{"schemeUrl":"https://m.you.163.com/item/list?categoryId=1005002&style=pd","picUrl":"https://yanxuan.nosdn.127.net/37520d1204a0c55474021b43dac2a69e.png","text":"美食酒水","textColor":"333333"},{"schemeUrl":"https://m.you.163.com/item/list?categoryId=1013001&style=pd","picUrl":"https://yanxuan.nosdn.127.net/6c3bd9d885c818b1f73e497335a68b47.png","text":"个护清洁","textColor":"333333"},{"schemeUrl":"https://m.you.163.com/item/list?categoryId=1011000&style=pd","picUrl":"https://yanxuan.nosdn.127.net/559d2a240ec20b096590a902217009ff.png","text":"母婴亲子","textColor":"333333"},{"schemeUrl":"https://m.you.163.com/item/list?categoryId=109243029&style=pd","picUrl":"https://yanxuan.nosdn.127.net/5c088559ebcc3f0ffcda663f04dfbeb2.png","text":"运动旅行","textColor":"333333"},{"schemeUrl":"https://m.you.163.com/item/list?categoryId=1043000&style=pd","picUrl":"https://yanxuan.nosdn.127.net/fbca8e1f2948f0c09fc7672c2c125384.png","text":"数码家电","textColor":"333333"},{"schemeUrl":"https://m.you.163.com/item/list?categoryId=1019000&style=pd","picUrl":"https://yanxuan.nosdn.127.net/f7281169d4e82d5d8d52aa1fec83fe01.png","text":"全球特色","textColor":"333333"},{"schemeUrl":"https://act.you.163.com/act/pub/OuB7EL0tpQ3Z.html","picUrl":"https://yanxuan.nosdn.127.net/12e8efd15b9b210ab156a7ee9b340548.gif","text":"好货抄底","textColor":"333333"}]},"indexActivityModule":[{"backgroundUrl":"","picUrl":"https://yanxuan-item.nosdn.127.net/f961b628a67e5a95150b962a48963b6d.png","activityPrice":"¥69","subTitle":"今日特价","originPrice":"¥99","tag":"","title":"福利社","targetUrl":"https://m.you.163.com/saleCenter/index","showPicUrl":"https://yanxuan-item.nosdn.127.net/f961b628a67e5a95150b962a48963b6d.png"},{"tag":"1元起包邮","subTitle":"","title":"新人拼团","targetUrl":"https://m.you.163.com/pin/item/list"}]};
-
-/***/ }),
-/* 26 */,
-/* 27 */,
-/* 28 */,
-/* 29 */,
-/* 30 */,
-/* 31 */,
-/* 32 */,
-/* 33 */,
-/* 34 */
-/*!**********************************************************!*\
-  !*** ./node_modules/@babel/runtime/regenerator/index.js ***!
-  \**********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(/*! regenerator-runtime */ 35);
-
-
-/***/ }),
-/* 35 */
-/*!************************************************************!*\
-  !*** ./node_modules/regenerator-runtime/runtime-module.js ***!
-  \************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-/**
- * Copyright (c) 2014-present, Facebook, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-
-// This method of obtaining a reference to the global object needs to be
-// kept identical to the way it is obtained in runtime.js
-var g = (function() {
-  return this || (typeof self === "object" && self);
-})() || Function("return this")();
-
-// Use `getOwnPropertyNames` because not all browsers support calling
-// `hasOwnProperty` on the global `self` object in a worker. See #183.
-var hadRuntime = g.regeneratorRuntime &&
-  Object.getOwnPropertyNames(g).indexOf("regeneratorRuntime") >= 0;
-
-// Save the old regeneratorRuntime in case it needs to be restored later.
-var oldRuntime = hadRuntime && g.regeneratorRuntime;
-
-// Force reevalutation of runtime.js.
-g.regeneratorRuntime = undefined;
-
-module.exports = __webpack_require__(/*! ./runtime */ 36);
-
-if (hadRuntime) {
-  // Restore the original runtime.
-  g.regeneratorRuntime = oldRuntime;
-} else {
-  // Remove the global property added by runtime.js.
-  try {
-    delete g.regeneratorRuntime;
-  } catch(e) {
-    g.regeneratorRuntime = undefined;
-  }
-}
-
-
-/***/ }),
-/* 36 */
-/*!*****************************************************!*\
-  !*** ./node_modules/regenerator-runtime/runtime.js ***!
-  \*****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-/**
- * Copyright (c) 2014-present, Facebook, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-
-!(function(global) {
-  "use strict";
-
-  var Op = Object.prototype;
-  var hasOwn = Op.hasOwnProperty;
-  var undefined; // More compressible than void 0.
-  var $Symbol = typeof Symbol === "function" ? Symbol : {};
-  var iteratorSymbol = $Symbol.iterator || "@@iterator";
-  var asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator";
-  var toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
-
-  var inModule = typeof module === "object";
-  var runtime = global.regeneratorRuntime;
-  if (runtime) {
-    if (inModule) {
-      // If regeneratorRuntime is defined globally and we're in a module,
-      // make the exports object identical to regeneratorRuntime.
-      module.exports = runtime;
-    }
-    // Don't bother evaluating the rest of this file if the runtime was
-    // already defined globally.
-    return;
-  }
-
-  // Define the runtime globally (as expected by generated code) as either
-  // module.exports (if we're in a module) or a new, empty object.
-  runtime = global.regeneratorRuntime = inModule ? module.exports : {};
-
-  function wrap(innerFn, outerFn, self, tryLocsList) {
-    // If outerFn provided and outerFn.prototype is a Generator, then outerFn.prototype instanceof Generator.
-    var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator;
-    var generator = Object.create(protoGenerator.prototype);
-    var context = new Context(tryLocsList || []);
-
-    // The ._invoke method unifies the implementations of the .next,
-    // .throw, and .return methods.
-    generator._invoke = makeInvokeMethod(innerFn, self, context);
-
-    return generator;
-  }
-  runtime.wrap = wrap;
-
-  // Try/catch helper to minimize deoptimizations. Returns a completion
-  // record like context.tryEntries[i].completion. This interface could
-  // have been (and was previously) designed to take a closure to be
-  // invoked without arguments, but in all the cases we care about we
-  // already have an existing method we want to call, so there's no need
-  // to create a new function object. We can even get away with assuming
-  // the method takes exactly one argument, since that happens to be true
-  // in every case, so we don't have to touch the arguments object. The
-  // only additional allocation required is the completion record, which
-  // has a stable shape and so hopefully should be cheap to allocate.
-  function tryCatch(fn, obj, arg) {
-    try {
-      return { type: "normal", arg: fn.call(obj, arg) };
-    } catch (err) {
-      return { type: "throw", arg: err };
-    }
-  }
-
-  var GenStateSuspendedStart = "suspendedStart";
-  var GenStateSuspendedYield = "suspendedYield";
-  var GenStateExecuting = "executing";
-  var GenStateCompleted = "completed";
-
-  // Returning this object from the innerFn has the same effect as
-  // breaking out of the dispatch switch statement.
-  var ContinueSentinel = {};
-
-  // Dummy constructor functions that we use as the .constructor and
-  // .constructor.prototype properties for functions that return Generator
-  // objects. For full spec compliance, you may wish to configure your
-  // minifier not to mangle the names of these two functions.
-  function Generator() {}
-  function GeneratorFunction() {}
-  function GeneratorFunctionPrototype() {}
-
-  // This is a polyfill for %IteratorPrototype% for environments that
-  // don't natively support it.
-  var IteratorPrototype = {};
-  IteratorPrototype[iteratorSymbol] = function () {
-    return this;
-  };
-
-  var getProto = Object.getPrototypeOf;
-  var NativeIteratorPrototype = getProto && getProto(getProto(values([])));
-  if (NativeIteratorPrototype &&
-      NativeIteratorPrototype !== Op &&
-      hasOwn.call(NativeIteratorPrototype, iteratorSymbol)) {
-    // This environment has a native %IteratorPrototype%; use it instead
-    // of the polyfill.
-    IteratorPrototype = NativeIteratorPrototype;
-  }
-
-  var Gp = GeneratorFunctionPrototype.prototype =
-    Generator.prototype = Object.create(IteratorPrototype);
-  GeneratorFunction.prototype = Gp.constructor = GeneratorFunctionPrototype;
-  GeneratorFunctionPrototype.constructor = GeneratorFunction;
-  GeneratorFunctionPrototype[toStringTagSymbol] =
-    GeneratorFunction.displayName = "GeneratorFunction";
-
-  // Helper for defining the .next, .throw, and .return methods of the
-  // Iterator interface in terms of a single ._invoke method.
-  function defineIteratorMethods(prototype) {
-    ["next", "throw", "return"].forEach(function(method) {
-      prototype[method] = function(arg) {
-        return this._invoke(method, arg);
-      };
-    });
-  }
-
-  runtime.isGeneratorFunction = function(genFun) {
-    var ctor = typeof genFun === "function" && genFun.constructor;
-    return ctor
-      ? ctor === GeneratorFunction ||
-        // For the native GeneratorFunction constructor, the best we can
-        // do is to check its .name property.
-        (ctor.displayName || ctor.name) === "GeneratorFunction"
-      : false;
-  };
-
-  runtime.mark = function(genFun) {
-    if (Object.setPrototypeOf) {
-      Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
-    } else {
-      genFun.__proto__ = GeneratorFunctionPrototype;
-      if (!(toStringTagSymbol in genFun)) {
-        genFun[toStringTagSymbol] = "GeneratorFunction";
-      }
-    }
-    genFun.prototype = Object.create(Gp);
-    return genFun;
-  };
-
-  // Within the body of any async function, `await x` is transformed to
-  // `yield regeneratorRuntime.awrap(x)`, so that the runtime can test
-  // `hasOwn.call(value, "__await")` to determine if the yielded value is
-  // meant to be awaited.
-  runtime.awrap = function(arg) {
-    return { __await: arg };
-  };
-
-  function AsyncIterator(generator) {
-    function invoke(method, arg, resolve, reject) {
-      var record = tryCatch(generator[method], generator, arg);
-      if (record.type === "throw") {
-        reject(record.arg);
-      } else {
-        var result = record.arg;
-        var value = result.value;
-        if (value &&
-            typeof value === "object" &&
-            hasOwn.call(value, "__await")) {
-          return Promise.resolve(value.__await).then(function(value) {
-            invoke("next", value, resolve, reject);
-          }, function(err) {
-            invoke("throw", err, resolve, reject);
-          });
-        }
-
-        return Promise.resolve(value).then(function(unwrapped) {
-          // When a yielded Promise is resolved, its final value becomes
-          // the .value of the Promise<{value,done}> result for the
-          // current iteration.
-          result.value = unwrapped;
-          resolve(result);
-        }, function(error) {
-          // If a rejected Promise was yielded, throw the rejection back
-          // into the async generator function so it can be handled there.
-          return invoke("throw", error, resolve, reject);
-        });
-      }
-    }
-
-    var previousPromise;
-
-    function enqueue(method, arg) {
-      function callInvokeWithMethodAndArg() {
-        return new Promise(function(resolve, reject) {
-          invoke(method, arg, resolve, reject);
-        });
-      }
-
-      return previousPromise =
-        // If enqueue has been called before, then we want to wait until
-        // all previous Promises have been resolved before calling invoke,
-        // so that results are always delivered in the correct order. If
-        // enqueue has not been called before, then it is important to
-        // call invoke immediately, without waiting on a callback to fire,
-        // so that the async generator function has the opportunity to do
-        // any necessary setup in a predictable way. This predictability
-        // is why the Promise constructor synchronously invokes its
-        // executor callback, and why async functions synchronously
-        // execute code before the first await. Since we implement simple
-        // async functions in terms of async generators, it is especially
-        // important to get this right, even though it requires care.
-        previousPromise ? previousPromise.then(
-          callInvokeWithMethodAndArg,
-          // Avoid propagating failures to Promises returned by later
-          // invocations of the iterator.
-          callInvokeWithMethodAndArg
-        ) : callInvokeWithMethodAndArg();
-    }
-
-    // Define the unified helper method that is used to implement .next,
-    // .throw, and .return (see defineIteratorMethods).
-    this._invoke = enqueue;
-  }
-
-  defineIteratorMethods(AsyncIterator.prototype);
-  AsyncIterator.prototype[asyncIteratorSymbol] = function () {
-    return this;
-  };
-  runtime.AsyncIterator = AsyncIterator;
-
-  // Note that simple async functions are implemented on top of
-  // AsyncIterator objects; they just return a Promise for the value of
-  // the final result produced by the iterator.
-  runtime.async = function(innerFn, outerFn, self, tryLocsList) {
-    var iter = new AsyncIterator(
-      wrap(innerFn, outerFn, self, tryLocsList)
-    );
-
-    return runtime.isGeneratorFunction(outerFn)
-      ? iter // If outerFn is a generator, return the full iterator.
-      : iter.next().then(function(result) {
-          return result.done ? result.value : iter.next();
-        });
-  };
-
-  function makeInvokeMethod(innerFn, self, context) {
-    var state = GenStateSuspendedStart;
-
-    return function invoke(method, arg) {
-      if (state === GenStateExecuting) {
-        throw new Error("Generator is already running");
-      }
-
-      if (state === GenStateCompleted) {
-        if (method === "throw") {
-          throw arg;
-        }
-
-        // Be forgiving, per 25.3.3.3.3 of the spec:
-        // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-generatorresume
-        return doneResult();
-      }
-
-      context.method = method;
-      context.arg = arg;
-
-      while (true) {
-        var delegate = context.delegate;
-        if (delegate) {
-          var delegateResult = maybeInvokeDelegate(delegate, context);
-          if (delegateResult) {
-            if (delegateResult === ContinueSentinel) continue;
-            return delegateResult;
-          }
-        }
-
-        if (context.method === "next") {
-          // Setting context._sent for legacy support of Babel's
-          // function.sent implementation.
-          context.sent = context._sent = context.arg;
-
-        } else if (context.method === "throw") {
-          if (state === GenStateSuspendedStart) {
-            state = GenStateCompleted;
-            throw context.arg;
-          }
-
-          context.dispatchException(context.arg);
-
-        } else if (context.method === "return") {
-          context.abrupt("return", context.arg);
-        }
-
-        state = GenStateExecuting;
-
-        var record = tryCatch(innerFn, self, context);
-        if (record.type === "normal") {
-          // If an exception is thrown from innerFn, we leave state ===
-          // GenStateExecuting and loop back for another invocation.
-          state = context.done
-            ? GenStateCompleted
-            : GenStateSuspendedYield;
-
-          if (record.arg === ContinueSentinel) {
-            continue;
-          }
-
-          return {
-            value: record.arg,
-            done: context.done
-          };
-
-        } else if (record.type === "throw") {
-          state = GenStateCompleted;
-          // Dispatch the exception by looping back around to the
-          // context.dispatchException(context.arg) call above.
-          context.method = "throw";
-          context.arg = record.arg;
-        }
-      }
-    };
-  }
-
-  // Call delegate.iterator[context.method](context.arg) and handle the
-  // result, either by returning a { value, done } result from the
-  // delegate iterator, or by modifying context.method and context.arg,
-  // setting context.delegate to null, and returning the ContinueSentinel.
-  function maybeInvokeDelegate(delegate, context) {
-    var method = delegate.iterator[context.method];
-    if (method === undefined) {
-      // A .throw or .return when the delegate iterator has no .throw
-      // method always terminates the yield* loop.
-      context.delegate = null;
-
-      if (context.method === "throw") {
-        if (delegate.iterator.return) {
-          // If the delegate iterator has a return method, give it a
-          // chance to clean up.
-          context.method = "return";
-          context.arg = undefined;
-          maybeInvokeDelegate(delegate, context);
-
-          if (context.method === "throw") {
-            // If maybeInvokeDelegate(context) changed context.method from
-            // "return" to "throw", let that override the TypeError below.
-            return ContinueSentinel;
-          }
-        }
-
-        context.method = "throw";
-        context.arg = new TypeError(
-          "The iterator does not provide a 'throw' method");
-      }
-
-      return ContinueSentinel;
-    }
-
-    var record = tryCatch(method, delegate.iterator, context.arg);
-
-    if (record.type === "throw") {
-      context.method = "throw";
-      context.arg = record.arg;
-      context.delegate = null;
-      return ContinueSentinel;
-    }
-
-    var info = record.arg;
-
-    if (! info) {
-      context.method = "throw";
-      context.arg = new TypeError("iterator result is not an object");
-      context.delegate = null;
-      return ContinueSentinel;
-    }
-
-    if (info.done) {
-      // Assign the result of the finished delegate to the temporary
-      // variable specified by delegate.resultName (see delegateYield).
-      context[delegate.resultName] = info.value;
-
-      // Resume execution at the desired location (see delegateYield).
-      context.next = delegate.nextLoc;
-
-      // If context.method was "throw" but the delegate handled the
-      // exception, let the outer generator proceed normally. If
-      // context.method was "next", forget context.arg since it has been
-      // "consumed" by the delegate iterator. If context.method was
-      // "return", allow the original .return call to continue in the
-      // outer generator.
-      if (context.method !== "return") {
-        context.method = "next";
-        context.arg = undefined;
-      }
-
-    } else {
-      // Re-yield the result returned by the delegate method.
-      return info;
-    }
-
-    // The delegate iterator is finished, so forget it and continue with
-    // the outer generator.
-    context.delegate = null;
-    return ContinueSentinel;
-  }
-
-  // Define Generator.prototype.{next,throw,return} in terms of the
-  // unified ._invoke helper method.
-  defineIteratorMethods(Gp);
-
-  Gp[toStringTagSymbol] = "Generator";
-
-  // A Generator should always return itself as the iterator object when the
-  // @@iterator function is called on it. Some browsers' implementations of the
-  // iterator prototype chain incorrectly implement this, causing the Generator
-  // object to not be returned from this call. This ensures that doesn't happen.
-  // See https://github.com/facebook/regenerator/issues/274 for more details.
-  Gp[iteratorSymbol] = function() {
-    return this;
-  };
-
-  Gp.toString = function() {
-    return "[object Generator]";
-  };
-
-  function pushTryEntry(locs) {
-    var entry = { tryLoc: locs[0] };
-
-    if (1 in locs) {
-      entry.catchLoc = locs[1];
-    }
-
-    if (2 in locs) {
-      entry.finallyLoc = locs[2];
-      entry.afterLoc = locs[3];
-    }
-
-    this.tryEntries.push(entry);
-  }
-
-  function resetTryEntry(entry) {
-    var record = entry.completion || {};
-    record.type = "normal";
-    delete record.arg;
-    entry.completion = record;
-  }
-
-  function Context(tryLocsList) {
-    // The root entry object (effectively a try statement without a catch
-    // or a finally block) gives us a place to store values thrown from
-    // locations where there is no enclosing try statement.
-    this.tryEntries = [{ tryLoc: "root" }];
-    tryLocsList.forEach(pushTryEntry, this);
-    this.reset(true);
-  }
-
-  runtime.keys = function(object) {
-    var keys = [];
-    for (var key in object) {
-      keys.push(key);
-    }
-    keys.reverse();
-
-    // Rather than returning an object with a next method, we keep
-    // things simple and return the next function itself.
-    return function next() {
-      while (keys.length) {
-        var key = keys.pop();
-        if (key in object) {
-          next.value = key;
-          next.done = false;
-          return next;
-        }
-      }
-
-      // To avoid creating an additional object, we just hang the .value
-      // and .done properties off the next function object itself. This
-      // also ensures that the minifier will not anonymize the function.
-      next.done = true;
-      return next;
-    };
-  };
-
-  function values(iterable) {
-    if (iterable) {
-      var iteratorMethod = iterable[iteratorSymbol];
-      if (iteratorMethod) {
-        return iteratorMethod.call(iterable);
-      }
-
-      if (typeof iterable.next === "function") {
-        return iterable;
-      }
-
-      if (!isNaN(iterable.length)) {
-        var i = -1, next = function next() {
-          while (++i < iterable.length) {
-            if (hasOwn.call(iterable, i)) {
-              next.value = iterable[i];
-              next.done = false;
-              return next;
-            }
-          }
-
-          next.value = undefined;
-          next.done = true;
-
-          return next;
-        };
-
-        return next.next = next;
-      }
-    }
-
-    // Return an iterator with no values.
-    return { next: doneResult };
-  }
-  runtime.values = values;
-
-  function doneResult() {
-    return { value: undefined, done: true };
-  }
-
-  Context.prototype = {
-    constructor: Context,
-
-    reset: function(skipTempReset) {
-      this.prev = 0;
-      this.next = 0;
-      // Resetting context._sent for legacy support of Babel's
-      // function.sent implementation.
-      this.sent = this._sent = undefined;
-      this.done = false;
-      this.delegate = null;
-
-      this.method = "next";
-      this.arg = undefined;
-
-      this.tryEntries.forEach(resetTryEntry);
-
-      if (!skipTempReset) {
-        for (var name in this) {
-          // Not sure about the optimal order of these conditions:
-          if (name.charAt(0) === "t" &&
-              hasOwn.call(this, name) &&
-              !isNaN(+name.slice(1))) {
-            this[name] = undefined;
-          }
-        }
-      }
-    },
-
-    stop: function() {
-      this.done = true;
-
-      var rootEntry = this.tryEntries[0];
-      var rootRecord = rootEntry.completion;
-      if (rootRecord.type === "throw") {
-        throw rootRecord.arg;
-      }
-
-      return this.rval;
-    },
-
-    dispatchException: function(exception) {
-      if (this.done) {
-        throw exception;
-      }
-
-      var context = this;
-      function handle(loc, caught) {
-        record.type = "throw";
-        record.arg = exception;
-        context.next = loc;
-
-        if (caught) {
-          // If the dispatched exception was caught by a catch block,
-          // then let that catch block handle the exception normally.
-          context.method = "next";
-          context.arg = undefined;
-        }
-
-        return !! caught;
-      }
-
-      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
-        var entry = this.tryEntries[i];
-        var record = entry.completion;
-
-        if (entry.tryLoc === "root") {
-          // Exception thrown outside of any try block that could handle
-          // it, so set the completion value of the entire function to
-          // throw the exception.
-          return handle("end");
-        }
-
-        if (entry.tryLoc <= this.prev) {
-          var hasCatch = hasOwn.call(entry, "catchLoc");
-          var hasFinally = hasOwn.call(entry, "finallyLoc");
-
-          if (hasCatch && hasFinally) {
-            if (this.prev < entry.catchLoc) {
-              return handle(entry.catchLoc, true);
-            } else if (this.prev < entry.finallyLoc) {
-              return handle(entry.finallyLoc);
-            }
-
-          } else if (hasCatch) {
-            if (this.prev < entry.catchLoc) {
-              return handle(entry.catchLoc, true);
-            }
-
-          } else if (hasFinally) {
-            if (this.prev < entry.finallyLoc) {
-              return handle(entry.finallyLoc);
-            }
-
-          } else {
-            throw new Error("try statement without catch or finally");
-          }
-        }
-      }
-    },
-
-    abrupt: function(type, arg) {
-      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
-        var entry = this.tryEntries[i];
-        if (entry.tryLoc <= this.prev &&
-            hasOwn.call(entry, "finallyLoc") &&
-            this.prev < entry.finallyLoc) {
-          var finallyEntry = entry;
-          break;
-        }
-      }
-
-      if (finallyEntry &&
-          (type === "break" ||
-           type === "continue") &&
-          finallyEntry.tryLoc <= arg &&
-          arg <= finallyEntry.finallyLoc) {
-        // Ignore the finally entry if control is not jumping to a
-        // location outside the try/catch block.
-        finallyEntry = null;
-      }
-
-      var record = finallyEntry ? finallyEntry.completion : {};
-      record.type = type;
-      record.arg = arg;
-
-      if (finallyEntry) {
-        this.method = "next";
-        this.next = finallyEntry.finallyLoc;
-        return ContinueSentinel;
-      }
-
-      return this.complete(record);
-    },
-
-    complete: function(record, afterLoc) {
-      if (record.type === "throw") {
-        throw record.arg;
-      }
-
-      if (record.type === "break" ||
-          record.type === "continue") {
-        this.next = record.arg;
-      } else if (record.type === "return") {
-        this.rval = this.arg = record.arg;
-        this.method = "return";
-        this.next = "end";
-      } else if (record.type === "normal" && afterLoc) {
-        this.next = afterLoc;
-      }
-
-      return ContinueSentinel;
-    },
-
-    finish: function(finallyLoc) {
-      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
-        var entry = this.tryEntries[i];
-        if (entry.finallyLoc === finallyLoc) {
-          this.complete(entry.completion, entry.afterLoc);
-          resetTryEntry(entry);
-          return ContinueSentinel;
-        }
-      }
-    },
-
-    "catch": function(tryLoc) {
-      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
-        var entry = this.tryEntries[i];
-        if (entry.tryLoc === tryLoc) {
-          var record = entry.completion;
-          if (record.type === "throw") {
-            var thrown = record.arg;
-            resetTryEntry(entry);
-          }
-          return thrown;
-        }
-      }
-
-      // The context.catch method must only be called with a location
-      // argument that corresponds to a known catch block.
-      throw new Error("illegal catch attempt");
-    },
-
-    delegateYield: function(iterable, resultName, nextLoc) {
-      this.delegate = {
-        iterator: values(iterable),
-        resultName: resultName,
-        nextLoc: nextLoc
-      };
-
-      if (this.method === "next") {
-        // Deliberately forget the last sent value so that we don't
-        // accidentally pass it on to the delegate.
-        this.arg = undefined;
-      }
-
-      return ContinueSentinel;
-    }
-  };
-})(
-  // In sloppy mode, unbound `this` refers to the global object, fallback to
-  // Function constructor if we're in global strict mode. That is sadly a form
-  // of indirect eval which violates Content Security Policy.
-  (function() {
-    return this || (typeof self === "object" && self);
-  })() || Function("return this")()
-);
-
-
 /***/ })
-]]);
+
+}]);
 //# sourceMappingURL=../../.sourcemap/mp-weixin/common/vendor.js.map

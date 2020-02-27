@@ -15,7 +15,7 @@
 			</view>
 			<view class="tab-box">
 				<view class="scroll-box">
-					<scroll-view class="scroll-view" scroll-x="true">
+					<scroll-view class="scroll-view_H" scroll-x="true">
 						<view class="scroll-view-item"
 							@click="activeName('推荐')"
 							:class="{active:activeIndex=='推荐'?true:false}"
@@ -166,26 +166,9 @@
 			toggleActive(){
 				this.toggleIsActive = !this.toggleIsActive
 			},
-			/**
-			 * 请求静态数据只是为了代码不那么乱
-			 * 分次请求未作整合
-			 */
-			
-			//轮播图切换修改背景色
-			/*swiperChange(e) {
-				const index = e.detail.current;
-				this.swiperCurrent = index;
-				this.titleNViewBackground = this.carouselList[index].background;
-			},*/
-			
-			//详情页
-			/*navToDetailPage(item) {
-				//测试数据没有写id，用title代替
-				let id = item.title;
-				uni.navigateTo({
-					url: `/pages/product/product?id=${id}`
-				})
-			},*/
+			scroll:function(e){
+				console.log(e)
+			}
 		}
 	}
 </script>
@@ -259,14 +242,12 @@
 			.scroll-box{
 				width: 650upx;
 				height: 60upx;
-				// overflow: hidden;
-				.scroll-view{
-					background-color: #567;
+				.scroll-view_H{
 					height: 60upx;
-					width: 1460upx;
 					padding: 0 30upx;
 					display: flex;
 					flex-wrap: nowrap;
+					white-space: nowrap;
 					.scroll-view-item{
 						display: inline-block;
 						line-height: 60upx;
@@ -316,6 +297,7 @@
 					z-index: 9;
 					&.active{
 						transform: rotate(180deg);
+						transition: transform 0.5s;
 					}
 					.icon{
 						width: 30upx;

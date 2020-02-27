@@ -85,18 +85,17 @@
       width: 650rpx;
       height: 60rpx;
 }
-.mp-header-box .tab-box .scroll-box .scroll-view {
-        background-color: #567;
+.mp-header-box .tab-box .scroll-box .scroll-view_H {
         height: 60rpx;
-        width: 1460rpx;
         padding: 0 30rpx;
         display: -webkit-box;
         display: -webkit-flex;
         display: flex;
         -webkit-flex-wrap: nowrap;
                 flex-wrap: nowrap;
+        white-space: nowrap;
 }
-.mp-header-box .tab-box .scroll-box .scroll-view .scroll-view-item {
+.mp-header-box .tab-box .scroll-box .scroll-view_H .scroll-view-item {
           display: inline-block;
           line-height: 60rpx;
           padding: 0 16rpx;
@@ -105,13 +104,13 @@
           margin-left: 20rpx;
           position: relative;
 }
-.mp-header-box .tab-box .scroll-box .scroll-view .scroll-view-item:first-child {
+.mp-header-box .tab-box .scroll-box .scroll-view_H .scroll-view-item:first-child {
             margin-left: 0;
 }
-.mp-header-box .tab-box .scroll-box .scroll-view .scroll-view-item.active {
+.mp-header-box .tab-box .scroll-box .scroll-view_H .scroll-view-item.active {
             color: #dd1a21;
 }
-.mp-header-box .tab-box .scroll-box .scroll-view .scroll-view-item.active::after {
+.mp-header-box .tab-box .scroll-box .scroll-view_H .scroll-view-item.active::after {
               display: block;
               content: '';
               width: 100%;
@@ -149,6 +148,10 @@
 .mp-header-box .tab-box .toggleWrap .toggle.active {
           -webkit-transform: rotate(180deg);
                   transform: rotate(180deg);
+          -webkit-transition: -webkit-transform 0.5s;
+          transition: -webkit-transform 0.5s;
+          transition: transform 0.5s;
+          transition: transform 0.5s, -webkit-transform 0.5s;
 }
 .mp-header-box .tab-box .toggleWrap .toggle .icon {
           width: 30rpx;

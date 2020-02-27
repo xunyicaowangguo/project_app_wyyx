@@ -411,7 +411,7 @@ var _index = _interopRequireDefault(__webpack_require__(/*! ../../common/datas/i
 //
 var _default = { data: function data() {return { indexSwiperData: [], indexDate: {}, activeIndex: '推荐', toggleIsActive: false };}, mounted: function mounted() {this.indexSwiperData = _indexCateModule.default;this.indexDate = _index.default;}, methods: { //头部滚动条
     activeName: function activeName(index) {this.activeIndex = index;}, //点击三角切换
-    toggleActive: function toggleActive() {this.toggleIsActive = !this.toggleIsActive;} } };exports.default = _default;
+    toggleActive: function toggleActive() {this.toggleIsActive = !this.toggleIsActive;}, scroll: function scroll(e) {console.log(e);} } };exports.default = _default;
 
 /***/ }),
 
