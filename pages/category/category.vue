@@ -90,7 +90,6 @@
 	}
 	
 	.right-aside{
-		background-color: #4399FC;
 		width: 588upx;
 		height: 1110upx;
 		flex-shrink: 0;

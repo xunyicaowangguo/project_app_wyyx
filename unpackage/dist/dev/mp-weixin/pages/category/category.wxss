@@ -54,7 +54,6 @@ page,
       opacity: .8;
 }
 .right-aside {
-  background-color: #4399FC;
   width: 588rpx;
   height: 1110rpx;
   -webkit-flex-shrink: 0;

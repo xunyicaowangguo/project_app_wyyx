@@ -123,25 +123,54 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 var _cateLists = _interopRequireDefault(__webpack_require__(/*! ../../common/datas/cateLists.json */ 156));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} //
 //
 //
 //
 //
 //
-var _default = { props: ["currentId"], data: function data() {return { cateLists: [], cateList: {} };
-
-  },
-  mounted: function mounted() {var _this = this;
-    console.log(this.$props);
-    this.cateList = _cateLists.default.find(function (item) {return item.id == _this.$props.currentId;});
-    // console.log(this.cateList)
-  },
-  watch: {
-    currentId: function currentId(val, oldVal) {
-      console.log(val, oldVal);
-      this.cateList = _cateLists.default.find(function (item) {return item.id == val;});
-      // console.log(this.cateList)
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+var _default = { props: ["currentId"], data: function data() {return { cateLists: [], cateList: {} };}, mounted: function mounted() {var _this = this;console.log(this.$props);this.cateList = _cateLists.default.find(function (item) {return item.id == _this.$props.currentId;}); // console.log(this.cateList)
+  }, watch: { currentId: function currentId(val, oldVal) {console.log(val, oldVal);this.cateList = _cateLists.default.find(function (item) {return item.id == val;}); // console.log(this.cateList)
     } } };exports.default = _default;
 
 /***/ }),
